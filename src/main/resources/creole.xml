@@ -1,0 +1,123 @@
+<CREOLE-DIRECTORY>
+	<CREOLE>
+		<!--
+
+
+		ANC Document
+
+		A language resource that loads an ANC/XCES document with standoff markup into GATE as a single 
+		document in one step.  The XCES Document will appear in the "New Language Resource" menu in Gate.
+		-->
+		<RESOURCE>
+			<NAME>ANC Document</NAME>
+			<JAR>ANC.jar</JAR>
+			<CLASS>org.anc.gate.ANCDocument</CLASS>
+			<COMMENT>ANC transient document</COMMENT>
+			<OR>
+				<PARAMETER NAME="sourceUrl" SUFFIXES="xces;anc" COMMENT="Source URL of the document header">java.net.URL</PARAMETER>
+				<PARAMETER NAME="stringContent" COMMENT="The content of the document">java.lang.String</PARAMETER>
+			</OR>
+			<PARAMETER COMMENT="Should the document read the original markup"
+				NAME="markupAware" DEFAULT="true">java.lang.Boolean</PARAMETER>
+			<PARAMETER NAME="encoding" OPTIONAL="true" COMMENT="Encoding" DEFAULT="">java.lang.String</PARAMETER>
+			<PARAMETER NAME="sourceUrlStartOffset"
+				COMMENT="Start offset for documents based on ranges" OPTIONAL="true">java.lang.Long</PARAMETER>
+			<PARAMETER NAME="sourceUrlEndOffset"
+				COMMENT="End offset for documents based on ranges" OPTIONAL="true">java.lang.Long</PARAMETER>
+			<PARAMETER NAME="preserveOriginalContent"
+				COMMENT="Should the document preserve the original content" DEFAULT="false">java.lang.Boolean</PARAMETER>
+			<PARAMETER NAME="collectRepositioningInfo"
+				COMMENT="Should the document collect repositioning information" DEFAULT="false">java.lang.Boolean</PARAMETER>
+			<PARAMETER NAME="loadStandoff"
+				COMMENT="Should standoff annotations be loaded" DEFAULT="true"
+				OPTIONAL="true" RUNTIME="false">java.lang.Boolean</PARAMETER>
+			<PARAMETER NAME="standoffASName"
+				COMMENT="Annotation set to add standoff tags to"
+				DEFAULT="Standoff markups" RUNTIME="false" OPTIONAL="true">java.lang.String</PARAMETER>
+			<PARAMETER NAME="standoffAnnotations" OPTIONAL="true" COMMENT="Standoff annotations to add">java.util.List</PARAMETER>
+			<ICON>lr.gif</ICON>
+		</RESOURCE>
+		<RESOURCE>
+			<NAME>XCES Document Format</NAME>
+			<CLASS>org.anc.gate.XCESDocumentFormat</CLASS>
+			<AUTOINSTANCE/>
+			<PRIVATE/>
+		</RESOURCE>
+		<!-- 
+		
+		
+		ANC Load Standoff
+		
+		Loads annotations from a standoff file (cesAna) and adds them to an open document.
+		-->
+		<RESOURCE>
+			<NAME>ANC Load Standoff</NAME>
+			<JAR>ANC.jar</JAR>
+			<CLASS>org.anc.creole.LoadStandoff</CLASS>
+			<COMMENT>Add standoff annotations to an open document</COMMENT>
+			<PARAMETER NAME="document" COMMENT="Document to be processed"
+				RUNTIME="true" REQUIRED="true">gate.Document</PARAMETER>
+			<PARAMETER NAME="sourceUrl"
+				COMMENT="Location of the cesAna document containing standoff annotations"
+				RUNTIME="true" REQUIRED="true">java.net.URL</PARAMETER>
+			<PARAMETER NAME="standoffASName"
+				COMMENT="Annotation set to add standoff tags to" RUNTIME="true"
+				DEFAULT="Standoff markups" OPTIONAL="true">java.lang.String</PARAMETER>
+		</RESOURCE>
+		<!--
+		
+		
+		ANC Save Content
+		
+		Saves a documents content to a text file.
+		-->
+		<RESOURCE>
+			<NAME>ANC Save Content</NAME>
+			<CLASS>org.anc.creole.SaveContent</CLASS>
+			<COMMENT>Save the textual content of a document to a text file</COMMENT>
+			<JAR>ANC.jar</JAR>
+			<PARAMETER NAME="document"
+				COMMENT="The document to save"
+				REQUIRED="true"
+				RUNTIME="true">gate.Document</PARAMETER>
+			<PARAMETER   NAME="destination"
+			           COMMENT="The file to be written"
+			           RUNTIME="true">java.net.URL</PARAMETER>
+			<PARAMETER   NAME="encoding"
+			           COMMENT="Character encoding for the file"
+			           RUNTIME="true"
+			           OPTIONAL="true"
+			           DEFAULT="UTF-8">java.lang.String</PARAMETER>
+		</RESOURCE>		
+		<!-- 
+		
+		ANC Save Standoff Markup
+		-->
+		<RESOURCE>
+			<NAME>ANC Save Standoff</NAME>
+			<CLASS>org.anc.creole.SaveStandoff</CLASS>
+			<COMMENT>Saves annotations to a standoff file</COMMENT>
+			<JAR>ANC.jar</JAR>
+			<PARAMETER NAME="document" COMMENT="Document to save"
+				REQUIRED="true" RUNTIME="true">gate.Document</PARAMETER>
+			<PARAMETER NAME="destination" COMMENT="Location to write the file"
+				REQUIRED="true" RUNTIME="true">java.net.URL</PARAMETER>
+			<PARAMETER NAME="inputASName"
+				COMMENT="Set containing annotations to save" RUNTIME="true"
+				OPTIONAL="true" DEFAULT="Standoff markups">java.lang.String</PARAMETER>
+			<PARAMETER NAME="standoffTags" OPTIONAL="true"
+				COMMENT="List of annoations types to be saved" RUNTIME="true">java.util.List</PARAMETER>
+			<PARAMETER NAME="encoding"
+				COMMENT="Character encoding to use when writing the file"
+				RUNTIME="true" OPTIONAL="true" DEFAULT="UTF-8">java.lang.String</PARAMETER>
+			<PARAMETER NAME="namespace"
+				COMMENT="Namespace to use for the document" RUNTIME="true"
+				OPTIONAL="true" DEFAULT="http://www.xces.org/schema/2003">java.lang.String</PARAMETER>
+			<PARAMETER NAME="version" RUNTIME="true" DEFAULT="1.0"
+				OPTIONAL="true" COMMENT="Version number assigned to the document">java.lang.String</PARAMETER>
+			<PARAMETER NAME="schemaLocation"
+				COMMENT="Location of the schema for the namespace"
+				RUNTIME="true" OPTIONAL="true">java.lang.String</PARAMETER>
+		</RESOURCE>
+	</CREOLE>
+</CREOLE-DIRECTORY>
