@@ -15,7 +15,7 @@
  * 
  */
 
-package ANC.gate;
+package org.anc.gate;
 
 import gate.*;
 import gate.creole.ExecutionException;

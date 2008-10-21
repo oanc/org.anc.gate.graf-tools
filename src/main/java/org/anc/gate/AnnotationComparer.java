@@ -15,7 +15,7 @@
  * 
  */
 
-package ANC.gate;
+package org.anc.gate;
 
 import java.util.Comparator;
 
@@ -30,7 +30,6 @@ import gate.Annotation;
 class EndComparer implements Comparator<Annotation>
 {
 
-   @Override
    public int compare(Annotation left, Annotation right)
    {
       long loffset = left.getEndNode().getOffset().longValue();

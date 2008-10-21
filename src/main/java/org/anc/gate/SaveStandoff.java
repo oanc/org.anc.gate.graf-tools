@@ -15,7 +15,7 @@
  * 
  */
 
-package ANC.gate;
+package org.anc.gate;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -168,7 +168,7 @@ public class SaveStandoff extends ANCLanguageAnalyzer
 
 	  // Sort the sentences by offset so they are added in order.
 	  
-	  Comparator<Annotation> comp = ANC.gate.AnnotationComparer.createStartComparator();
+	  Comparator<Annotation> comp = org.anc.gate.AnnotationComparer.createStartComparator();
 	  ArrayList<Annotation> sortedAnnotations = new ArrayList<Annotation>(annotations);
 	  Collections.sort(sortedAnnotations, comp);
 	  Iterator<Annotation> it = sortedAnnotations.iterator();

@@ -15,7 +15,7 @@
  * 
  */
 
-package ANC.gate;
+package org.anc.gate;
 
 import java.io.*;
 import java.util.*;
@@ -29,7 +29,7 @@ import java.net.*;
 //import ANC.creole.ANCLanguageAnalyser;
 
 /**  */
-public class SaveContent extends ANC.gate.ANCLanguageAnalyzer
+public class SaveContent extends org.anc.gate.ANCLanguageAnalyzer
 {
 	// Parameters passed by Gate.
 	public static final String DESTINATION_PARAMETER_NAME = "destination";

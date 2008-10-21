@@ -2,7 +2,14 @@
   <id>jar-with-common</id>
   <formats>
     <format>jar</format>
+    <format>zip</format>
   </formats>
+  <files>
+  	<file>
+	  	<outputDirectory></outputDirectory>
+  		<source>${basedir}/src/main/resources/creole.xml</source>
+  	</file>
+  </files>
   <includeBaseDirectory>false</includeBaseDirectory>
   <dependencySets>
     <dependencySet>
