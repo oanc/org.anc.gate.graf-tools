@@ -1,0 +1,30 @@
+<assembly>
+	<id>dist</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<fileSets>
+		<fileSet>
+			<includes>
+				<include>README*</include>
+				<include>LICENSE*</include>
+				<include>NOTICE*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>target</directory>
+			<outputDirectory></outputDirectory>
+			<includes>
+				<include>ANC-GATE.jar</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>src/main/resources</directory>
+			<outputDirectory></outputDirectory>
+			<includes>
+				<include>creole.xml</include>
+				<include>LICENSE.txt</include>
+			</includes>
+		</fileSet>
+	</fileSets>
+</assembly>
