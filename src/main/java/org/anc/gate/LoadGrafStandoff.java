@@ -21,15 +21,11 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-//import org.xces.graf.io.*;
-//import org.xces.graf.api.*;
-//import org.xces.graf.impl.*;
-
 import gate.*;
 import gate.creole.ResourceInstantiationException;
 import org.xml.sax.*;
 
-import ANC.util.*;
+import org.anc.util.*;
 import gate.creole.ExecutionException;
 import gate.util.InvalidOffsetException;
 

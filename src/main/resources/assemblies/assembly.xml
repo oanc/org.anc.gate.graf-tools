@@ -1,8 +1,7 @@
 <assembly>
-  <id>jar-with-common</id>
+  <id>GATE</id>
   <formats>
     <format>jar</format>
-    <format>zip</format>
   </formats>
   <files>
   	<file>
@@ -18,7 +17,7 @@
       <unpack>true</unpack>
       <scope>runtime</scope>
       <includes>
-      	<include>ANC:common</include>
+      	<include>org.anc:common</include>
       	<include>org.xces:xces-parser</include>
       </includes>
     </dependencySet>
