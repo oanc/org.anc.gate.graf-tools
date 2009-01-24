@@ -23,6 +23,11 @@ import java.util.*;
 
 import gate.*;
 import gate.creole.ResourceInstantiationException;
+
+import org.xces.graf.api.*;
+import org.xces.graf.impl.CharacterAnchor;
+import org.xces.graf.io.*;
+import org.xces.graf.util.IFunction;
 import org.xml.sax.*;
 
 import org.anc.util.*;
@@ -34,29 +39,22 @@ import gate.util.InvalidOffsetException;
  * @author Keith Suderman
  * @version 1.0
  */
-public class LoadGrafStandoff extends LoadStandoff
+public class LoadGrafStandoff extends ANCLanguageAnalyzer
 {
-   /*
-	public static final String TYPES_PARAMETER = "types";
-//   public static final String LABEL_PARAMETER = "labelType";
+	public static final String STANDOFFASNAME_PARAMETER = "standoffASName";
+	public static final String SOURCE_URL_PARAMETER = "sourceUrl";
 
-//   protected String labelType;
-	protected List<String> types;
-//   protected Set<String> typeSet = new HashSet<String>();
+	protected String standoffASName = null;
+	protected URL sourceUrl = null;
 
 	protected GraphParser parser;
 	protected AnnotationSet annotations;
+	protected GetRangeFunction getRangeFn = new GetRangeFunction();
 
 	public LoadGrafStandoff()
 	{
 		super();
 	}
-
-//   public void setLabelType(String label) { this.labelType = label; }
-	public void setTypes(List<String> types) { this.types = types; }
-
-//   public String getLabelType() { return labelType; }
-	public List<String> getTypes() { return types; }
 
 	public Resource init() throws ResourceInstantiationException
 	{
@@ -75,13 +73,13 @@ public class LoadGrafStandoff extends LoadStandoff
 	public void execute() throws ExecutionException
 	{
 		annotations = getAnnotations(standoffASName);
-		URL url = this.getSourceUrl();
-		File file = new File(url.getPath());
+//		URL url = this.getSourceUrl();
+		File file = new File(sourceUrl.getPath());
 		IGraph graph = null;
 		try
 		{
 			graph = parser.parse(file);
-			graph.sort();
+//			graph.sort();
 			for (INode node : graph.nodes())
 			{
 //         String type = node.getFeature("ptb", "label")
@@ -90,39 +88,76 @@ public class LoadGrafStandoff extends LoadStandoff
 		}
 		catch (Exception ex)
 		{
+			System.out.println(ex.getMessage());
 			throw new ExecutionException(ex);
 		}
 		System.out.println("Execution complete.");
 	}
 
+	public String getStandoffASName() { return standoffASName; }
+	public void setStandoffASName(String name) { standoffASName = name; }
+
+	public URL getSourceUrl() { return sourceUrl; }
+	public void setSourceUrl(URL url) { sourceUrl = url; }
+
 	protected void addAnnotation(INode node) throws InvalidOffsetException
 	{
-		FeatureMap features = Factory.newFeatureMap();
-		Offset offset = getOffset(node);
-		if (offset == null)
+		getRangeFn.reset();
+		Offset offset = getRangeFn.apply(node);
+		if (offset.getEnd() < offset.getStart())
 		{
 			return;
 		}
-
-//      IFeatureStructure fs = node.getFeatures();
-		for (String type : types)
+		
+		for (IAnnotationSet aSet : node.annotationSets())
 		{
-			IFeatureStructure fs = node.getFeatures().getFeatureStructure(type);
-			if (fs == null)
+			String aSetName = aSet.getType();
+			for (IAnnotation a : aSet.annotations())
 			{
-				continue;
+				FeatureMap features = Factory.newFeatureMap();
+				features.put("graf:set", aSetName);
+				String label = a.getLabel();
+				for (IFeatureStructureElement fse : a.features())
+				{
+					addFeatures(fse, features, null);
+				}
+//				System.out.println("Adding annotation " + label + " from " + offset.getStart() +
+//						" to " + offset.getEnd());
+				try
+				{
+					annotations.add(offset.getStart(), offset.getEnd(), label, features);
+				}
+				catch (InvalidOffsetException e)
+				{
+					throw new InvalidOffsetException("Invalid offsets for " + label + " from " + offset.getStart() +
+							" to " + offset.getEnd());
+				}
 			}
-			String label = node.getType();
-			if (label == null)
+		}
+	}
+
+	private void addFeatures(IFeatureStructureElement fse, FeatureMap features, String prefix)
+	{
+		if (fse.isFeature())
+		{
+			IFeature f = (IFeature) fse;
+			String name = f.getName();
+			if (prefix != null)
 			{
-				label = type;
+				name = prefix + "/" + name; 
+			}
+			features.put(name, f.getValue());	   	
+		}
+		else
+		{
+			IFeatureStructure fs = (IFeatureStructure) fse;
+			String type = fs.getType();
+			if (prefix != null)
+			{
+				type = prefix + "/" + type;
 			}
 			addFeatures(fs, features, type);
-			System.out.println("Adding annotation " + label + " from " + offset.getStart() +
-						" to " + offset.getEnd());
-			annotations.add(offset.getStart(), offset.getEnd(), label, features);
 		}
-//      addFeatures(node, features, null);
 	}
 
 	protected void addFeatures(IFeatureStructure fs, FeatureMap features, String type)
@@ -137,8 +172,8 @@ public class LoadGrafStandoff extends LoadStandoff
 			if (e instanceof IFeature)
 			{
 				IFeature f = (IFeature) e;
-				System.out.println("Adding feature " + f.getName() + " = " +
-										 f.getValue());
+//				System.out.println("Adding feature " + f.getName() + " = " +
+//						f.getValue());
 				if (type == null)
 				{
 					features.put(f.getName(), f.getValue());
@@ -168,13 +203,9 @@ public class LoadGrafStandoff extends LoadStandoff
 		}
 	}
 
+	@Deprecated
 	protected Offset getOffset(INode node)
 	{
-		if (node instanceof ISpan)
-		{
-			return getOffset((ISpan)node);
-		}
-
 		Offset offset = (Offset) node.getUserObject();
 		if (offset != null)
 		{
@@ -215,30 +246,21 @@ public class LoadGrafStandoff extends LoadStandoff
 		return offset;
 	}
 
-	protected Offset getOffset(ISpan span)
-	{
-		Offset offset = new Offset(span.getStart(), span.getEnd());
-//		System.out.print("Creating offset for span " + span.getId());
-//		System.out.println(" from " + offset.getStart() + " to " +
-//		 offset.getEnd());
-		span.setUserObject(offset);
-		return offset;
-	}
-
 	protected void test()
 	{
 		try
 		{
+			System.setProperty("gate.home", "d:/Applications/Gate-5.0");
 			Gate.init();
 			Document doc = Factory.newDocument(new URL(
-			 "file:/e:/corpora2/masc/ptb/graf/written/110cyl067.txt"));
+			"file:/D:/corpora/masc/ptb/graf/110cyl067-ptb.xml"));
 			System.out.println("Document loaded");
-			Resource res = Factory.createResource("ANC.gate.LoadGrafStandoff");
+			Resource res = Factory.createResource("org.anc.gate.LoadGrafStandoff");
 			LoadGrafStandoff load = (LoadGrafStandoff) res;
 			System.out.println("Resource created.");
-			List<String> types = new Vector<String> ();
-			types.add("ptb");
-			load.setTypes(types);
+//			List<String> types = new Vector<String> ();
+//			types.add("ptb");
+//			load.setTypes(types);
 			load.setDocument(doc);
 			load.execute();
 			System.out.println("Done");
@@ -259,6 +281,11 @@ public class LoadGrafStandoff extends LoadStandoff
 
 class Offset extends Pair<Long, Long>
 {
+	public Offset()
+	{
+		super(Long.MAX_VALUE, Long.MIN_VALUE);
+	}
+
 	public Offset(long start, long end)
 	{
 		super(start, end);
@@ -266,6 +293,51 @@ class Offset extends Pair<Long, Long>
 	public Long getStart() { return first; }
 	public Long getEnd() { return second; }
 	public void setStart(long start) { setFirst(start); }
-	public void setEnd(long end) { setEnd(end); }
-	*/
+	public void setEnd(long end) { setSecond(end); }
+
+}
+
+class GetRangeFunction implements IFunction<INode, Offset>
+{
+	protected Offset offset = new Offset();
+
+	public Offset apply(INode item)
+	{
+		for (IRegion region : item.getRegions())
+		{
+			getRange(region);
+		}
+		for (IEdge e : item.getOutEdges())
+		{
+			apply(e.getTo());
+		}
+		return offset;
+	}
+
+	private void getRange(IRegion region)
+	{
+		IAnchor startAnchor = region.getStart();
+		IAnchor endAnchor = region.getEnd();
+		if (!(startAnchor instanceof CharacterAnchor) || !(endAnchor instanceof CharacterAnchor))
+		{
+			return;
+		}
+
+		CharacterAnchor start = (CharacterAnchor) startAnchor;
+		CharacterAnchor end = (CharacterAnchor) endAnchor;
+		if (start.getOffset() < offset.getStart())
+		{
+			offset.setStart(start.getOffset());
+		}
+		if (end.getOffset() > offset.getEnd())
+		{
+			offset.setEnd(end.getOffset());
+		}
+	}
+
+	public void reset() 
+	{ 
+		offset.setStart(Long.MAX_VALUE);
+		offset.setEnd(Long.MIN_VALUE);
+	}
 }

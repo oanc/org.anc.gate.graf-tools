@@ -60,7 +60,7 @@
     <dependency>
     	<groupId>gate</groupId>
     	<artifactId>gate</artifactId>
-    	<version>3.1</version>
+    	<version>5.0</version>
     </dependency>
     <dependency>
       <groupId>org.anc</groupId>
@@ -72,12 +72,22 @@
       <artifactId>xces-parser</artifactId>
       <version>1.0.6</version>
     </dependency>
+    <dependency>
+    	<groupId>org.tc37sc4.graf</groupId>
+    	<artifactId>graf-api</artifactId>
+    	<version>0.1.6-SNAPSHOT</version>
+    </dependency>
   </dependencies>
   <repositories>
     <repository>
       <id>anc-dev-release</id>
       <name>ANC Development Repository</name>
       <url>http://www.americannationalcorpus.org/maven/release</url>
+    </repository>
+    <repository>
+      <id>anc-dev-3rdparty</id>
+      <name>ANC 3rd Party Repository</name>
+      <url>http://www.americannationalcorpus.org/maven/thirdparty</url>
     </repository>
   </repositories>
   <distributionManagement>
