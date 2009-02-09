@@ -8,7 +8,6 @@
 		A language resource that loads an ANC/XCES document with standoff markup into GATE as a single 
 		document in one step.  The XCES Document will appear in the "New Language Resource" menu in Gate.
 		-->
-		<!--  
 		<RESOURCE>
 			<NAME>ANC Document</NAME>
 			<JAR>ANC-GATE.jar</JAR>
@@ -20,7 +19,8 @@
 			</OR>
 			<PARAMETER COMMENT="Should the document read the original markup"
 				NAME="markupAware" DEFAULT="true">java.lang.Boolean</PARAMETER>
-			<PARAMETER NAME="encoding" OPTIONAL="true" COMMENT="Encoding" DEFAULT="">java.lang.String</PARAMETER>
+			<PARAMETER NAME="encoding" OPTIONAL="true" COMMENT="Encoding (header)" DEFAULT="">java.lang.String</PARAMETER>
+			<PARAMETER NAME="contentEncoding" OPTIONAL="true" COMMENT="Content encoding" DEFAULT="UTF-8">java.lang.String</PARAMETER>
 			<PARAMETER NAME="sourceUrlStartOffset"
 				COMMENT="Start offset for documents based on ranges" OPTIONAL="true">java.lang.Long</PARAMETER>
 			<PARAMETER NAME="sourceUrlEndOffset"
@@ -38,13 +38,14 @@
 			<PARAMETER NAME="standoffAnnotations" OPTIONAL="true" COMMENT="Standoff annotations to add">java.util.List</PARAMETER>
 			<ICON>lr.gif</ICON>
 		</RESOURCE>
+		<!-- 
 		<RESOURCE>
 			<NAME>XCES Document Format</NAME>
 			<CLASS>org.anc.gate.XCESDocumentFormat</CLASS>
 			<AUTOINSTANCE/>
 			<PRIVATE/>
 		</RESOURCE>
-		-->
+		 -->
 		<!-- 
 		
 		
@@ -53,14 +54,14 @@
 		Loads annotations from a standoff file (cesAna) and adds them to an open document.
 		-->
 		<RESOURCE>
-			<NAME>ANC Load GrAF Standoff</NAME>
+			<NAME>ANC Load Standoff</NAME>
 			<JAR>ANC-GATE.jar</JAR>
-			<CLASS>org.anc.gate.LoadGrafStandoff</CLASS>
+			<CLASS>org.anc.gate.LoadStandoff</CLASS>
 			<COMMENT>Add standoff annotations to an open document</COMMENT>
 			<PARAMETER NAME="document" COMMENT="Document to be processed"
 				RUNTIME="true" REQUIRED="true">gate.Document</PARAMETER>
 			<PARAMETER NAME="sourceUrl"
-				COMMENT="Location of the document containing standoff annotations"
+				COMMENT="Location of the cesAna document containing standoff annotations"
 				RUNTIME="true" REQUIRED="true">java.net.URL</PARAMETER>
 			<PARAMETER NAME="standoffASName"
 				COMMENT="Annotation set to add standoff tags to" RUNTIME="true"
@@ -96,7 +97,7 @@
 		ANC Save Standoff Markup
 		-->
 		<RESOURCE>
-			<NAME>ANC Save GrAF Standoff</NAME>
+			<NAME>ANC Save Standoff</NAME>
 			<CLASS>org.anc.gate.SaveStandoff</CLASS>
 			<COMMENT>Saves annotations to a standoff file</COMMENT>
 			<JAR>ANC-GATE.jar</JAR>
