@@ -65,9 +65,12 @@ public class LoadStandoff extends ANCLanguageAnalyzer
 	 parser.parse(list, sourceUrl.getPath());
 	 for (Annotation a : list)
 	 {
+       System.out.println("Adding annotation " + a.getType().getLocalName() +
+             " from " + a.getStart() + " to " + a.getEnd());
 	    FeatureMap fm = Factory.newFeatureMap();
 	    for (Annotation.Feature f : a.getFeatures())
 	    {
+	       System.out.println("   feature " + f.getKey() + "=" + f.getValue());
 	       fm.put(f.getKey(), f.getValue());
 	    }
 	    try
