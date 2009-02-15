@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.anc.Sys;
 import org.xces.*;
+import org.xces.graf.util.GraphUtils;
 
 ////import org.xces.Constants;
 ////import org.xces.util.AnnotationComparer;
@@ -54,6 +55,7 @@ public class SaveStandoff extends ANCLanguageAnalyzer
 	public static final String INPUTASNAME_PARAMETER_NAME = "inputASName";
 	public static final String STANDOFFTAGS_PARAMETER_NAME = "standoffTags";
 	public static final String ENCODING_PARAMETER_NAME = "encoding";
+	public static final String ANNOTYPE_PARAMETER_NAME = "annotationType";
 	public static final String VERSION_PARAMETER_NAME = "version";
 	public static final String NAMESPACE_PARAMETER_NAME = "namespace";
 	public static final String SCHEMALOCATION_PARAMETER_NAME = "schemaLocation";
@@ -64,14 +66,13 @@ public class SaveStandoff extends ANCLanguageAnalyzer
 	private java.net.URL destination = null;
 	private String inputASName = null;
 	private java.util.List standoffTags = null;
+	private String annotationType = "standoff";	
 	private String version = null;
 	private String encoding = null;
 	private String namespace = null;
 	private String schemaLocation = null;
 
 	public SaveStandoff() { }
-//   public void setCorpus(Corpus corpus) { this.corpus = corpus; }
-//   public Corpus getCorpus() { return corpus; }
 
 	public Resource init() throws ResourceInstantiationException
 	{
@@ -92,12 +93,6 @@ public class SaveStandoff extends ANCLanguageAnalyzer
 		if(null == destination)
 			throw new ExecutionException("Parameter destination has not been set.");
 
-//      if(null == inputASName)
-//         throw new ExecutionException("Parameter inputASName has not been set.");
-
-//      if(null == standoffTags)
-//         throw new ExecutionException("Parameter standoffTags has not been set.");
-
 		if (null == encoding)
 		{
 		  encoding = "UTF-8";
@@ -105,23 +100,15 @@ public class SaveStandoff extends ANCLanguageAnalyzer
 
 		try
 		{
-//        System.out.println("(SaveStandoff.java:74) Getting XML");
-//        String xml = getXml();
-//        if (xml == null)
-//        {
-//          System.out.println("No xml found.");
-//          return;
-//        }
 			 File f = new File(destination.getPath());
 			 if (f.isDirectory())
 			 {
-				 f = new File(f, document.getName() + "-standoff.xml");
+				 f = new File(f, document.getName() + "-" + annotationType + 
+						 ".xml");
 			 }
 		  FileOutputStream stream = new FileOutputStream(f);
 		  OutputStreamWriter writer = new OutputStreamWriter(stream, encoding);
 		  writeXml(writer);
-//        System.out.println("(SaveStandoff.java:74) Writing file");
-//        writer.write(xml);
 		  writer.close();
 		}
 		catch (IOException ex)
@@ -146,7 +133,7 @@ public class SaveStandoff extends ANCLanguageAnalyzer
 			}
 			else
 			{
-				 annotations = originals.get(new HashSet(standoffTags));
+				 annotations = originals.get(new HashSet<String>(standoffTags));
 			}
 		 }
 	  }
@@ -159,7 +146,7 @@ public class SaveStandoff extends ANCLanguageAnalyzer
 
 	  if (annotations == null || annotations.size() == 0)
 	  {
-		 System.out.println("org.xces.creole.SaveStandoff : No standoff annotations found.");
+		 System.out.println("org.anc.gate.SaveStandoff : No standoff annotations found.");
 		 failed = true;
 		 return;
 	  }
@@ -231,11 +218,7 @@ public class SaveStandoff extends ANCLanguageAnalyzer
 	  if (! (value instanceof String))
 		 return value;
 
-	  String result = ((String)value).replaceAll("&", "&amp;");
-	  result = result.replaceAll("<", "&lt;");
-	  result = result.replaceAll(">", "&gt;");
-	  result = result.replaceAll("\"", "&quot;");
-	  return result;
+	  return GraphUtils.encode((String)value);
 	}
 	// Property getters and setters.
 //   public void setDocument(gate.Document document) { this.document = document; }
@@ -262,6 +245,9 @@ public class SaveStandoff extends ANCLanguageAnalyzer
 	public void setVersion(String version) { this.version = version; }
 	public String getVersion() { return version; }
 
+	public void setAnnotationType(String type) { this.annotationType = type; }
+	public String getAnnotationType() { return annotationType; }
+	
 	private void dump(Set set, String filter)
 	{
 		if (set != null && set.size() > 0)
