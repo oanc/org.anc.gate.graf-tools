@@ -200,7 +200,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
 			IAnnotation grafAnnotation = Factory.newAnnotation(gateAnnotation.getType());
 			node.addAnnotation(grafAnnotation);
 			FeatureMap fm = gateAnnotation.getFeatures();
-			if (fm != null || fm.size() > 0)
+			if (fm != null && fm.size() > 0)
 			{
 				Set attSet = fm.entrySet();
 				Iterator asIt = attSet.iterator();
