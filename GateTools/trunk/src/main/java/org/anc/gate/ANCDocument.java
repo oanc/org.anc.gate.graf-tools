@@ -30,8 +30,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
+import org.xces.standoff.Annotation;
+import org.xces.standoff.AnnotationParser;
+import org.xces.standoff.Annotation.Feature;
 import org.xml.sax.SAXException;
-import gate.Annotation;
+//import gate.Annotation;
 import gate.AnnotationSet;
 import gate.DocumentContent;
 import gate.Factory;
@@ -133,7 +136,7 @@ public class ANCDocument extends gate.corpora.DocumentImpl
     DocumentContent docContent = new DocumentContentImpl(theContent);
     this.setContent(docContent);
 
-
+/*
     LoadStandoff loader = new LoadStandoff();
     loader.init();
     loader.setDocument(this);
@@ -147,24 +150,27 @@ public class ANCDocument extends gate.corpora.DocumentImpl
       {
         try
         {
-         loader.setSourceUrl(new URL("file://" + basePath + "/" + filename));
+      	  URL standoff = new URL("file://" + basePath + "/" + filename);
+      	  System.out.println("Loading standoff from " + standoff.getPath());
+         loader.setSourceUrl(standoff);
+         loader.execute();
         }
-        catch (MalformedURLException e)
+        catch (Exception e)
         {
            throw new ResourceInstantiationException(e);
         }
       }
     }
+  */  
     
     
-    /*
     // Get a parser for the standoff annotations
-    CesAnaParser parser = new CesAnaParser();
+    AnnotationParser<List<Annotation>> parser = new AnnotationParser<List<Annotation>>();
     if (standoffAnnotations != null)
     {
       AnnotationSet as = this.getAnnotations(standoffASName);
-      parser.setAnnotationSet(as);
-      Iterator it = standoffAnnotations.iterator();
+//      parser.setAnnotationSet(as);
+      Iterator<String> it = standoffAnnotations.iterator();
       while (it.hasNext())
 //      StringTokenizer tokens = new StringTokenizer(standoffAnnotations);
 //      while (tokens.hasMoreTokens())
@@ -175,11 +181,30 @@ public class ANCDocument extends gate.corpora.DocumentImpl
         if (filename != null)
         {
           // System.out.println("Adding annotations from " + basePath + "/" + filename);
-          parser.parse(basePath + "/" + filename);
+      	  List<Annotation> annotations = new LinkedList<Annotation>();
+          parser.parse(annotations, basePath + "/" + filename);
+          for (Annotation a : annotations)
+          {
+         	long start = a.getStart();
+         	long end = a.getEnd();
+         	FeatureMap features = Factory.newFeatureMap();
+         	for (Feature f : a.getFeatures())
+         	{
+         		features.put(f.getName().getLocalName(), f.getValue());
+         	}
+         	try
+            {
+	            as.add(start, end, a.getType().getLocalName(), features);
+            }
+            catch (InvalidOffsetException e)
+            {
+               throw new ResourceInstantiationException(e);
+            }
+          }
         }
       }
     }
-    */
+    
 
     return this;
   }
@@ -256,7 +281,7 @@ public class ANCDocument extends gate.corpora.DocumentImpl
     Iterator it = set.iterator();
     while (it.hasNext())
     {
-      Annotation a = (Annotation) it.next();
+      gate.Annotation a = (gate.Annotation) it.next();
       FeatureMap theFeatures = a.getFeatures();
       if (theFeatures == null || theFeatures.size() == 0)
       {
