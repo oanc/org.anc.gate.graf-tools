@@ -8,7 +8,6 @@
 		A language resource that loads an ANC/XCES document with standoff markup into GATE as a single 
 		document in one step.  The XCES Document will appear in the "New Language Resource" menu in Gate.
 		-->
-		<!--  
 		<RESOURCE>
 			<NAME>ANC Document</NAME>
 			<JAR>ANC-GATE.jar</JAR>
@@ -39,6 +38,7 @@
 			<PARAMETER NAME="standoffAnnotations" OPTIONAL="true" COMMENT="Standoff annotations to add">java.util.List</PARAMETER>
 			<ICON>lr.gif</ICON>
 		</RESOURCE>
+		<!--  
 		<RESOURCE>
 			<NAME>XCES Document Format</NAME>
 			<CLASS>org.anc.gate.XCESDocumentFormat</CLASS>
