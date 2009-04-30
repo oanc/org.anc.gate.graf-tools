@@ -21,14 +21,6 @@
       	<artifactId>maven-assembly-plugin</artifactId>
       	<version>2.2-beta-2</version>
       	<configuration>
-      	<!-- 
-      		<descriptorRefs>
-      			<descriptorRef>jar-with-dependencies</descriptorRef>
-      		</descriptorRefs>
-      		 <descriptorRefs>
-      		 	<descriptorRef>src</descriptorRef>
-      		 </descriptorRefs>
-      		 -->
       		 <descriptors>
       		 	<descriptor>${basedir}/src/main/resources/assemblies/assembly.xml</descriptor>
       		 	<descriptor>${basedir}/src/main/resources/assemblies/distribution.xml</descriptor>
@@ -75,7 +67,7 @@
     <dependency>
     	<groupId>org.tc37sc4.graf</groupId>
     	<artifactId>graf-api</artifactId>
-    	<version>0.1.6-SNAPSHOT</version>
+    	<version>1.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <repositories>
@@ -94,12 +86,12 @@
     <repository>
       <id>anc-dev-release</id>
       <name>ANC Development Repository</name>
-      <url>http://www.americannationalcorpus.org/maven/release</url>
+      <url>dav:http://www.americannationalcorpus.org/maven/release</url>
     </repository>
     <snapshotRepository>
       <id>anc-dev-snapshot</id>
       <name>ANC Snapshot Repository</name>
-      <url>http://www.americannationalcorpus.org/maven/snapshot</url>
+      <url>dav:http://www.americannationalcorpus.org/maven/snapshot</url>
     </snapshotRepository>
   </distributionManagement>    
 </project>
