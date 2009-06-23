@@ -71,7 +71,10 @@ public class SaveContent extends org.anc.gate.ANCLanguageAnalyzer
 		  String content = document.getContent().toString();
 		  writer.write(content);
 		  writer.close();
-		  failed = false;
+
+//	       System.out.println("Content for " + document.getName());
+//	        System.out.println(content);
+	        failed = false;
 		}
 		catch (IOException ex)
 		{

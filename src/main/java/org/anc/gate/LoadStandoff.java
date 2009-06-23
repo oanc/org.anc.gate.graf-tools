@@ -65,23 +65,34 @@ public class LoadStandoff extends ANCLanguageAnalyzer
 	 parser.parse(list, sourceUrl.getPath());
 	 for (Annotation a : list)
 	 {
-       System.out.println("Adding annotation " + a.getType().getLocalName() +
-             " from " + a.getStart() + " to " + a.getEnd());
-	    FeatureMap fm = Factory.newFeatureMap();
-	    for (Annotation.Feature f : a.getFeatures())
+	    long start = a.getStart();
+	    long end = a.getEnd();
+	    
+	    if (start < 0 || end < start)
 	    {
-	       System.out.println("   feature " + f.getKey() + "=" + f.getValue());
-	       fm.put(f.getKey(), f.getValue());
+	       System.out.println("Invalid offsets for " + a.getType().getLocalName() +
+	             " from " + a.getStart() + " to " + a.getEnd());
 	    }
-	    try
-      {
-         as.add(new Long(a.getStart()), new Long(a.getEnd()), 
-               a.getType().getLocalName(), fm);
-      }
-      catch (InvalidOffsetException e)
-      {
-         throw new ExecutionException(e);
-      }
+	    else
+	    {
+   	    FeatureMap fm = Factory.newFeatureMap();
+   	    for (Annotation.Feature f : a.getFeatures())
+   	    {
+//   	       System.out.println("   feature " + f.getKey() + "=" + f.getValue());
+   	       fm.put(f.getKey(), f.getValue());
+   	    }
+   	    try
+         {
+            as.add(new Long(a.getStart()), new Long(a.getEnd()), 
+                  a.getType().getLocalName(), fm);
+         }
+         catch (InvalidOffsetException e)
+         {
+            System.out.println("Invalid offsets for " + a.getType().getLocalName() +
+                  " from " + a.getStart() + " to " + a.getEnd());
+            //throw new ExecutionException(e);
+         }
+	    }
 	 }
   }
 
