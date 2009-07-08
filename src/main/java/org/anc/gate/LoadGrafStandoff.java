@@ -117,10 +117,11 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
 				FeatureMap features = Factory.newFeatureMap();
 				features.put("graf:set", aSetName);
 				String label = a.getLabel();
-				for (IFeatureStructureElement fse : a.features())
-				{
-					addFeatures(fse, features, null);
-				}
+				addFeatures(a.getFeatures(), features, null);
+//				for (IFeatureStructureElement fse : a.features())
+//				{
+//					addFeatures(fse, features, null);
+//				}
 //				System.out.println("Adding annotation " + label + " from " + offset.getStart() +
 //						" to " + offset.getEnd());
 				try
@@ -167,39 +168,65 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
 		{
 			return;
 		}
-		for (IFeatureStructureElement e : fs.features())
+		for (IFeature f : fs.features())
 		{
-			if (e instanceof IFeature)
-			{
-				IFeature f = (IFeature) e;
-//				System.out.println("Adding feature " + f.getName() + " = " +
-//						f.getValue());
-				if (type == null)
-				{
-					features.put(f.getName(), f.getValue());
-				}
-				else
-				{
-					features.put(type + "." + f.getName(), f.getValue());
-				}
-			}
-			else
-			{
-				IFeatureStructure childFS = (IFeatureStructure) e;
-				String childType = childFS.getType();
-				if (childType == null)
-				{
-					childType = type;
-				}
-				else
-				{
-					if (type != null)
-					{
-						childType = type + "." + childType;
-					}
-				}
-				addFeatures(childFS, features, childType);
-			}
+		   if (f.isAtomic())
+		   {
+		      if (type == null)
+		      {
+		         features.put(f.getName(), f.getValue());
+		      }
+		      else
+		      {
+		         features.put(type + "." + f.getName(), f.getValue());
+		      }
+		   }
+		   else
+		   {
+		      IFeatureStructure childFS = (IFeatureStructure) f.getValue();
+		      String childType = childFS.getType();
+		      if (childType == null)
+		      {
+		         childType = type;
+		      }
+		      else
+		      {
+		         if (type != null)
+		         {
+		            childType = type + "." + childType;
+		         }
+		      }
+		      addFeatures(childFS, features, childType);
+		   }
+//			if (e instanceof IFeature)
+//			{
+//				IFeature f = (IFeature) e;
+//				if (type == null)
+//				{
+//					features.put(f.getName(), f.getValue());
+//				}
+//				else
+//				{
+//					features.put(type + "." + f.getName(), f.getValue());
+//				}
+//			}
+//			else
+//			{
+//				IFeatureStructure childFS = (IFeatureStructure) e;
+//				String childType = childFS.getType();
+//				if (childType == null)
+//				{
+//					childType = type;
+//				}
+//				else
+//				{
+//					if (type != null)
+//					{
+//						childType = type + "." + childType;
+//					}
+//				}
+//				addFeatures(childFS, features, childType);
+//			}
 		}
 	}
 
