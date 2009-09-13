@@ -148,6 +148,46 @@
 		</RESOURCE>
 		<!-- 
 		
+		ANC Save Standoff Markup
+		-->
+		<RESOURCE>
+			<NAME>ANC Save XCES Corpus Standoff</NAME>
+			<CLASS>org.anc.gate.SaveCorpusStandoff</CLASS>
+			<COMMENT>Saves annotations to a standoff file</COMMENT>
+			<JAR>ANC-GATE.jar</JAR>
+			<PARAMETER NAME="document" COMMENT="Document to save"
+				REQUIRED="true" RUNTIME="true">gate.Document</PARAMETER>
+			<PARAMETER NAME="destination" COMMENT="Location to write the file"
+				REQUIRED="true" RUNTIME="true">java.net.URL</PARAMETER>
+			<PARAMETER NAME="inputASName"
+				COMMENT="Set containing annotations to save" RUNTIME="true"
+				OPTIONAL="true" DEFAULT="Standoff markups">java.lang.String</PARAMETER>
+			<PARAMETER NAME="standoffTags" OPTIONAL="true"
+				COMMENT="List of annoations types to be saved" RUNTIME="true">java.util.List</PARAMETER>
+			<PARAMETER NAME="encoding"
+				COMMENT="Character encoding to use when writing the file"
+				RUNTIME="true" OPTIONAL="true" DEFAULT="UTF-8">java.lang.String</PARAMETER>
+			<PARAMETER NAME="annotationType"
+				COMMENT="Annotation type suffix to use when generating file names."
+				RUNTIME="true" OPTIONAL="true" DEFAULT="standoff">java.lang.String</PARAMETER>			
+			<PARAMETER NAME="namespace"
+				COMMENT="Namespace to use for the document" RUNTIME="true"
+				OPTIONAL="true" DEFAULT="http://www.xces.org/schema/2003">java.lang.String</PARAMETER>
+			<PARAMETER NAME="version" RUNTIME="true" DEFAULT="1.0"
+				OPTIONAL="true" COMMENT="Version number assigned to the document">java.lang.String</PARAMETER>
+			<PARAMETER NAME="schemaLocation"
+				COMMENT="Location of the schema for the namespace"
+				RUNTIME="true" OPTIONAL="true">java.lang.String</PARAMETER>
+			<PARAMETER NAME="fileExtension" 
+				COMMENT="Filename extension to be replaced with the annotation type and .xml suffix"
+				RUNTIME="true" OPTIONAL="true" DEFAULT=".txt">java.lang.String</PARAMETER>
+			<PARAMETER NAME="filterFeatures" 
+				COMMENT="Feature names to be excluded from the output"
+				RUNTIME="true" OPTIONAL="true">java.util.List</PARAMETER>
+				
+		</RESOURCE>
+		<!-- 
+		
 		ANC Save Graf Standoff Markup
 		-->
 		<RESOURCE>
