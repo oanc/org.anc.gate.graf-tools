@@ -17,44 +17,48 @@
 
 package org.anc.gate;
 
-import gate.*;
-import gate.util.*;
-import gate.creole.*;
+import gate.Annotation;
+import gate.AnnotationSet;
 import gate.creole.AbstractLanguageAnalyser;
+import gate.creole.ExecutionException;
 
 public class ANCLanguageAnalyzer extends AbstractLanguageAnalyser
 {
    protected boolean failed = false;
-   
-   public boolean failed() { return failed; }
-   public boolean defined(String s)
+
+   public boolean failed()
    {
-     return !((s == null) || ("".equals(s)));
+      return failed;
    }
 
-   public AnnotationSet getAnnotations(String name) throws ExecutionException
+   public boolean defined(String s)
    {
-     if (document == null)
-       throw new ExecutionException("Document has not been set.");
+      return !((s == null) || ("".equals(s)));
+   }
 
-     if (name == null ||
-         "".equals(name) ||
-         "Default".equals(name))
-     {
-       return document.getAnnotations();
-     }
-     return document.getAnnotations(name);
+   public AnnotationSet getAnnotations(String aName) throws ExecutionException
+   {
+      if (document == null)
+      {
+         throw new ExecutionException("Document has not been set.");
+      }
+
+      if (aName == null || "".equals(aName) || "Default".equals(aName))
+      {
+         return document.getAnnotations();
+      }
+      return document.getAnnotations(aName);
    }
 
    public long getAnnotationStart(Object a)
    {
-     assert(a instanceof Annotation);
-     return ((Annotation)a).getStartNode().getOffset().intValue();
+      assert (a instanceof Annotation);
+      return ((Annotation) a).getStartNode().getOffset().intValue();
    }
 
    public long getAnnotationEnd(Object a)
    {
-     assert(a instanceof Annotation);
-     return ((Annotation)a).getEndNode().getOffset().intValue();
+      assert (a instanceof Annotation);
+      return ((Annotation) a).getEndNode().getOffset().intValue();
    }
 }

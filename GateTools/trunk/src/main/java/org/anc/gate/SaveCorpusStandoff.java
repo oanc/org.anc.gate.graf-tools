@@ -17,6 +17,14 @@
 
 package org.anc.gate;
 
+import gate.Annotation;
+import gate.AnnotationSet;
+import gate.FeatureMap;
+import gate.Resource;
+import gate.creole.ExecutionException;
+import gate.creole.ResourceInstantiationException;
+import gate.util.Out;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,17 +40,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.anc.Sys;
-import org.xces.*;
+import org.xces.XCES;
 import org.xces.graf.util.GraphUtils;
-
-////import org.xces.Constants;
-////import org.xces.util.AnnotationComparer;
-////import ANC.creole.ANCLanguageAnalyser;
-
-//import gate.resources.*;
-import gate.*;
-import gate.creole.*;
-import gate.util.*;
 
 /**
  */
@@ -61,7 +60,7 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
    public static final String SCHEMALOCATION_PARAMETER_NAME = "schemaLocation";
    public static final String FILE_EXTENSION_PARAMETER_NAME = "fileExtension";
    public static final String FILTER_FEATURES_PARAMETER_NAME = "filterFeatures";
-   
+
    // Properties to hold parameter values.
 // private gate.Document document = null;
 // private Corpus corpus = null;
@@ -76,11 +75,12 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
    private String fileExtension = null;
    private List<String> filterFeaturesList = null;
    private Set<String> featureFilter = null;
-   
+
    public SaveCorpusStandoff()
    {
    }
 
+   @Override
    public Resource init() throws ResourceInstantiationException
    {
       super.init();
@@ -88,18 +88,24 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
       return this;
    }
 
+   @Override
    public void reInit() throws ResourceInstantiationException
    {
       this.init();
    }
 
+   @Override
    public void execute() throws ExecutionException
    {
       if (null == document)
+      {
          throw new ExecutionException("Parameter document has not been set.");
+      }
 
       if (null == destination)
+      {
          throw new ExecutionException("Parameter destination has not been set.");
+      }
 
       if (null == encoding)
       {
@@ -115,7 +121,7 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
             featureFilter.add(feature);
          }
       }
-      
+
       try
       {
          // Create the filename from the document name.
@@ -131,7 +137,7 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
 //            filename = document.getName().replaceAll(fileExtension,
 //                  "-" + annotationType + ".xml");
 //         }
-         
+
          File destDir = new File(destination.getPath());
          if (destDir.isFile())
          {
@@ -194,7 +200,7 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
             annotations);
       Collections.sort(sortedAnnotations, comp);
       Iterator<Annotation> it = sortedAnnotations.iterator();
-      File f = new File(document.getSourceUrl().getPath());
+      new File(document.getSourceUrl().getPath());
 
 // StringBuffer buffer = new StringBuffer();
       writer.write("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>"
@@ -214,7 +220,7 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
 
       while (it.hasNext())
       {
-         Annotation a = (Annotation) it.next();
+         Annotation a = it.next();
          long start = a.getStartNode().getOffset().longValue();
          long end = a.getEndNode().getOffset().longValue();
          FeatureMap fm = a.getFeatures();
@@ -222,15 +228,17 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
                + "=\"" + a.getType() + "\" " + XCES.ANNO_FROM + "=\"" + start
                + "\" " + XCES.ANNO_TO + "=\"" + end + "\"");
          if (fm == null || fm.size() == 0)
+         {
             writer.write("/>" + Sys.EOL);
+         }
          else
          {
             writer.write(">" + Sys.EOL);
-            Set attSet = fm.entrySet();
-            Iterator asIt = attSet.iterator();
+            Set<Map.Entry<Object, Object>> attSet = fm.entrySet();
+            Iterator<Map.Entry<Object, Object>> asIt = attSet.iterator();
             while (asIt.hasNext())
             {
-               Map.Entry att = (Map.Entry) asIt.next();
+               Map.Entry<Object, Object> att = (Map.Entry<Object, Object>) asIt.next();
                if (!featureFilter.contains(att.getKey()))
                {
 // if ("id".equals(att.getKey()))
@@ -255,7 +263,9 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
    protected Object fix(Object value)
    {
       if (!(value instanceof String))
+      {
          return value;
+      }
 
       return GraphUtils.encode((String) value);
    }
@@ -284,12 +294,12 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
       return inputASName;
    }
 
-   public void setStandoffTags(java.util.List standoffTags)
+   public void setStandoffTags(java.util.List<String> standoffTags)
    {
       this.standoffTags = standoffTags;
    }
 
-   public java.util.List getStandoffTags()
+   public java.util.List<String> getStandoffTags()
    {
       return standoffTags;
    }
@@ -354,28 +364,13 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
       return fileExtension;
    }
 
-   public void setFilterFeatures(List features) { filterFeaturesList = features; }
-   public List getFilterFeatures() { return filterFeaturesList; }
-   
-   private void dump(Set set, String filter)
+   public void setFilterFeatures(List<String> features)
    {
-      if (set != null && set.size() > 0)
-      {
-         Iterator it = set.iterator();
-         while (it.hasNext())
-         {
-            Annotation a = (Annotation) it.next();
-            String tag = a.getType();
-            if (filter == null)
-            {
-               Out.prln(a);
-            }
-            else if (filter.equals(tag))
-            {
-               Out.prln(tag + ": " + getAnnotationStart(a) + "-"
-                     + getAnnotationEnd(a));
-            }
-         }
-      }
+      filterFeaturesList = features;
+   }
+
+   public List<String> getFilterFeatures()
+   {
+      return filterFeaturesList;
    }
 }

@@ -17,17 +17,19 @@
 
 package org.anc.gate;
 
-import java.util.Comparator;
-
 import gate.Annotation;
 
-/** Compares two GATE annotations by their end offsets.  If the end offsets
- *  are equal the annotations will be compared by start offsets.
+import java.io.Serializable;
+import java.util.Comparator;
+
+/**
+ * Compares two GATE annotations by their end offsets. If the end offsets are
+ * equal the annotations will be compared by start offsets.
  * 
  * @author Keith Suderman
  * @version 1.0
  */
-class EndComparer implements Comparator<Annotation>
+class EndComparer implements Comparator<Annotation>, Serializable
 {
 
    public int compare(Annotation left, Annotation right)
@@ -47,13 +49,14 @@ class EndComparer implements Comparator<Annotation>
    }
 }
 
-/** Compares two GATE annotations by their start offsets.  If the start offsets
- *  are equal the annotations will be compared by end offsets.
+/**
+ * Compares two GATE annotations by their start offsets. If the start offsets
+ * are equal the annotations will be compared by end offsets.
  * 
  * @author Keith Suderman
  * @version 1.0
  */
-class StartComparer implements Comparator<Annotation>
+class StartComparer implements Comparator<Annotation>, Serializable
 {
    public int compare(Annotation left, Annotation right)
    {
@@ -101,7 +104,9 @@ public class AnnotationComparer // implements Comparator
    public static Comparator<Annotation> create(int type)
    {
       if (START == type)
+      {
          return new StartComparer();
+      }
       return new EndComparer();
    }
 
@@ -109,12 +114,12 @@ public class AnnotationComparer // implements Comparator
    {
       return new StartComparer();
    }
-   
+
    public static Comparator<Annotation> createEndComparator()
    {
       return new EndComparer();
    }
-   
+
    protected long getStart(Annotation a)
    {
       return a.getStartNode().getOffset().longValue();

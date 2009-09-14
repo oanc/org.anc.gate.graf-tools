@@ -17,77 +17,100 @@
 
 package org.anc.gate;
 
-import java.io.*;
-import java.util.*;
+import gate.Resource;
+import gate.creole.ExecutionException;
+import gate.creole.ResourceInstantiationException;
 
-import gate.*;
-import gate.creole.*;
-import gate.util.*;
-import java.net.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
-//import ANC.creole.ANCProcessingResource;
-//import ANC.creole.ANCLanguageAnalyser;
+// import ANC.creole.ANCProcessingResource;
+// import ANC.creole.ANCLanguageAnalyser;
 
 /**  */
 public class SaveContent extends org.anc.gate.ANCLanguageAnalyzer
 {
-	// Parameters passed by Gate.
-	public static final String DESTINATION_PARAMETER_NAME = "destination";
-	public static final String ENCODING_PARAMETER_NAME = "encoding";
+   // Parameters passed by Gate.
+   public static final String DESTINATION_PARAMETER_NAME = "destination";
+   public static final String ENCODING_PARAMETER_NAME = "encoding";
 
-	// Properties to hold parameter values.
-	private java.net.URL destination = null;
-	private java.lang.String encoding = null;
+   // Properties to hold parameter values.
+   private java.net.URL destination = null;
+   private java.lang.String encoding = null;
 
-	public SaveContent() { }
+   public SaveContent()
+   {
+   }
 
-	public Resource init() throws ResourceInstantiationException
-	{
-		super.init();
-		return this;
-	}
+   @Override
+   public Resource init() throws ResourceInstantiationException
+   {
+      super.init();
+      return this;
+   }
 
-	public void reInit() throws ResourceInstantiationException
-	{
-		this.init();
-	}
+   @Override
+   public void reInit() throws ResourceInstantiationException
+   {
+      this.init();
+   }
 
-	public void execute() throws ExecutionException
-	{
-	  failed = true;
-		if(null == destination)
-			throw new ExecutionException("Parameter destination has not been set.");
+   @Override
+   public void execute() throws ExecutionException
+   {
+      failed = true;
+      if (null == destination)
+      {
+         throw new ExecutionException("Parameter destination has not been set.");
+      }
 
-		if(null == encoding)
-		  encoding = "UTF-8";
+      if (null == encoding)
+      {
+         encoding = "UTF-8";
+      }
 
-		try
-		{
-		  FileOutputStream ofstream = new FileOutputStream(destination.getPath());
-		  OutputStreamWriter writer = new OutputStreamWriter(ofstream, encoding);
+      try
+      {
+         FileOutputStream ofstream = new FileOutputStream(destination.getPath());
+         OutputStreamWriter writer = new OutputStreamWriter(ofstream, encoding);
 //        System.out.println("Set encoding to " + writer.getEncoding());
 //        FileWriter writer = new FileWriter(destination.getPath());
 
-		  String content = document.getContent().toString();
-		  writer.write(content);
-		  writer.close();
+         String content = document.getContent().toString();
+         writer.write(content);
+         writer.close();
 
 //	       System.out.println("Content for " + document.getName());
 //	        System.out.println(content);
-	        failed = false;
-		}
-		catch (IOException ex)
-		{
-		  throw new ExecutionException(
-				"SaveContent I/O Exception: " + ex.getMessage());
-		}
-	}
+         failed = false;
+      }
+      catch (IOException ex)
+      {
+         throw new ExecutionException("SaveContent I/O Exception: "
+               + ex.getMessage());
+      }
+   }
 
-	// Property getters and setters.
-	public void setDestination(java.net.URL destination) { this.destination = destination; }
-	public java.net.URL getDestination() { return destination; }
+   // Property getters and setters.
+   public void setDestination(java.net.URL destination)
+   {
+      this.destination = destination;
+   }
 
-	public void setEncoding(java.lang.String encoding) { this.encoding = encoding; }
-	public java.lang.String getEncoding() { return encoding; }
+   public java.net.URL getDestination()
+   {
+      return destination;
+   }
+
+   public void setEncoding(java.lang.String encoding)
+   {
+      this.encoding = encoding;
+   }
+
+   public java.lang.String getEncoding()
+   {
+      return encoding;
+   }
 
 }
