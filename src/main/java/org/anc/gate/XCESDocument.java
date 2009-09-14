@@ -23,9 +23,9 @@ package org.anc.gate;
  */
 public class XCESDocument extends ANCDocument
 {
-  public XCESDocument()
-  {
-     super();
-  }
+   public XCESDocument()
+   {
+      super();
+   }
 
 }

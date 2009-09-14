@@ -17,7 +17,10 @@
 
 package org.anc.gate;
 
-import gate.*;
+import gate.AnnotationSet;
+import gate.Factory;
+import gate.FeatureMap;
+import gate.Resource;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
 import gate.util.InvalidOffsetException;
@@ -29,86 +32,97 @@ import java.util.List;
 import org.xces.standoff.Annotation;
 import org.xces.standoff.AnnotationParser;
 
-//import org.xces.gate.CesAnaParser;
-//import ANC.creole.*;
-
 /**
- * <p> </p>
- * <p> </p>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Company: American National Corpus</p>
+ * 
  * @author Keith Suderman
- * @version 1.0
  */
 
 public class LoadStandoff extends ANCLanguageAnalyzer
 {
-  public static final String STANDOFFASNAME_PARAMETER = "standoffASName";
-  public static final String SOURCE_URL_PARAMETER = "sourceUrl";
+   public static final long serialVersionUID = 1L;
+   public static final String STANDOFFASNAME_PARAMETER = "standoffASName";
+   public static final String SOURCE_URL_PARAMETER = "sourceUrl";
 
-  protected String standoffASName = null;
-  protected URL sourceUrl = null;
-//  private CesAnaParser parser = null;
-  private AnnotationParser<List<Annotation>> parser = null;
-  
-  public LoadStandoff()
-  {
-//	 parser = new CesAnaParser();
-     parser = new AnnotationParser<List<Annotation>>();
-  }
+   protected transient String standoffASName = null;
+   protected transient URL sourceUrl = null;
+   private transient AnnotationParser<List<Annotation>> parser = null;
 
-  public void execute() throws ExecutionException
-  {
-	 AnnotationSet as = getAnnotations(standoffASName);
+   public LoadStandoff()
+   {
+      parser = new AnnotationParser<List<Annotation>>();
+   }
+
+   @Override
+   public void execute() throws ExecutionException
+   {
+      AnnotationSet as = getAnnotations(standoffASName);
 //	 parser.setAnnotationSet(as);
-     List<Annotation> list = new LinkedList<Annotation>();
-	 parser.parse(list, sourceUrl.getPath());
-	 for (Annotation a : list)
-	 {
-	    long start = a.getStart();
-	    long end = a.getEnd();
-	    
-	    if (start < 0 || end < start)
-	    {
-	       System.out.println("Invalid offsets for " + a.getType().getLocalName() +
-	             " from " + a.getStart() + " to " + a.getEnd());
-	    }
-	    else
-	    {
-   	    FeatureMap fm = Factory.newFeatureMap();
-   	    for (Annotation.Feature f : a.getFeatures())
-   	    {
+      List<Annotation> list = new LinkedList<Annotation>();
+      parser.parse(list, sourceUrl.getPath());
+      for (Annotation a : list)
+      {
+         long start = a.getStart();
+         long end = a.getEnd();
+
+         if (start < 0 || end < start)
+         {
+            System.out.println("Invalid offsets for "
+                  + a.getType().getLocalName() + " from " + a.getStart()
+                  + " to " + a.getEnd());
+         }
+         else
+         {
+            FeatureMap fm = Factory.newFeatureMap();
+            for (Annotation.Feature f : a.getFeatures())
+            {
 //   	       System.out.println("   feature " + f.getKey() + "=" + f.getValue());
-   	       fm.put(f.getKey(), f.getValue());
-   	    }
-   	    try
-         {
-            as.add(new Long(a.getStart()), new Long(a.getEnd()), 
-                  a.getType().getLocalName(), fm);
+               fm.put(f.getKey(), f.getValue());
+            }
+            try
+            {
+               as.add(Long.valueOf(a.getStart()), Long.valueOf(a.getEnd()), 
+                     a.getType().getLocalName(), fm);
+            }
+            catch (InvalidOffsetException e)
+            {
+               System.out.println("Invalid offsets for "
+                     + a.getType().getLocalName() + " from " + a.getStart()
+                     + " to " + a.getEnd());
+               //throw new ExecutionException(e);
+            }
          }
-         catch (InvalidOffsetException e)
-         {
-            System.out.println("Invalid offsets for " + a.getType().getLocalName() +
-                  " from " + a.getStart() + " to " + a.getEnd());
-            //throw new ExecutionException(e);
-         }
-	    }
-	 }
-  }
+      }
+   }
 
-  public Resource init() throws ResourceInstantiationException
-  {
-	 return super.init();
-  }
+   @Override
+   public Resource init() throws ResourceInstantiationException
+   {
+      return super.init();
+   }
 
-  public void reInit() throws ResourceInstantiationException
-  {
-	 this.init();
-  }
+   @Override
+   public void reInit() throws ResourceInstantiationException
+   {
+      this.init();
+   }
 
-  public String getStandoffASName() { return standoffASName; }
-  public void setStandoffASName(String name) { standoffASName = name; }
+   public String getStandoffASName()
+   {
+      return standoffASName;
+   }
 
-  public URL getSourceUrl() { return sourceUrl; }
-  public void setSourceUrl(URL url) { sourceUrl = url; }
+   public void setStandoffASName(String name)
+   {
+      standoffASName = name;
+   }
+
+   public URL getSourceUrl()
+   {
+      return sourceUrl;
+   }
+
+   public void setSourceUrl(URL url)
+   {
+      sourceUrl = url;
+   }
 }
