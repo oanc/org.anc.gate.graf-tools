@@ -1,97 +1,98 @@
-<?xml version="1.0" encoding="UTF-8"?><project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.anc.gate</groupId>
-  <artifactId>GateTools</artifactId>
-  <name>ANC Gate Tools</name>
-  <version>2.0</version>
-  <description>Plugins for loading and saving ANC files with standoff markup</description>
-  <url>http://www.americannationalcorpus.org</url>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
-      <plugin>
-      	<artifactId>maven-assembly-plugin</artifactId>
-      	<version>2.2-beta-2</version>
-      	<configuration>
-      		 <descriptors>
-      		 	<descriptor>${basedir}/src/main/resources/assemblies/assembly.xml</descriptor>
-      		 	<descriptor>${basedir}/src/main/resources/assemblies/distribution.xml</descriptor>
-      		 	<descriptor>${basedir}/src/main/resources/assemblies/source.xml</descriptor>
-      		 </descriptors>
-      		<finalName>ANC</finalName>
-      		<appendAssemblyId>true</appendAssemblyId>
-      	</configuration>
-      	<executions>
-      		<execution>
-      			<id>make-assembly</id>
-      			<phase>package</phase>
-      			<goals>
-      				<goal>attached</goal>
-      			</goals>
-      		</execution>
-      	</executions>
-      </plugin>      
-      <!--   -->
-    </plugins>
-  </build>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.4</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>gate</groupId>
-    	<artifactId>gate</artifactId>
-    	<version>5.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.anc</groupId>
-      <artifactId>common</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xces</groupId>
-      <artifactId>xces-parser</artifactId>
-      <version>1.0.6</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.tc37sc4.graf</groupId>
-    	<artifactId>graf-api</artifactId>
-    	<version>1.0.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
-  <repositories>
-    <repository>
-      <id>anc-dev-release</id>
-      <name>ANC Development Repository</name>
-      <url>http://www.americannationalcorpus.org/maven/release</url>
-    </repository>
-    <repository>
-      <id>anc-dev-3rdparty</id>
-      <name>ANC 3rd Party Repository</name>
-      <url>http://www.americannationalcorpus.org/maven/thirdparty</url>
-    </repository>
-  </repositories>
-  <distributionManagement>
-    <repository>
-      <id>anc-dev-release</id>
-      <name>ANC Development Repository</name>
-      <url>dav:http://www.americannationalcorpus.org/maven/release</url>
-    </repository>
-    <snapshotRepository>
-      <id>anc-dev-snapshot</id>
-      <name>ANC Snapshot Repository</name>
-      <url>dav:http://www.americannationalcorpus.org/maven/snapshot</url>
-    </snapshotRepository>
-  </distributionManagement>    
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.anc.gate</groupId>
+	<artifactId>GateTools</artifactId>
+	<name>ANC Gate Tools</name>
+	<version>2.0</version>
+	<description>Plugins for loading and saving ANC files with standoff
+		markup</description>
+	<url>http://www.americannationalcorpus.org</url>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-2</version>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/distribution.xml</descriptor>
+						<descriptor>src/main/assembly/source.xml</descriptor>
+					</descriptors>
+					<finalName>ANC</finalName>
+					<appendAssemblyId>true</appendAssemblyId>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attached</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!--   -->
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>gate</groupId>
+			<artifactId>gate</artifactId>
+			<version>5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.anc</groupId>
+			<artifactId>common</artifactId>
+			<version>2.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.xces</groupId>
+			<artifactId>xces-parser</artifactId>
+			<version>1.0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.tc37sc4.graf</groupId>
+			<artifactId>graf-api</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+	<repositories>
+		<repository>
+			<id>anc-dev-release</id>
+			<name>ANC Development Repository</name>
+			<url>http://www.americannationalcorpus.org/maven/release</url>
+		</repository>
+		<repository>
+			<id>anc-dev-3rdparty</id>
+			<name>ANC 3rd Party Repository</name>
+			<url>http://www.americannationalcorpus.org/maven/thirdparty</url>
+		</repository>
+	</repositories>
+	<distributionManagement>
+		<repository>
+			<id>anc-dev-release</id>
+			<name>ANC Development Repository</name>
+			<url>dav:http://www.americannationalcorpus.org/maven/release</url>
+		</repository>
+		<snapshotRepository>
+			<id>anc-dev-snapshot</id>
+			<name>ANC Snapshot Repository</name>
+			<url>dav:http://www.americannationalcorpus.org/maven/snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
