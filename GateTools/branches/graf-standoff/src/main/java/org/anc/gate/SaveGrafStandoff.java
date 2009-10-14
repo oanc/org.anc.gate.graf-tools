@@ -37,6 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 import org.anc.util.IDGenerator;
@@ -219,7 +220,20 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
             while (asIt.hasNext())
             {
                Map.Entry<Object, Object> att = asIt.next();
-               if (!"isEmptyAndSpan".equals(att.getKey()))
+               String attName = att.getKey().toString();
+               if ("graf:children".equals(attName))
+               {
+                  String childrenList = att.getValue().toString();
+                  StringTokenizer tokenizer = new StringTokenizer(childrenList);
+                  while (tokenizer.hasMoreTokens())
+                  {
+                     String childId = tokenizer.nextToken();
+                     INode child = graph.findNode(childId);
+                     //TODO check child != null
+                     graph.addEdge(node, child);
+                  }
+               }
+               else if (!"isEmptyAndSpan".equals(att.getKey()))
                {
                   String key = (String) att.getKey();
                   String value = GraphUtils.encode((String) att.getValue());
