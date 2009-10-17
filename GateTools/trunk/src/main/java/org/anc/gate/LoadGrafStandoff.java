@@ -63,7 +63,9 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
    protected transient GraphParser parser;
    protected AnnotationSet annotations;
    protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
-
+   protected transient String content = null;
+   protected transient int endOfContent = 0;
+   
    public LoadGrafStandoff()
    {
       super();
@@ -88,6 +90,9 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
    public void execute() throws ExecutionException
    {
       annotations = getAnnotations(standoffASName);
+      content = document.getContent().toString();
+      endOfContent = content.length();
+      
 //		URL url = this.getSourceUrl();
       File file = new File(sourceUrl.getPath());
       IGraph graph = null;
@@ -153,13 +158,24 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
 //				}
 //				System.out.println("Adding annotation " + label + " from " + offset.getStart() +
 //						" to " + offset.getEnd());
+            long start = offset.getStart();
+            long end = offset.getEnd();
             try
             {
-               annotations.add(offset.getStart(), offset.getEnd(), label,
+               if (end > endOfContent)
+               {
+                  System.err.println("Invalid end offset for " + label +
+                        " " + end + ", end of content = " + endOfContent);
+             
+                  end = endOfContent;
+               }
+               annotations.add(start, end, label,
                      newFeatures);
             }
             catch (InvalidOffsetException e)
             {
+               System.err.println("Invalid offsets for " + label);
+               System.err.println("Annotation span : " + start + " - " + end);
                throw new InvalidOffsetException("Invalid offsets for " + label
                      + " from " + offset.getStart() + " to " + offset.getEnd());
             }
@@ -181,11 +197,11 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
          {
             if (type == null)
             {
-               fm.put(f.getName(), f.getValue());
+               fm.put(f.getName(), f.getValue().getValue());
             }
             else
             {
-               fm.put(type + "." + f.getName(), f.getValue());
+               fm.put(type + "." + f.getName(), f.getValue().getValue());
             }
          }
          else
