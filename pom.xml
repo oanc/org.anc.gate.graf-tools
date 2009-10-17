@@ -24,8 +24,7 @@
 				<version>2.2-beta-2</version>
 				<configuration>
 					<descriptors>
-						<descriptor>src/main/assembly/distribution.xml</descriptor>
-						<descriptor>src/main/assembly/source.xml</descriptor>
+						<descriptor>${assembly.xml}</descriptor>
 					</descriptors>
 					<finalName>ANC</finalName>
 					<appendAssemblyId>true</appendAssemblyId>
@@ -100,4 +99,37 @@
 			<url>dav:http://www.americannationalcorpus.org/maven/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
+	<profiles>
+		<profile>
+			<id>make-jar</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<assembly.xml>src/main/assembly/assembly.xml</assembly.xml>
+			</properties>
+		</profile>
+		<profile>
+			<id>make-dist</id>
+			<activation>
+				<property>
+					<name>make-dist</name>
+				</property>
+			</activation>
+			<properties>
+				<assembly.xml>src/main/assembly/distribution.xml</assembly.xml>
+			</properties>
+		</profile>
+		<profile>
+			<id>make-source</id>
+			<activation>
+				<property>
+					<name>make-source</name>
+				</property>
+			</activation>
+			<properties>
+				<assembly.xml>src/main/assembly/source.xml</assembly.xml>
+			</properties>
+		</profile>
+	</profiles>
 </project>
