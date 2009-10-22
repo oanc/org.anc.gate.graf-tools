@@ -152,12 +152,15 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             newFeatures.put("graf:set", aSetName);
             String label = a.getLabel();
             addFeatures(a.getFeatures(), newFeatures, null);
-//				for (IFeatureStructureElement fse : a.features())
-//				{
-//					addFeatures(fse, features, null);
-//				}
-//				System.out.println("Adding annotation " + label + " from " + offset.getStart() +
-//						" to " + offset.getEnd());
+            //TODO
+				//for (IFeatureStructureElement fse : a.features())
+            	for (IFeature fse : a.features())
+				{
+				//	addFeatures(fse, features, null);
+            		System.out.println(fse.toString());
+				}
+				System.out.println("Adding annotation " + label + " from " + offset.getStart() +
+					" to " + offset.getEnd());
             long start = offset.getStart();
             long end = offset.getEnd();
             try
