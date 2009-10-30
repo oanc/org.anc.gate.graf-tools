@@ -24,6 +24,7 @@ import gate.Resource;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
 import gate.util.Out;
+import gate.util.Pair;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,6 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 import org.anc.util.IDGenerator;
@@ -178,6 +180,8 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
       Collections.sort(sortedAnnotations, comp);
       Iterator<Annotation> it = sortedAnnotations.iterator();
       new File(document.getSourceUrl().getPath());
+      
+      List<Pair> pairs = null;
 
       while (it.hasNext())
       {
@@ -221,7 +225,10 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
                Map.Entry<Object, Object> att = asIt.next();
                if (!"isEmptyAndSpan".equals(att.getKey()))
                {
+            	   //TODO if key equals graph edge, save list as node id list
+            	   //parse id string, put into list of pairs
                   String key = (String) att.getKey();
+                  
                   String value = GraphUtils.encode((String) att.getValue());
                   grafAnnotation.addFeature(key, value);
                }
@@ -229,6 +236,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
          }
 
       }
+      //TODO take list of pairs, and add edges to graph (graph is already created, just add edges between appropriate nodes)
       return graph;
    }
 
