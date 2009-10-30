@@ -21,6 +21,9 @@
       	<include>org.xces:xces-parser</include>
       	<include>org.tc37sc4.graf:graf-api</include>
       </includes>
+      <excludes>
+      	<exclude>gate:gate</exclude>
+      </excludes>
     </dependencySet>
   </dependencySets>
   <fileSets>

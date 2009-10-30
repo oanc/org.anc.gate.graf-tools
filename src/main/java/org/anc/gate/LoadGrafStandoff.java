@@ -179,30 +179,31 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       {
          if (f.isAtomic())
          {
-            if (type == null)
-            {
-               fm.put(f.getName(), f.getValue());
-            }
-            else
-            {
-               fm.put(type + "." + f.getName(), f.getValue());
-            }
+            String fName = f.getName();
+//            if (type != null)
+//            {
+//               fName = type + "." + f.getName();
+//            }
+            System.out.println("Adding " + fName + "=" + f.getValue().getValue());
+//            if (type == null)
+//            {
+//               fm.put(f.getName(), f.getValue().getValue());
+//            }
+//            else
+//            {
+               fm.put(fName, f.getValue().getValue());
+//            }
          }
          else
          {
             IFeatureStructure childFS = (IFeatureStructure) f.getValue();
-            String childType = childFS.getType();
-            if (childType == null)
+            String childType = f.getName();
+            if (type != null)
             {
-               childType = type;
+               childType = type + "." + childType;
             }
-            else
-            {
-               if (type != null)
-               {
-                  childType = type + "." + childType;
-               }
-            }
+            System.out.println("Adding fs " + childType + " " + childFS);
+            
             addFeatures(childFS, fm, childType);
          }
 //			if (e instanceof IFeature)
