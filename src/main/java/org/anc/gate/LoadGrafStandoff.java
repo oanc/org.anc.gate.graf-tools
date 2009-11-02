@@ -156,8 +156,8 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             //TODO graf:edges and graf:set should be declared as 
             // constants rather than using the literal strings.S
             FeatureMap newFeatures = Factory.newFeatureMap();
-            newFeatures.put("graf:edges", ids.toString());
-            newFeatures.put("graf:set", aSetName);
+            newFeatures.put(Graf.EDGE_ATT, ids.toString());
+            newFeatures.put(Graf.SET_ATT, aSetName);
             String label = a.getLabel();
             addFeatures(a.getFeatures(), newFeatures, null);
             
