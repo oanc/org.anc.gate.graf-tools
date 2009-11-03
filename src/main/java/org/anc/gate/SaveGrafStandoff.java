@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -181,8 +182,8 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
       Iterator<Annotation> it = sortedAnnotations.iterator();
       new File(document.getSourceUrl().getPath());
       
-      List<Pair> pairs = null;
-
+      List<Pair> pairs = new LinkedList<Pair>();
+      
       while (it.hasNext())
       {
          Annotation gateAnnotation = it.next();
@@ -229,6 +230,12 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
             	   //parse id string, put into list of pairs
                   String key = (String) att.getKey();
                   
+                  if(key == Graf.EDGE_ATT)
+                  {
+                	  Pair nodeToChild = new Pair(node.getId(), att.getValue());
+                	  pairs.add(nodeToChild);
+                  }
+                  
                   String value = GraphUtils.encode((String) att.getValue());
                   grafAnnotation.addFeature(key, value);
                }
@@ -237,6 +244,20 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
 
       }
       //TODO take list of pairs, and add edges to graph (graph is already created, just add edges between appropriate nodes)
+      StringBuilder s = new StringBuilder();
+      
+      for(Pair p : pairs)
+      {
+    	s.append(p.toString() + " ");
+      }
+      
+      StringTokenizer sT = new StringTokenizer(s.toString());
+      
+      while(sT.hasMoreTokens())
+      {
+    	  graph.addEdge(sT.nextToken(), sT.nextToken());
+      }
+      
       return graph;
    }
 
