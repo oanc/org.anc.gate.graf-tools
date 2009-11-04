@@ -52,179 +52,196 @@ import org.xml.sax.SAXException;
  */
 public class LoadGrafStandoff extends ANCLanguageAnalyzer
 {
-	private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = 1L;
 
-	public static final String STANDOFFASNAME_PARAMETER = "standoffASName";
-	public static final String SOURCE_URL_PARAMETER = "sourceUrl";
+   public static final String STANDOFFASNAME_PARAMETER = "standoffASName";
+   public static final String SOURCE_URL_PARAMETER = "sourceUrl";
 
-	protected String standoffASName = null;
-	protected URL sourceUrl = null;
+   protected String standoffASName = null;
+   protected URL sourceUrl = null;
 
-	protected transient GraphParser parser;
-	protected AnnotationSet annotations;
-	protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
-	protected transient String content = null;
-	protected transient int endOfContent = 0;
+   protected transient GraphParser parser;
+   protected AnnotationSet annotations;
+   protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
+   protected transient String content = null;
+   protected transient int endOfContent = 0;
 
-	public LoadGrafStandoff()
-	{
-		super();
-	}
+   public LoadGrafStandoff()
+   {
+      super();
+   }
 
-	@Override
-	public Resource init() throws ResourceInstantiationException
-	{
-		try
-		{
-			super.init();
-			parser = new GraphParser();
-		}
-		catch (SAXException ex)
-		{
-			throw new ResourceInstantiationException(ex);
-		}
-		return this;
-	}
+   @Override
+   public Resource init() throws ResourceInstantiationException
+   {
+      try
+      {
+         super.init();
+         parser = new GraphParser();
+      }
+      catch (SAXException ex)
+      {
+         throw new ResourceInstantiationException(ex);
+      }
+      return this;
+   }
 
-	@Override
-	public void execute() throws ExecutionException
-	{
-		annotations = getAnnotations(standoffASName);
-		content = document.getContent().toString();
-		endOfContent = content.length();
+   @Override
+   public void execute() throws ExecutionException
+   {
+      annotations = getAnnotations(standoffASName);
+      content = document.getContent().toString();
+      endOfContent = content.length();
 
 //		URL url = this.getSourceUrl();
-File file = new File(sourceUrl.getPath());
-IGraph graph = null;
-try
-{
-	graph = parser.parse(file);
+      File file = new File(sourceUrl.getPath());
+      IGraph graph = null;
+      try
+      {
+         graph = parser.parse(file);
 //	graph.sort();
-	for (INode node : graph.nodes())
-	{
+         for (INode node : graph.nodes())
+         {
 //		String type = node.getFeature("ptb", "label")
-		addAnnotation(node);
-	}
-}
-catch (Exception ex)
-{
-	System.out.println(ex.getMessage());
-	throw new ExecutionException(ex);
-}
-System.out.println("Execution complete.");
-	}
+            addAnnotation(node);
+         }
+      }
+      catch (Exception ex)
+      {
+         System.out.println("Error loading standoff.");
+         ex.printStackTrace();
+//         System.out.println(ex.getMessage());
+         throw new ExecutionException(ex);
+      }
+      System.out.println("Execution complete.");
+   }
 
-	public String getStandoffASName()
-	{
-		return standoffASName;
-	}
+   public String getStandoffASName()
+   {
+      return standoffASName;
+   }
 
-	public void setStandoffASName(String name)
-	{
-		standoffASName = name;
-	}
+   public void setStandoffASName(String name)
+   {
+      standoffASName = name;
+   }
 
-	public URL getSourceUrl()
-	{
-		return sourceUrl;
-	}
+   public URL getSourceUrl()
+   {
+      return sourceUrl;
+   }
 
-	public void setSourceUrl(URL url)
-	{
-		sourceUrl = url;
-	}
+   public void setSourceUrl(URL url)
+   {
+      sourceUrl = url;
+   }
 
-	protected void addAnnotation(INode node) throws InvalidOffsetException
-	{
-		getRangeFn.reset();
-		Offset offset = getRangeFn.apply(node);
-		if (offset.getEnd() < offset.getStart())
-		{
-			return;
-		}
+   protected void addAnnotation(INode node) throws InvalidOffsetException
+   {
+      getRangeFn.reset();
+      Offset offset = getRangeFn.apply(node);
+      if (offset.getEnd() < offset.getStart())
+      {
+         return;
+      }
 
-		for (IAnnotationSet aSet : node.annotationSets())
-		{	
-			String aSetName = aSet.getType();
-			for (IAnnotation a : aSet.annotations())
-			{
-				FeatureMap newFeatures = Factory.newFeatureMap();
-				newFeatures.put("graf:set", aSetName);
-				String label = a.getLabel();
-				addFeatures(a.getFeatures(), newFeatures, null);
-				//TODO
-				//for (IFeatureStructureElement fse : a.features())
-				for (IFeature fse : a.features())
-				{
-					addFeatures((IFeatureStructure) a.features(), features, null);
+      StringBuilder ids = new StringBuilder();
+      for (IEdge e :node.getOutEdges())
+      {
+         ids.append(e.getId() + " ");
+      }
+      for (IAnnotationSet aSet : node.annotationSets())
+      {
+         String aSetName = aSet.getType();
+         for (IAnnotation a : aSet.annotations())
+         {
+            //TODO graf:edges and graf:set should be declared as 
+            // constants rather than using the literal strings.S
+            FeatureMap newFeatures = Factory.newFeatureMap();
+            newFeatures.put(Graf.EDGE_ATT, ids.toString());
+            newFeatures.put(Graf.SET_ATT, aSetName);
+            String label = a.getLabel();
+            addFeatures(a.getFeatures(), newFeatures, null);
+            
+            //for (IFeatureStructureElement fse : a.features())
+            //for (IFeature fse : a.features())
+            //{
+              // addFeatures((IFeatureStructure) a.features(), features, null);
 //					addFeatures(fse.feature)
 //					System.out.println(fse.toString());
-				}
-				System.out.println("Adding annotation " + label + " from " + offset.getStart() +
-						" to " + offset.getEnd());
-				long start = offset.getStart();
-				long end = offset.getEnd();
-				try
-				{
-					if (end > endOfContent)
-					{
-						System.err.println("Invalid end offset for " + label +
-								" " + end + ", end of content = " + endOfContent);
+            //}
+            //System.out.println("Adding annotation " + label + " from "
+            //      + offset.getStart() + " to " + offset.getEnd());
+            long start = offset.getStart();
+            long end = offset.getEnd();
+            try
+            {
+               if (end > endOfContent)
+               {
+                  System.err.println("Invalid end offset for " + label + " "
+                        + end + ", end of content = " + endOfContent);
 
-						end = endOfContent;
-					}
-					annotations.add(start, end, label,
-							newFeatures);
-				}
-				catch (InvalidOffsetException e)
-				{
-					System.err.println("Invalid offsets for " + label);
-					System.err.println("Annotation span : " + start + " - " + end);
-					throw new InvalidOffsetException("Invalid offsets for " + label
-							+ " from " + offset.getStart() + " to " + offset.getEnd());
-				}
-			}
-		}
-	}
+                  end = endOfContent;
+               }
+               if (start > end )
+               {
+                  System.err.println("Invalid start offset for " + label + " "
+                        + start + ", end of content = " + endOfContent);
+               }
+               else
+               {
+                  annotations.add(start, end, label, newFeatures);
+               }
+            }
+            catch (InvalidOffsetException e)
+            {
+               System.err.println("Invalid offsets for " + label);
+               System.err.println("Annotation span : " + start + " - " + end);
+               throw new InvalidOffsetException("Invalid offsets for " + label
+                     + " from " + offset.getStart() + " to " + offset.getEnd());
+            }
+         }
+      }
+   }
 
-	protected void addFeatures(IFeatureStructure featStruc, FeatureMap fm,
-			String type)
-	{
-		IFeatureStructure fs = featStruc;
-		if (fs == null)
-		{
-			return;
-		}
-		for (IFeature f : fs.features())
-		{
-			if (f.isAtomic()) 
-			{
-				if (type == null)
-				{
-					fm.put(f.getName(), f.getValue().getValue());
-				}
-				else
-				{
-					fm.put(type + "." + f.getName(), f.getValue().getValue());
-				}
-			}
-			else
-			{
-				IFeatureStructure childFS = (IFeatureStructure) f.getValue();
-				String childType = childFS.getType();
-				if (childType == null)
-				{
-					childType = type;
-				}
-				else
-				{
-					if (type != null)
-					{
-						childType = type + "." + childType;
-					}
-				}
-				addFeatures(childFS, fm, childType);
-			}
+   protected void addFeatures(IFeatureStructure featStruc, FeatureMap fm,
+         String type)
+   {
+      IFeatureStructure fs = featStruc;
+      if (fs == null)
+      {
+         return;
+      }
+      for (IFeature f : fs.features())
+      {
+         if (f.isAtomic())
+         {
+            if (type == null)
+            {
+               fm.put(f.getName(), f.getValue().getValue());
+            }
+            else
+            {
+               fm.put(type + "." + f.getName(), f.getValue().getValue());
+            }
+         }
+         else
+         {
+            IFeatureStructure childFS = (IFeatureStructure) f.getValue();
+            String childType = childFS.getType();
+            if (childType == null)
+            {
+               childType = type;
+            }
+            else
+            {
+               if (type != null)
+               {
+                  childType = type + "." + childType;
+               }
+            }
+            addFeatures(childFS, fm, childType);
+         }
 //			if (e instanceof IFeature)
 //			{
 //			IFeature f = (IFeature) e;
@@ -254,161 +271,161 @@ System.out.println("Execution complete.");
 //			}
 //			addFeatures(childFS, features, childType);
 //			}
-		}
-	}
+      }
+   }
 
-	@Deprecated
-	protected Offset getOffset(INode node)
-	{
-		Offset offset = (Offset) node.getUserObject();
-		if (offset != null)
-		{
+   @Deprecated
+   protected Offset getOffset(INode node)
+   {
+      Offset offset = (Offset) node.getUserObject();
+      if (offset != null)
+      {
 //			System.out.print("Found offset for node " + node.getId());
 //			System.out.println(" from " + offset.getStart() + " to " +
 //			offset.getEnd());
-			return offset;
-		}
+         return offset;
+      }
 
-		long start = Long.MAX_VALUE;
-		long end = Long.MIN_VALUE;
-		for (IEdge e : node.getOutEdges())
-		{
-			INode to = e.getTo();
-			offset = getOffset(to);
-			if (offset != null)
-			{
-				if (offset.getStart() < start)
-				{
-					start = offset.getStart();
-				}
-				if (offset.getEnd() > end)
-				{
-					end = offset.getEnd();
-				}
-			}
-		}
-		if (end <= start)
-		{
-			return null;
-		}
+      long start = Long.MAX_VALUE;
+      long end = Long.MIN_VALUE;
+      for (IEdge e : node.getOutEdges())
+      {
+         INode to = e.getTo();
+         offset = getOffset(to);
+         if (offset != null)
+         {
+            if (offset.getStart() < start)
+            {
+               start = offset.getStart();
+            }
+            if (offset.getEnd() > end)
+            {
+               end = offset.getEnd();
+            }
+         }
+      }
+      if (end <= start)
+      {
+         return null;
+      }
 
-		offset = new Offset(start, end);
+      offset = new Offset(start, end);
 //		System.out.print("Creating offset for node " + node.getId());
 //System.out.println(" from " + offset.getStart() + " to " +
 //		offset.getEnd());
-		node.setUserObject(offset);
-		return offset;
-	}
+      node.setUserObject(offset);
+      return offset;
+   }
 
-	protected void test()
-	{
-		try
-		{
-			System.setProperty("gate.home", "d:/Applications/Gate-5.0");
-			Gate.init();
-			Document doc = Factory.newDocument(new URL(
-					"file:/D:/corpora/masc/ptb/graf/110cyl067-ptb.xml"));
-			System.out.println("Document loaded");
-			Resource res = Factory.createResource("org.anc.gate.LoadGrafStandoff");
-			LoadGrafStandoff load = (LoadGrafStandoff) res;
-			System.out.println("Resource created.");
+   protected void test()
+   {
+      try
+      {
+         System.setProperty("gate.home", "d:/Applications/Gate-5.0");
+         Gate.init();
+         Document doc = Factory.newDocument(new URL(
+               "file:/D:/corpora/masc/ptb/graf/110cyl067-ptb.xml"));
+         System.out.println("Document loaded");
+         Resource res = Factory.createResource("org.anc.gate.LoadGrafStandoff");
+         LoadGrafStandoff load = (LoadGrafStandoff) res;
+         System.out.println("Resource created.");
 //			List<String> types = new Vector<String> ();
 //			types.add("ptb");
 //			load.setTypes(types);
-			load.setDocument(doc);
-			load.execute();
-			System.out.println("Done");
-		}
-		catch (Exception ex)
-		{
-			System.out.println(ex);
-			ex.printStackTrace();
-		}
-	}
+         load.setDocument(doc);
+         load.execute();
+         System.out.println("Done");
+      }
+      catch (Exception ex)
+      {
+         System.out.println(ex);
+         ex.printStackTrace();
+      }
+   }
 
-	public static void main(String[] args)
-	{
-		LoadGrafStandoff app = new LoadGrafStandoff();
-		app.test();
-	}
+   public static void main(String[] args)
+   {
+      LoadGrafStandoff app = new LoadGrafStandoff();
+      app.test();
+   }
 }
 
 class Offset extends Pair<Long, Long>
 {
-	public Offset()
-	{
-		super(Long.MAX_VALUE, Long.MIN_VALUE);
-	}
+   public Offset()
+   {
+      super(Long.MAX_VALUE, Long.MIN_VALUE);
+   }
 
-	public Offset(long start, long end)
-	{
-		super(start, end);
-	}
+   public Offset(long start, long end)
+   {
+      super(start, end);
+   }
 
-	public Long getStart()
-	{
-		return first;
-	}
+   public Long getStart()
+   {
+      return first;
+   }
 
-	public Long getEnd()
-	{
-		return second;
-	}
+   public Long getEnd()
+   {
+      return second;
+   }
 
-	public void setStart(long start)
-	{
-		setFirst(start);
-	}
+   public void setStart(long start)
+   {
+      setFirst(start);
+   }
 
-	public void setEnd(long end)
-	{
-		setSecond(end);
-	}
+   public void setEnd(long end)
+   {
+      setSecond(end);
+   }
 
 }
 
 class GetRangeFunction implements IFunction<INode, Offset>
 {
-	protected Offset offset = new Offset();
+   protected Offset offset = new Offset();
 
-	public Offset apply(INode item)
-	{
-		for (IRegion region : item.getRegions())
-		{
-			getRange(region);
-		}
-		for (IEdge e : item.getOutEdges())
-		{
-			apply(e.getTo());
-		}
-		return offset;
-	}
+   public Offset apply(INode item)
+   {
+      for (IRegion region : item.getRegions())
+      {
+         getRange(region);
+      }
+      for (IEdge e : item.getOutEdges())
+      {
+         apply(e.getTo());
+      }
+      return offset;
+   }
 
-	private void getRange(IRegion region)
-	{
-		IAnchor startAnchor = region.getStart();
-		IAnchor endAnchor = region.getEnd();
-		if (!(startAnchor instanceof CharacterAnchor)
-				|| !(endAnchor instanceof CharacterAnchor))
-		{
-			return;
-		}
+   private void getRange(IRegion region)
+   {
+      IAnchor startAnchor = region.getStart();
+      IAnchor endAnchor = region.getEnd();
+      if (!(startAnchor instanceof CharacterAnchor)
+            || !(endAnchor instanceof CharacterAnchor))
+      {
+         return;
+      }
 
-		CharacterAnchor start = (CharacterAnchor) startAnchor;
-		CharacterAnchor end = (CharacterAnchor) endAnchor;
-		if (start.getOffset() < offset.getStart())
-		{
-			offset.setStart(start.getOffset());
-		}
-		if (end.getOffset() > offset.getEnd())
-		{
-			offset.setEnd(end.getOffset());
-		}
-	}
+      CharacterAnchor start = (CharacterAnchor) startAnchor;
+      CharacterAnchor end = (CharacterAnchor) endAnchor;
+      if (start.getOffset() < offset.getStart())
+      {
+         offset.setStart(start.getOffset());
+      }
+      if (end.getOffset() > offset.getEnd())
+      {
+         offset.setEnd(end.getOffset());
+      }
+   }
 
-	public void reset()
-	{
-		offset.setStart(Long.MAX_VALUE);
-		offset.setEnd(Long.MIN_VALUE);
-	}
+   public void reset()
+   {
+      offset.setStart(Long.MAX_VALUE);
+      offset.setEnd(Long.MIN_VALUE);
+   }
 }

@@ -26,6 +26,7 @@
 					<descriptors>
 						<descriptor>src/main/assembly/assembly.xml</descriptor>
 						<descriptor>src/main/assembly/distribution.xml</descriptor>
+						<descriptor>src/main/assembly/source.xml</descriptor>
 					</descriptors>
 					<finalName>ANC</finalName>
 					<appendAssemblyId>true</appendAssemblyId>
