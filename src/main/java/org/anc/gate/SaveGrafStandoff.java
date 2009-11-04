@@ -244,20 +244,19 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
 
       }
       //TODO take list of pairs, and add edges to graph (graph is already created, just add edges between appropriate nodes)
-      StringBuilder s = new StringBuilder();
+//      StringBuilder s = new StringBuilder();
       
-      for(Pair p : pairs)
+      for (Pair p : pairs)
       {
-    	s.append(p.toString() + " ");
+         //s.append(p.toString() + " ");
+
+         StringTokenizer sT = new StringTokenizer((String) p.second);
+
+         while (sT.hasMoreTokens())
+         {
+            graph.addEdge((String) p.first, sT.nextToken());
+         }
       }
-      
-      StringTokenizer sT = new StringTokenizer(s.toString());
-      
-      while(sT.hasMoreTokens())
-      {
-    	  graph.addEdge(sT.nextToken(), sT.nextToken());
-      }
-      
       return graph;
    }
 
