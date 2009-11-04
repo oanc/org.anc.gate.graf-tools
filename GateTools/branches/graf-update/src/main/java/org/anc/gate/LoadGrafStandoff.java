@@ -108,7 +108,9 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       }
       catch (Exception ex)
       {
-         System.out.println(ex.getMessage());
+         System.out.println("Error loading standoff.");
+         ex.printStackTrace();
+//         System.out.println(ex.getMessage());
          throw new ExecutionException(ex);
       }
       System.out.println("Execution complete.");
@@ -162,14 +164,14 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             addFeatures(a.getFeatures(), newFeatures, null);
             
             //for (IFeatureStructureElement fse : a.features())
-            for (IFeature fse : a.features())
-            {
-               addFeatures((IFeatureStructure) a.features(), features, null);
+            //for (IFeature fse : a.features())
+            //{
+              // addFeatures((IFeatureStructure) a.features(), features, null);
 //					addFeatures(fse.feature)
 //					System.out.println(fse.toString());
-            }
-            System.out.println("Adding annotation " + label + " from "
-                  + offset.getStart() + " to " + offset.getEnd());
+            //}
+            //System.out.println("Adding annotation " + label + " from "
+            //      + offset.getStart() + " to " + offset.getEnd());
             long start = offset.getStart();
             long end = offset.getEnd();
             try
@@ -181,7 +183,15 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
 
                   end = endOfContent;
                }
-               annotations.add(start, end, label, newFeatures);
+               if (start > end )
+               {
+                  System.err.println("Invalid start offset for " + label + " "
+                        + start + ", end of content = " + endOfContent);
+               }
+               else
+               {
+                  annotations.add(start, end, label, newFeatures);
+               }
             }
             catch (InvalidOffsetException e)
             {
