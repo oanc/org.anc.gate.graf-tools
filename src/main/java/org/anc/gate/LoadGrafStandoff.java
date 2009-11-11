@@ -148,7 +148,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       StringBuilder ids = new StringBuilder();
       for (IEdge e :node.getOutEdges())
       {
-         ids.append(e.getId() + " ");
+         ids.append(e.getTo().getId() + " ");
       }
       for (IAnnotationSet aSet : node.annotationSets())
       {
@@ -158,7 +158,11 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             //TODO graf:edges and graf:set should be declared as 
             // constants rather than using the literal strings.S
             FeatureMap newFeatures = Factory.newFeatureMap();
-            newFeatures.put(Graf.EDGE_ATT, ids.toString());
+//            newFeatures.put(Graf.EDGE_ATT, ids.toString());
+            if(node.getOutEdges().size() > 0)
+            {
+            	newFeatures.put(Graf.EDGE_ATT, ids.toString());
+            }
             newFeatures.put(Graf.SET_ATT, aSetName);
             String label = a.getLabel();
             addFeatures(a.getFeatures(), newFeatures, null);
