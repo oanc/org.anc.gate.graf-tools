@@ -28,7 +28,7 @@
 						<descriptor>src/main/assembly/distribution.xml</descriptor>
 						<descriptor>src/main/assembly/source.xml</descriptor>
 					</descriptors>
-					<finalName>ANC</finalName>
+					<finalName>ANC-${project.version}</finalName>
 					<appendAssemblyId>true</appendAssemblyId>
 				</configuration>
 				<executions>
