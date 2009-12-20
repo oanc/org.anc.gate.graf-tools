@@ -205,7 +205,14 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
             {
                // System.out.println("Adding annotations from " + basePath + "/" + filename);
                List<Annotation> newAnnotations = new LinkedList<Annotation>();
-               parser.parse(newAnnotations, basePath + "/" + filename);
+               try
+               {
+                  parser.parse(newAnnotations, basePath + "/" + filename);
+               }
+               catch (Exception e)
+               {
+                  throw new ResourceInstantiationException(e);
+               }
                for (Annotation a : newAnnotations)
                {
                   long start = a.getStart();

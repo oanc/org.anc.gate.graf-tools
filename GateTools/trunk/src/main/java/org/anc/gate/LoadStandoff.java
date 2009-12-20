@@ -25,12 +25,14 @@ import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
 import gate.util.InvalidOffsetException;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.xces.standoff.Annotation;
 import org.xces.standoff.AnnotationParser;
+import org.xml.sax.SAXException;
 
 /**
  * 
@@ -58,7 +60,15 @@ public class LoadStandoff extends ANCLanguageAnalyzer
       AnnotationSet as = getAnnotations(standoffASName);
 //	 parser.setAnnotationSet(as);
       List<Annotation> list = new LinkedList<Annotation>();
-      parser.parse(list, sourceUrl.getPath());
+      try
+      {
+         parser.parse(list, sourceUrl.getPath());
+      }
+      catch (Exception e)
+      {
+         e.printStackTrace();
+         throw new ExecutionException(e);
+      }
       for (Annotation a : list)
       {
          long start = a.getStart();
@@ -76,7 +86,7 @@ public class LoadStandoff extends ANCLanguageAnalyzer
             for (Annotation.Feature f : a.getFeatures())
             {
 //   	       System.out.println("   feature " + f.getKey() + "=" + f.getValue());
-               fm.put(f.getKey(), f.getValue());
+               fm.put(f.getKey().toString(), f.getValue());
             }
             try
             {
