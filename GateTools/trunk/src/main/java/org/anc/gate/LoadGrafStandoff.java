@@ -93,16 +93,16 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       content = document.getContent().toString();
       endOfContent = content.length();
 
-//		URL url = this.getSourceUrl();
+//    URL url = this.getSourceUrl();
       File file = new File(sourceUrl.getPath());
       IGraph graph = null;
       try
       {
          graph = parser.parse(file);
-//	graph.sort();
+// graph.sort();
          for (INode node : graph.nodes())
          {
-//		String type = node.getFeature("ptb", "label")
+//    String type = node.getFeature("ptb", "label")
             addAnnotation(node);
          }
       }
@@ -148,7 +148,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       StringBuilder ids = new StringBuilder();
       for (IEdge e :node.getOutEdges())
       {
-         ids.append(e.getId() + " ");
+         ids.append(e.getTo().getId() + " ");
       }
       for (IAnnotationSet aSet : node.annotationSets())
       {
@@ -158,7 +158,11 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             //TODO graf:edges and graf:set should be declared as 
             // constants rather than using the literal strings.S
             FeatureMap newFeatures = Factory.newFeatureMap();
-            newFeatures.put(Graf.EDGE_ATT, ids.toString());
+//            newFeatures.put(Graf.EDGE_ATT, ids.toString());
+            if(node.getOutEdges().size() > 0)
+            {
+            	newFeatures.put(Graf.EDGE_ATT, ids.toString());
+            }
             newFeatures.put(Graf.SET_ATT, aSetName);
             String label = a.getLabel();
             addFeatures(a.getFeatures(), newFeatures, null);
@@ -167,8 +171,8 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             //for (IFeature fse : a.features())
             //{
               // addFeatures((IFeatureStructure) a.features(), features, null);
-//					addFeatures(fse.feature)
-//					System.out.println(fse.toString());
+//             addFeatures(fse.feature)
+//             System.out.println(fse.toString());
             //}
             //System.out.println("Adding annotation " + label + " from "
             //      + offset.getStart() + " to " + offset.getEnd());
@@ -242,35 +246,35 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             }
             addFeatures(childFS, fm, childType);
          }
-//			if (e instanceof IFeature)
-//			{
-//			IFeature f = (IFeature) e;
-//			if (type == null)
-//			{
-//			features.put(f.getName(), f.getValue());
-//			}
-//			else
-//			{
-//			features.put(type + "." + f.getName(), f.getValue());
-//			}
-//			}
-//			else
-//			{
-//			IFeatureStructure childFS = (IFeatureStructure) e;
-//			String childType = childFS.getType();
-//			if (childType == null)
-//			{
-//			childType = type;
-//			}
-//			else
-//			{
-//			if (type != null)
-//			{
-//			childType = type + "." + childType;
-//			}
-//			}
-//			addFeatures(childFS, features, childType);
-//			}
+//       if (e instanceof IFeature)
+//       {
+//       IFeature f = (IFeature) e;
+//       if (type == null)
+//       {
+//       features.put(f.getName(), f.getValue());
+//       }
+//       else
+//       {
+//       features.put(type + "." + f.getName(), f.getValue());
+//       }
+//       }
+//       else
+//       {
+//       IFeatureStructure childFS = (IFeatureStructure) e;
+//       String childType = childFS.getType();
+//       if (childType == null)
+//       {
+//       childType = type;
+//       }
+//       else
+//       {
+//       if (type != null)
+//       {
+//       childType = type + "." + childType;
+//       }
+//       }
+//       addFeatures(childFS, features, childType);
+//       }
       }
    }
 
@@ -280,9 +284,9 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       Offset offset = (Offset) node.getUserObject();
       if (offset != null)
       {
-//			System.out.print("Found offset for node " + node.getId());
-//			System.out.println(" from " + offset.getStart() + " to " +
-//			offset.getEnd());
+//       System.out.print("Found offset for node " + node.getId());
+//       System.out.println(" from " + offset.getStart() + " to " +
+//       offset.getEnd());
          return offset;
       }
 
@@ -310,9 +314,9 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       }
 
       offset = new Offset(start, end);
-//		System.out.print("Creating offset for node " + node.getId());
+//    System.out.print("Creating offset for node " + node.getId());
 //System.out.println(" from " + offset.getStart() + " to " +
-//		offset.getEnd());
+//    offset.getEnd());
       node.setUserObject(offset);
       return offset;
    }
@@ -329,9 +333,9 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
          Resource res = Factory.createResource("org.anc.gate.LoadGrafStandoff");
          LoadGrafStandoff load = (LoadGrafStandoff) res;
          System.out.println("Resource created.");
-//			List<String> types = new Vector<String> ();
-//			types.add("ptb");
-//			load.setTypes(types);
+//       List<String> types = new Vector<String> ();
+//       types.add("ptb");
+//       load.setTypes(types);
          load.setDocument(doc);
          load.execute();
          System.out.println("Done");
