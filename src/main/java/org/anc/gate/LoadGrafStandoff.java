@@ -38,6 +38,7 @@ import org.xces.graf.api.IEdge;
 import org.xces.graf.api.IFeature;
 import org.xces.graf.api.IFeatureStructure;
 import org.xces.graf.api.IGraph;
+import org.xces.graf.api.ILink;
 import org.xces.graf.api.INode;
 import org.xces.graf.api.IRegion;
 import org.xces.graf.impl.CharacterAnchor;
@@ -150,11 +151,12 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       {
          ids.append(e.getTo().getId() + " ");
       }
-      for (IAnnotationSet aSet : node.annotationSets())
-      {
-         String aSetName = aSet.getType();
-         for (IAnnotation a : aSet.annotations())
+//      for (IAnnotationSet aSet : node.annotationSets())
+//      {
+//         String aSetName = aSet.getType();
+         for (IAnnotation a : node.annotations())
          {
+            String aSetName = a.getAnnotationSet().getType();
             //TODO graf:edges and graf:set should be declared as 
             // constants rather than using the literal strings.S
             FeatureMap newFeatures = Factory.newFeatureMap();
@@ -205,7 +207,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
                      + " from " + offset.getStart() + " to " + offset.getEnd());
             }
          }
-      }
+      //}
    }
 
    protected void addFeatures(IFeatureStructure featStruc, FeatureMap fm,
@@ -394,9 +396,12 @@ class GetRangeFunction implements IFunction<INode, Offset>
 
    public Offset apply(INode item)
    {
-      for (IRegion region : item.getRegions())
+      for (ILink link : item.links())
       {
-         getRange(region);
+         for (IRegion region : link)
+         {
+            getRange(region);
+         }
       }
       for (IEdge e : item.getOutEdges())
       {

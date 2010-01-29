@@ -40,6 +40,7 @@ import java.util.Set;
 
 import org.anc.Sys;
 import org.xces.XCES;
+import org.xces.graf.io.XML;
 import org.xces.graf.util.GraphUtils;
 
 /**
@@ -235,7 +236,7 @@ public class SaveStandoff extends ANCLanguageAnalyzer
          return value;
       }
 
-      return GraphUtils.encode((String) value);
+      return XML.encode((String) value);
    }
 
    // Property getters and setters.
