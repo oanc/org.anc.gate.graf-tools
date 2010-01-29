@@ -52,6 +52,7 @@ import org.xces.graf.api.INode;
 import org.xces.graf.api.IRegion;
 import org.xces.graf.impl.Factory;
 import org.xces.graf.io.GrafRenderer;
+import org.xces.graf.io.XML;
 import org.xces.graf.util.GraphUtils;
 
 /**
@@ -236,7 +237,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
                 	  pairs.add(nodeToChild);
                   }
                   
-                  String value = GraphUtils.encode((String) att.getValue());
+                  String value = XML.encode((String) att.getValue());
                   grafAnnotation.addFeature(key, value);
                }
             }
