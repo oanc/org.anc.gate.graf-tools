@@ -156,7 +156,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
 //         String aSetName = aSet.getType();
          for (IAnnotation a : node.annotations())
          {
-            String aSetName = a.getAnnotationSet().getType();
+            String aSetName = a.getAnnotationSet().getName();
             //TODO graf:edges and graf:set should be declared as 
             // constants rather than using the literal strings.S
             FeatureMap newFeatures = Factory.newFeatureMap();
