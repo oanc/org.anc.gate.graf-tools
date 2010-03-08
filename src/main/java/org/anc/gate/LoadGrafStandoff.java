@@ -93,6 +93,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       annotations = getAnnotations(standoffASName);
       content = document.getContent().toString();
       endOfContent = content.length();
+//      System.out.println("Content length is " + endOfContent);
 
 //    URL url = this.getSourceUrl();
       File file = new File(sourceUrl.getPath());
@@ -176,8 +177,8 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
 //             addFeatures(fse.feature)
 //             System.out.println(fse.toString());
             //}
-            //System.out.println("Adding annotation " + label + " from "
-            //      + offset.getStart() + " to " + offset.getEnd());
+//            System.out.println("Adding annotation " + label + " from "
+//                  + offset.getStart() + " to " + offset.getEnd());
             long start = offset.getStart();
             long end = offset.getEnd();
             try
