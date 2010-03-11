@@ -214,7 +214,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
    }
 
    protected void addFeatures(IFeatureStructure featStruc, FeatureMap fm,
-         String type)
+         String base)
    {
       IFeatureStructure fs = featStruc;
       if (fs == null)
@@ -225,31 +225,28 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       {
          if (f.isAtomic())
          {
-            if (type == null)
+            if (base == null)
             {
-               fm.put(f.getName(), f.getValue().getValue());
+               fm.put(f.getName(), f.getStringValue());
             }
             else
             {
-               fm.put(type + "." + f.getName(), f.getValue().getValue());
+               fm.put(base + "/" + f.getName(), f.getStringValue());
             }
          }
          else
          {
             IFeatureStructure childFS = (IFeatureStructure) f.getValue();
-            String childType = childFS.getType();
-            if (childType == null)
+            String childName = null;
+            if (base == null)
             {
-               childType = type;
+               childName = f.getName();
             }
             else
             {
-               if (type != null)
-               {
-                  childType = type + "." + childType;
-               }
+               childName = base + "/" + f.getName();               
             }
-            addFeatures(childFS, fm, childType);
+            addFeatures(childFS, fm, childName);
          }
 //       if (e instanceof IFeature)
 //       {
