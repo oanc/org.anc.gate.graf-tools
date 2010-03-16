@@ -77,31 +77,31 @@
 		<dependency>
 			<groupId>org.tc37sc4.graf</groupId>
 			<artifactId>graf-api</artifactId>
-			<version>1.0.0-alpha1-SNAPSHOT</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
 			<id>anc-dev-release</id>
 			<name>ANC Development Repository</name>
-			<url>http://www.americannationalcorpus.org/maven/release</url>
+			<url>http://www.anc.org/maven/release</url>
 		</repository>
 		<repository>
 			<id>anc-dev-3rdparty</id>
 			<name>ANC 3rd Party Repository</name>
-			<url>http://www.americannationalcorpus.org/maven/thirdparty</url>
+			<url>http://www.anc.org/maven/thirdparty</url>
 		</repository>
 	</repositories>
 	<distributionManagement>
 		<repository>
 			<id>anc-dev-release</id>
 			<name>ANC Development Repository</name>
-			<url>dav:http://www.americannationalcorpus.org/maven/release</url>
+			<url>dav:http://www.anc.org/maven/release</url>
 		</repository>
 		<snapshotRepository>
 			<id>anc-dev-snapshot</id>
 			<name>ANC Snapshot Repository</name>
-			<url>dav:http://www.americannationalcorpus.org/maven/snapshot</url>
+			<url>dav:http://www.anc.org/maven/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<profiles>
