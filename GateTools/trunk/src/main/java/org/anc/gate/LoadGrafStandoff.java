@@ -166,9 +166,10 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             FeatureMap newFeatures = Factory.newFeatureMap();
             if(node.getOutEdges().size() > 0)
             {
-            	newFeatures.put(Graf.EDGE_ATT, ids.toString());
+            	newFeatures.put(Graf.GRAF_EDGE, ids.toString());
             }
-            newFeatures.put(Graf.SET_ATT, aSetName);
+            newFeatures.put(Graf.GRAF_SET, aSetName);
+            newFeatures.put(Graf.GRAF_ID, node.getId());
             String label = a.getLabel();
             addFeatures(a.getFeatures(), newFeatures, null);
             

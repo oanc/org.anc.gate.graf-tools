@@ -188,6 +188,8 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
       while (it.hasNext())
       {
          Annotation gateAnnotation = it.next();
+         FeatureMap fm = gateAnnotation.getFeatures();
+
          long start = gateAnnotation.getStartNode().getOffset().longValue();
          long end = gateAnnotation.getEndNode().getOffset().longValue();
 
@@ -195,10 +197,14 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
          IAnchor endAnchor = anchorFactory.newAnchor(end);
 
          IRegion region = graph.getRegion(startAnchor, endAnchor);
+         String grafId = (String) fm.get(Graf.GRAF_ID);
+         if (grafId == null)
+         {
+            grafId = id.generate("r");
+         }
          if (region == null)
          {
-            region = Factory
-                  .newRegion(id.generate("r"), startAnchor, endAnchor);
+            region = Factory.newRegion(id.generate("r"), startAnchor, endAnchor);
             graph.addRegion(region);
          }
 
@@ -217,7 +223,6 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
          IAnnotation grafAnnotation = Factory.newAnnotation(gateAnnotation
                .getType());
          node.addAnnotation(grafAnnotation);
-         FeatureMap fm = gateAnnotation.getFeatures();
          if (fm != null && fm.size() > 0)
          {
             Set<Map.Entry<Object, Object>> attSet = fm.entrySet();
@@ -231,7 +236,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
             	   //parse id string, put into list of pairs
                   String key = (String) att.getKey();
                   
-                  if(key == Graf.EDGE_ATT)
+                  if(key == Graf.GRAF_EDGE)
                   {
                 	  Pair nodeToChild = new Pair(node.getId(), att.getValue());
                 	  pairs.add(nodeToChild);
