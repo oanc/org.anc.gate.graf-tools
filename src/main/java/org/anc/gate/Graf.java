@@ -25,6 +25,7 @@ package org.anc.gate;
  */
 public final class Graf
 {
-   public static final String SET_ATT = "graf:set";
-   public static final String EDGE_ATT = "graf:edge";
+   public static final String GRAF_SET = "graf:set";
+   public static final String GRAF_EDGE = "graf:edge";
+   public static final String GRAF_ID = "graf:id";
 }
