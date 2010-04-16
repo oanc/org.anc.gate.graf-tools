@@ -184,7 +184,6 @@
 			<PARAMETER NAME="filterFeatures" 
 				COMMENT="Feature names to be excluded from the output"
 				RUNTIME="true" OPTIONAL="true">java.util.List</PARAMETER>
-				
 		</RESOURCE>
 		<!-- 
 		
@@ -212,6 +211,13 @@
 				RUNTIME="true" OPTIONAL="true" DEFAULT="standoff">java.lang.String</PARAMETER>			
 			<PARAMETER NAME="version" RUNTIME="true" DEFAULT="1.0"
 				OPTIONAL="true" COMMENT="Version number assigned to the document">java.lang.String</PARAMETER>
+			<PARAMETER NAME="grafASName" RUNTIME="true" OPTIONAL="false" DEFAULT="xces"
+				COMMENT="AnnotationSet name used in the GrAF standoff header">java.lang.String</PARAMETER>
+			<PARAMETER NAME="grafASType" RUNTIME="true" OPTIONAL="false" DEFAULT="http://www.xces.org/schema/2003"
+				COMMENT="Type URI for the GrAF annotation set.">java.lang.String</PARAMETER>
+			<PARAMETER NAME="grafDefaultASType" RUNTIME="true" OPTIONAL="false" DEFAULT="http://www.anc.org/ns/masc/1.0"
+				COMMENT="Default type URI for the other annotation sets encountered.">java.lang.String</PARAMETER>
+				
 		</RESOURCE>
 	</CREOLE>
 </CREOLE-DIRECTORY>

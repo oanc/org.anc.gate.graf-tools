@@ -33,6 +33,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -42,11 +43,13 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
+import org.anc.masc.MASC;
 import org.anc.util.IDGenerator;
 import org.xces.graf.api.GrafException;
 import org.xces.graf.api.IAnchor;
 import org.xces.graf.api.IAnchorFactory;
 import org.xces.graf.api.IAnnotation;
+import org.xces.graf.api.IAnnotationSet;
 import org.xces.graf.api.IGraph;
 import org.xces.graf.api.INode;
 import org.xces.graf.api.IRegion;
@@ -60,12 +63,24 @@ import org.xces.graf.util.GraphUtils;
 public class SaveGrafStandoff extends ANCLanguageAnalyzer
 {
    // Parameters passed by Gate.
+   /** Where the file will be written. */ 
    public static final String DESTINATION_PARAMETER_NAME = "destination";
+   /** Gate AnnotationSet containing the annotations to be saved. */
    public static final String INPUTASNAME_PARAMETER_NAME = "inputASName";
+   /** A white space delimited list of the annotation types (tags) to be saved. */
    public static final String STANDOFFTAGS_PARAMETER_NAME = "standoffTags";
+   /** Character encoding to use. Default is UTF-8. */
    public static final String ENCODING_PARAMETER_NAME = "encoding";
+   /** The type suffix that will be added to the file name. */
    public static final String ANNOTYPE_PARAMETER_NAME = "annotationType";
    public static final String VERSION_PARAMETER_NAME = "version";
+   /** The name of the GrAF annotation set. */
+   public static final String GRAF_AS_NAME = "grafASName";
+   /** The type URI for the above GrAF annotation set name. */
+   public static final String GRAF_AS_TYPE = "grafASType";
+   /** Default URI to use if undeclared annotation sets are encountered. */
+   public static final String GRAF_DEFAULT_AS_TYPE = "grafDefaultASType";
+   
 //	public static final String NAMESPACE_PARAMETER_NAME = "namespace";
 //	public static final String SCHEMALOCATION_PARAMETER_NAME = "schemaLocation";
 
@@ -76,7 +91,10 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
    private String annotationType = "standoff";
    private String version = null;
    private String encoding = null;
-
+   private String grafASName = null;
+   private String grafASType = null;
+   private String grafDefaultASType = null;
+   
 //	private String namespace = null;
 //	private String schemaLocation = null;
 
@@ -130,9 +148,13 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
          graf.render(graph);
          writer.close();
       }
+      catch (RuntimeException ex)
+      {
+         throw ex;
+      }
       catch (Exception ex)
       {
-         System.out.println(ex.getMessage());
+//         System.out.println(ex.getMessage());
          ex.printStackTrace();
          throw new ExecutionException(ex);
       }
@@ -144,6 +166,12 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
       IDGenerator id = new IDGenerator();
       IAnchorFactory anchorFactory = Factory.newCharacterAnchorFactory();
 
+      Map<String,IAnnotationSet> grafAnnotationSetMap = new HashMap<String, IAnnotationSet>();
+      IAnnotationSet set = Factory.newAnnotationSet(grafASName, grafASType);
+      graph.addAnnotationSet(set);
+      grafAnnotationSetMap.put(grafASName, set);
+      
+      // This is a Gate AnnotationSet object.
       AnnotationSet annotations = null;
       try
       {
@@ -223,6 +251,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
          IAnnotation grafAnnotation = Factory.newAnnotation(gateAnnotation
                .getType());
          node.addAnnotation(grafAnnotation);
+         boolean addedToSet = false;
          if (fm != null && fm.size() > 0)
          {
             Set<Map.Entry<Object, Object>> attSet = fm.entrySet();
@@ -232,8 +261,6 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
                Map.Entry<Object, Object> att = asIt.next();
                if (!"isEmptyAndSpan".equals(att.getKey()))
                {
-            	   //TODO if key equals graph edge, save list as node id list
-            	   //parse id string, put into list of pairs
                   String key = (String) att.getKey();
                   
                   if(key == Graf.GRAF_EDGE)
@@ -241,21 +268,42 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
                 	  Pair nodeToChild = new Pair(node.getId(), att.getValue());
                 	  pairs.add(nodeToChild);
                   }
-                  
-                  String value = XML.encode((String) att.getValue());
-                  grafAnnotation.addFeature(key, value);
+                  else if (key == Graf.GRAF_SET)
+                  {
+                     IAnnotationSet aset = grafAnnotationSetMap.get(key);
+                     if (aset == null)
+                     {
+                        String type = grafDefaultASType;
+                        if (type.endsWith("/"))
+                        {
+                           type = type + key;
+                        }
+                        else
+                        {
+                           type = type + "/" + key;
+                        }
+                        aset = Factory.newAnnotationSet(key, type);
+                        grafAnnotationSetMap.put(key, set);
+                     }
+                     aset.addAnnotation(grafAnnotation);
+                     addedToSet = true;
+                  }
+                  else
+                  {
+                     String value = XML.encode((String) att.getValue());
+                     grafAnnotation.addFeature(key, value);
+                  }
                }
             }
          }
-
+         if (!addedToSet)
+         {
+            set.addAnnotation(grafAnnotation);
+         }
       }
-      //TODO take list of pairs, and add edges to graph (graph is already created, just add edges between appropriate nodes)
-//      StringBuilder s = new StringBuilder();
-      
+
       for (Pair p : pairs)
       {
-         //s.append(p.toString() + " ");
-
          StringTokenizer sT = new StringTokenizer((String) p.second);
 
          while (sT.hasMoreTokens())
@@ -326,4 +374,23 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
    {
       return annotationType;
    }
+   
+   public void setGrafASType(String uri)
+   {
+      this.grafASType = uri;
+   }
+   
+   public String getGrafASType() { return grafASType; }
+   
+   public void setGrafASName(String name)
+   {
+      grafASName = name;
+   }
+   public String getGrafASName() { return grafASName; }
+      
+   public void setGrafDefaultASType(String uri)
+   {
+      grafDefaultASType = uri;
+   }
+   public String getGrafDefaultASType() { return grafDefaultASType; }
 }
