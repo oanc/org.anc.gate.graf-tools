@@ -1,0 +1,1 @@
+mvn install:install-file -DartifactId=gate -DgroupId=gate -Dversion=5.0 -Dfile=gate-5.0.jar
