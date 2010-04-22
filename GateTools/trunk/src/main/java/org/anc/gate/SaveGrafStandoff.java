@@ -162,6 +162,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
 
    public IGraph createGraph() throws IOException, GrafException
    {
+//      Out.prln("GrAF Annotation set name : " + grafASName);
       IGraph graph = Factory.newGraph();
       IDGenerator id = new IDGenerator();
       IAnchorFactory anchorFactory = Factory.newCharacterAnchorFactory();
@@ -209,7 +210,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
             annotations);
       Collections.sort(sortedAnnotations, comp);
       Iterator<Annotation> it = sortedAnnotations.iterator();
-      new File(document.getSourceUrl().getPath());
+//      new File(document.getSourceUrl().getPath());
       
       List<Pair> pairs = new LinkedList<Pair>();
       
@@ -270,20 +271,23 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
                   }
                   else if (key == Graf.GRAF_SET)
                   {
-                     IAnnotationSet aset = grafAnnotationSetMap.get(key);
+                     String setName = att.getValue().toString();
+                     IAnnotationSet aset = grafAnnotationSetMap.get(setName);
+                     
                      if (aset == null)
                      {
+                        Out.prln("Undefined annotation set " + setName);
                         String type = grafDefaultASType;
                         if (type.endsWith("/"))
                         {
-                           type = type + key;
+                           type = type + setName;
                         }
                         else
                         {
-                           type = type + "/" + key;
+                           type = type + "/" + setName;
                         }
-                        aset = Factory.newAnnotationSet(key, type);
-                        grafAnnotationSetMap.put(key, set);
+                        aset = Factory.newAnnotationSet(setName, type);
+                        grafAnnotationSetMap.put(setName, set);
                      }
                      aset.addAnnotation(grafAnnotation);
                      addedToSet = true;
