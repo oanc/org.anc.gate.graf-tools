@@ -294,8 +294,17 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
                   }
                   else
                   {
-                     String value = XML.encode((String) att.getValue());
-                     grafAnnotation.addFeature(key, value);
+                     String value = (String) att.getValue();
+                     if (value != null)
+                     {
+                        value = XML.encode(value);
+                        grafAnnotation.addFeature(key, value);
+                     }
+                     else
+                     {
+                        Out.prln("Null value specified for " + key + ": " + start 
+                              + "-" + end);
+                     }
                   }
                }
             }
