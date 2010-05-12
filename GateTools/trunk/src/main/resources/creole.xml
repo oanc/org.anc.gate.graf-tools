@@ -78,7 +78,7 @@
 			<NAME>ANC Load GrAF Standoff</NAME>
 			<JAR>ANC-GATE.jar</JAR>
 			<CLASS>org.anc.gate.LoadGrafStandoff</CLASS>
-			<COMMENT>Add standoff annotations to an open document</COMMENT>
+			<COMMENT>Add stand-off annotations to an open document</COMMENT>
 			<PARAMETER NAME="document" COMMENT="Document to be processed"
 				RUNTIME="true" REQUIRED="true">gate.Document</PARAMETER>
 			<PARAMETER NAME="sourceUrl"
@@ -87,6 +87,14 @@
 			<PARAMETER NAME="standoffASName"
 				COMMENT="Annotation set to add standoff tags to" RUNTIME="true"
 				DEFAULT="Standoff markups" OPTIONAL="true">java.lang.String</PARAMETER>
+		</RESOURCE>
+		<RESOURCE>
+			<NAME>ANC Load All GrAF Standoff</NAME>
+			<JAR>ANC-GATE.jar</JAR>
+			<CLASS>org.anc.gate.LoadAllGrafStandoff</CLASS>
+			<COMMENT>Adds all stand-off annotations to an open document</COMMENT>
+			<PARAMETER NAME="document" COMMENT="Document to be processed"
+				RUNTIME="true" REQUIRED="true">gate.Document</PARAMETER>
 		</RESOURCE>
 		<!--
 		
