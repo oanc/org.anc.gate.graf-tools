@@ -47,11 +47,13 @@ public class LoadStandoff extends ANCLanguageAnalyzer
 
    protected transient String standoffASName = null;
    protected transient URL sourceUrl = null;
-   private transient AnnotationParser<List<Annotation>> parser = null;
+//   private transient AnnotationParser<List<Annotation>> parser = null;
+   private transient AnnotationParser parser;
 
    public LoadStandoff()
    {
-      parser = new AnnotationParser<List<Annotation>>();
+//      parser = new AnnotationParser<List<Annotation>>();
+      parser = new AnnotationParser();
    }
 
    @Override
@@ -59,10 +61,11 @@ public class LoadStandoff extends ANCLanguageAnalyzer
    {
       AnnotationSet as = getAnnotations(standoffASName);
 //	 parser.setAnnotationSet(as);
-      List<Annotation> list = new LinkedList<Annotation>();
+      List<Annotation> list = null; // = new LinkedList<Annotation>();
       try
       {
-         parser.parse(list, sourceUrl.getPath());
+         list = parser.parse(sourceUrl.toURI());
+//         parser.parse(list, sourceUrl.getPath());
       }
       catch (Exception e)
       {

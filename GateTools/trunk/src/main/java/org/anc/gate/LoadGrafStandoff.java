@@ -31,6 +31,7 @@ import java.io.File;
 import java.net.URL;
 
 import org.anc.util.Pair;
+import org.apache.commons.io.FileUtils;
 import org.xces.graf.api.IAnchor;
 import org.xces.graf.api.IAnnotation;
 import org.xces.graf.api.IAnnotationSet;
@@ -96,7 +97,8 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
 //      System.out.println("Content length is " + endOfContent);
 
 //    URL url = this.getSourceUrl();
-      File file = new File(sourceUrl.getPath());
+//      File file = new File(sourceUrl.getPath());
+      File file = FileUtils.toFile(sourceUrl);
       IGraph graph = null;
       try
       {

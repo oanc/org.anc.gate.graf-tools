@@ -7,10 +7,45 @@
 	<version>2.0.1</version>
 	<description>Plugins for loading and saving ANC files with standoff
 		markup</description>
-	<url>http://www.americannationalcorpus.org</url>
+	<url>http://www.anc.org/projects/gate-tools</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	<issueManagement>
+		<system>Trac</system>
+		<url>https://www.anc.org/wiki</url>
+	</issueManagement>
+	<licenses>
+		<license>
+			<name>Apache 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+		</license>
+	</licenses>
+	<ciManagement>
+		<system>Hudson</system>
+		<url>http://www.anc.org:8080/hudson/job/gate-tools</url>
+	</ciManagement>
+	<scm>
+		<connection>scm:svn:http://www.anc.org/svn/GateTools/trunk</connection>
+		<developerConnection>scm:svn:https://www.anc.org/svn/GateTools/trunk</developerConnection>
+		<url>http://www.anc.org/svn/GateTools/trunk</url>
+	</scm>
+	<organization>
+		<name>American National Corpus</name>
+		<url>http://www.anc.org</url>
+	</organization>
+	<developers>
+		<developer>
+			<id>ksuderman</id>
+			<name>Keith Suderman</name>
+			<email>suderman@anc.org</email>
+			<organization>American National Corpus</organization>
+			<organizationUrl>http://www.anc.org/</organizationUrl>
+			<roles>
+				<role>Project Manager</role>
+			</roles>
+		</developer>
+	</developers>
 	<build>
 		<plugins>
 			<plugin>
@@ -72,12 +107,17 @@
 		<dependency>
 			<groupId>org.xces</groupId>
 			<artifactId>xces-parser</artifactId>
-			<version>1.0.8-SNAPSHOT</version>
+			<version>1.1.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.tc37sc4.graf</groupId>
 			<artifactId>graf-api</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.4</version>
 		</dependency>
 	</dependencies>
 	<repositories>
@@ -92,6 +132,15 @@
 			<url>http://www.anc.org/maven/thirdparty</url>
 		</repository>
 	</repositories>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.7</version>
+			</plugin>
+		</plugins>
+	</reporting>
 	<distributionManagement>
 		<repository>
 			<id>anc-dev-release</id>
@@ -103,6 +152,10 @@
 			<name>ANC Snapshot Repository</name>
 			<url>dav:http://www.anc.org/maven/snapshot</url>
 		</snapshotRepository>
+		<site>
+			<id>anc-scp</id>
+			<url>scp://suderman@anc.org:/var/www/anc/projects/gate-tools</url>
+		</site>
 	</distributionManagement>
 	<profiles>
 		<profile>
