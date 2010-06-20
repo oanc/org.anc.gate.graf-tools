@@ -17,6 +17,7 @@ import java.net.URL;
 
 import org.anc.io.PrefixFilter;
 import org.anc.util.Pair;
+import org.apache.commons.io.FileUtils;
 import org.xces.graf.api.IAnchor;
 import org.xces.graf.api.IAnnotation;
 import org.xces.graf.api.IAnnotationSet;
@@ -80,13 +81,13 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       URL url = document.getSourceUrl();
       content = document.getContent().toString();
       endOfContent = content.length();
-      String path = url.getPath();
-//      Out.prln("Path to document is " + path);
-//      Out.prln("Length " + endOfContent);
-      File file = new File(path);
+
+      File file = FileUtils.toFile(url);
+//      String path = url.getPath();
+//      File file = new File(path);
       if (!file.exists())
       {
-         throw new ExecutionException("Could not locate original document.");
+         throw new ExecutionException("Could not locate original document: " + file.getAbsolutePath());
       }
       File parentDir = file.getParentFile();
       String filename = file.getName();
