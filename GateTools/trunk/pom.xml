@@ -13,7 +13,7 @@
 	</properties>
 	<issueManagement>
 		<system>Trac</system>
-		<url>https://www.anc.org/wiki</url>
+		<url>http://www.anc.org/wiki</url>
 	</issueManagement>
 	<licenses>
 		<license>
@@ -28,7 +28,7 @@
 	<scm>
 		<connection>scm:svn:http://www.anc.org/svn/GateTools/trunk</connection>
 		<developerConnection>scm:svn:https://www.anc.org/svn/GateTools/trunk</developerConnection>
-		<url>http://www.anc.org/svn/GateTools/trunk</url>
+		<url>http://www.anc.org/projects/gate-tools/project-summary.html</url>
 	</scm>
 	<organization>
 		<name>American National Corpus</name>
@@ -51,7 +51,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0.2</version>
+				<version>2.3.1</version>
 				<configuration>
 					<source>1.5</source>
 					<target>1.5</target>
@@ -92,32 +92,44 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.4</version>
+			<type>jar</type>
 			<scope>test</scope>
+			<optional>false</optional>
 		</dependency>
 		<dependency>
 			<groupId>gate</groupId>
 			<artifactId>gate</artifactId>
 			<version>5.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.anc</groupId>
-			<artifactId>common</artifactId>
-			<version>2.2.0-SNAPSHOT</version>
+			<type>jar</type>
+			<optional>false</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.xces</groupId>
 			<artifactId>xces-parser</artifactId>
 			<version>1.1.1-SNAPSHOT</version>
+			<type>jar</type>
+			<optional>false</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.tc37sc4.graf</groupId>
 			<artifactId>graf-api</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
+			<type>jar</type>
+			<optional>false</optional>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>1.4</version>
+			<type>jar</type>
+			<optional>false</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.anc</groupId>
+			<artifactId>common</artifactId>
+			<version>2.3.1-SNAPSHOT</version>
+			<type>jar</type>
+			<optional>false</optional>
 		</dependency>
 	</dependencies>
 	<repositories>
@@ -130,6 +142,17 @@
 			<id>anc-dev-3rdparty</id>
 			<name>ANC 3rd Party Repository</name>
 			<url>http://www.anc.org/maven/thirdparty</url>
+		</repository>
+		<repository>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<id>anc-dev-snapshot</id>
+			<name>ANC Snapshot Repository</name>
+			<url>http://www.anc.org/maven/snapshot</url>
 		</repository>
 	</repositories>
 	<reporting>

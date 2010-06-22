@@ -188,7 +188,7 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
  */
 
       // Get a parser for the standoff annotations
-      AnnotationParser<List<Annotation>> parser = new AnnotationParser<List<Annotation>>();
+      AnnotationParser parser = new AnnotationParser();
       if (standoffAnnotations != null)
       {
          AnnotationSet as = this.getAnnotations(standoffASName);
@@ -204,10 +204,10 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
             if (filename != null)
             {
                // System.out.println("Adding annotations from " + basePath + "/" + filename);
-               List<Annotation> newAnnotations = new LinkedList<Annotation>();
+               List<Annotation> newAnnotations = null;// = new LinkedList<Annotation>();
                try
                {
-                  parser.parse(newAnnotations, basePath + "/" + filename);
+                  newAnnotations = parser.parse(basePath + "/" + filename);
                }
                catch (Exception e)
                {
