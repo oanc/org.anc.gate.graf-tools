@@ -42,6 +42,7 @@ import org.xces.graf.api.IGraph;
 import org.xces.graf.api.ILink;
 import org.xces.graf.api.INode;
 import org.xces.graf.api.IRegion;
+import org.xces.graf.api.IStandoffHeader;
 import org.xces.graf.impl.CharacterAnchor;
 import org.xces.graf.io.GraphParser;
 import org.xces.graf.util.IFunction;
@@ -91,22 +92,37 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
    @Override
    public void execute() throws ExecutionException
    {
+      //annotations is gate annotations not graf annotations
+      //getAnnotations comes from the parent class ANCLanguageAnalyzer
+      //standoffASName comes from the gate gui; default is 'Standoff markups'
       annotations = getAnnotations(standoffASName);
+      //gets the text body of the document; document is the gate document
       content = document.getContent().toString();
+      //get length of the document
       endOfContent = content.length();
-//      System.out.println("Content length is " + endOfContent);
+      System.out.println("standoffASName is " + standoffASName + " Content length is " + endOfContent);
 
-//    URL url = this.getSourceUrl();
+      //URL url = this.getSourceUrl();
+      //get the file path for the standoff file ( ie nc, vc etc ); sourceUrl comes from the gate gui
 //      File file = new File(sourceUrl.getPath());
       File file = FileUtils.toFile(sourceUrl);
+      //create empty graph to start
       IGraph graph = null;
       try
       {
+         //set graph to the graph file
          graph = parser.parse(file);
-// graph.sort();
+         //trying to add a Header to the graph ?
+         addHeader(graph);
+         //graph.sort();
+         //cycle through the nodes of the graph to get the annotations
          for (INode node : graph.nodes())
          {
-//    String type = node.getFeature("ptb", "label")
+            //String type = node.getFeature("ptb", "label")
+            //node by node adds a gate annotation object ( annotations above ) with a gate
+            //feature map ( which has a string of child node ids, the graf annotation setName, graf annotation labels
+            //this node's id, and any feature info from this node's feature structure)
+            //basically 'annotations' has all the node's stuff in it, in a gate understandable AnnotationSet
             addAnnotation(node);
          }
       }
@@ -114,7 +130,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       {
          System.out.println("Error loading standoff.");
          ex.printStackTrace();
-//         System.out.println(ex.getMessage());
+         //System.out.println(ex.getMessage());
          throw new ExecutionException(ex);
       }
       System.out.println("Execution complete.");
@@ -143,36 +159,55 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
    protected void addAnnotation(INode node) throws InvalidOffsetException
    {
       getRangeFn.reset();
+      //offset object extends pair, first is start (long), second is end (long),
       Offset offset = getRangeFn.apply(node);
       if (offset.getEnd() < offset.getStart())
       {
          return;
       }
 
+      //node ids from out edges ( children node ids ) will end up as a long string
+      //separated by spaces
       StringBuilder ids = new StringBuilder();
+      //cycle the out edges for this node
       for (IEdge e :node.getOutEdges())
       {
+         //append child node id to ids stringbuilder
          ids.append(e.getTo().getId() + " ");
       }
 //      for (IAnnotationSet aSet : node.annotationSets())
 //      {
 //         String aSetName = aSet.getType();
+      //cycle through the annotations of aformented node
          for (IAnnotation a : node.annotations())
          {
+            //create a gate object, FeatureMap, 
             FeatureMap newFeatures = Factory.newFeatureMap();
+            //we know since this is an anc standoff graph, use Standoff Markups as the annotation setName
             String aSetName = "Standoff Markups";
+            //now get the set from the annotationSet associated with the graphs node
             IAnnotationSet as = a.getAnnotationSet();
+            //as long as the graf annotationSet is not null
             if (as != null)
             {
+               //get the name of the graf annotationSet
                aSetName = as.getName();
+               //now put the graf annotationSet name in the gate FeatureMap using 'graf:set' as the key
                newFeatures.put(Graf.GRAF_SET, aSetName);
+               
             }
+            //if we have any outEdges put the 'id' stringbuilder in the gate FeatureMap using 'graf:edge' as the key
             if(node.getOutEdges().size() > 0)
             {
             	newFeatures.put(Graf.GRAF_EDGE, ids.toString());
             }
+            //put the node id in the gate FeatureMap using 'graf:id' as the key
             newFeatures.put(Graf.GRAF_ID, node.getId());
+            //get label from the graf objects annotation 
             String label = a.getLabel();
+            //see the addFeatures method for how it adds the features of this annotation to the
+            //gate FeatureMap using the IFeatureStructure from this graf annotation, it adds it to the
+            //gate FeatureMap newFeatures, null sent in as the base feature
             addFeatures(a.getFeatures(), newFeatures, null);
             
             //for (IFeatureStructureElement fse : a.features())
@@ -184,6 +219,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             //}
 //            System.out.println("Adding annotation " + label + " from "
 //                  + offset.getStart() + " to " + offset.getEnd());
+            //start and end from offset object ( returned from RangeFunction using this node
             long start = offset.getStart();
             long end = offset.getEnd();
             try
@@ -202,7 +238,10 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
                }
                else
                {
+                  //if here, the offsets look ok, finally add the annotation to the
+                  //gate annotations object using the start, end, anc graf annotation name and the gate feature map
                   annotations.add(start, end, label, newFeatures);
+                  
                }
             }
             catch (InvalidOffsetException e)
@@ -215,40 +254,87 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
          }
       //}
    }
+   
+   /**
+    * adds header info to a Feature Map so it can be added to the document
+    * @param graph
+    */
+   protected void addHeader(IGraph graph)
+   {
+      FeatureMap features = document.getFeatures();
+     // String aSetName = "Standoff Markups";
+      IStandoffHeader header = graph.getHeader();
+      
+      if (header != null)
+      {
+        // features.put(Graf.GRAF_HEADER, header);
+//         if (header.getMedia() != null)
+//         {
+           
+//            for (Medium medium : header.getMedia())
+//            {
+//               
+//               System.out.println("MediumName is " + medium.getName() + "\n" + "MediumType is " + medium.getType());
+//               features.put(Graf.GRAF_MEDIANAME, medium.getName());
+//               features.put(Graf.GRAF_MEDIATYPE, "TEST TEST TEST");
+//            }
+//         }
+//         if (header.getAnchorTypes() != null)
+//         {
+//            for (AnchorType anchorType : header.getAnchorTypes())
+//            {
+//               features.put(Graf.GRAF_MEDIATYPE, anchorType.getName());
+//               
+//            }
+//         }
+      }
+   }
 
    protected void addFeatures(IFeatureStructure featStruc, FeatureMap fm,
          String base)
    {
+      //graf type feature structure
       IFeatureStructure fs = featStruc;
+      //if empty, get out
       if (fs == null)
       {
          return;
       }
+      //loop through the features in the feature structure
       for (IFeature f : fs.features())
       {
+         //if this is not a feature structure, go, otherwise recurse with child features
          if (f.isAtomic())
          {
+            //if no base sent in, use the feature name as the key in the passed in feature map
             if (base == null)
             {
+               //put in feature map with feature name as key, and feature value as value
                fm.put(f.getName(), f.getStringValue());
             }
+            //if base is sent in append feature name to it, and use that as key instead
             else
             {
                fm.put(base + "/" + f.getName(), f.getStringValue());
             }
          }
+         //wait, this is not a feature, it is a feature structure, get the child feature structure and recurse with it
          else
          {
+            //get the child feature structure
             IFeatureStructure childFS = (IFeatureStructure) f.getValue();
             String childName = null;
+            //if base not sent in, use feature structure name as the new base, when recursing
             if (base == null)
             {
                childName = f.getName();
             }
+            //base is sent in, append feature ( or feature structure ) name to it, and use that as new base
             else
             {
                childName = base + "/" + f.getName();               
             }
+            //recurse with child featureStructure, featureMap, and feature name as base
             addFeatures(childFS, fm, childName);
          }
 //       if (e instanceof IFeature)

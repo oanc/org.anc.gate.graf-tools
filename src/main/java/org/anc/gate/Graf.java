@@ -28,4 +28,8 @@ public final class Graf
    public static final String GRAF_SET = "graf:set";
    public static final String GRAF_EDGE = "graf:edge";
    public static final String GRAF_ID = "graf:id";
+   public static final String GRAF_MEDIANAME = "graf:medianame";  //fgc
+   public static final String GRAF_MEDIATYPE = "graf:mediatype";  //fgc
+   public static final String GRAF_MEDIA = "graf:media"; //fgc
+   public static final String GRAF_HEADER = "graf:header"; //fgc
 }
