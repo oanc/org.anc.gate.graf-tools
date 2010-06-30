@@ -3,10 +3,16 @@ setlocal
 
 if "%GATE_HOME%"=="" echo no-gate
 
+if "%COMPUTERNAME%"=="FRANK-PC" goto FRANK-PC
 if "%COMPUTERNAME%"=="SCOTTY" goto scotty
 if "%COMPUTERNAME%"=="DAX" goto dax
 echo Can not configure script for %COMPUTERNAME%. Please edit .bat file.
 goto end
+
+:FRANK-PC
+echo Running on FRANK-PC
+set DIR==%GATE_HOME%\Plugins\ANC
+goto run
 
 :dax
 echo Running on Dax
