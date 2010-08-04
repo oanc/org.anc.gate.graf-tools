@@ -46,6 +46,48 @@
 			<PRIVATE/>
 		</RESOURCE>
 		-->
+		
+		<!--
+
+
+        Graf Document
+
+        A language resource that loads an ANC/XCES document with standoff markup into GATE as a single 
+        document in one step.  The Graf Document will appear in the "New Language Resource" menu in Gate.
+        -->
+        <RESOURCE>
+            <NAME>Graf Document</NAME>
+            <JAR>ANC-GATE.jar</JAR>
+            <CLASS>org.anc.gate.GrafDocument</CLASS>
+            <COMMENT>ANC transient document</COMMENT>
+            <OR>
+                <PARAMETER NAME="sourceUrl" SUFFIXES="xces;anc" COMMENT="Source URL of the document header">java.net.URL</PARAMETER>
+                <PARAMETER NAME="stringContent" COMMENT="The content of the document">java.lang.String</PARAMETER>
+            </OR>
+            <PARAMETER COMMENT="Should the document read the original markup"
+                NAME="markupAware" DEFAULT="true">java.lang.Boolean</PARAMETER>
+            <PARAMETER NAME="encoding" OPTIONAL="true" COMMENT="Encoding (header)" DEFAULT="">java.lang.String</PARAMETER>
+            <PARAMETER NAME="contentEncoding" OPTIONAL="true" COMMENT="Content encoding" DEFAULT="UTF-8">java.lang.String</PARAMETER>
+            <PARAMETER NAME="sourceUrlStartOffset"
+                COMMENT="Start offset for documents based on ranges" OPTIONAL="true">java.lang.Long</PARAMETER>
+            <PARAMETER NAME="sourceUrlEndOffset"
+                COMMENT="End offset for documents based on ranges" OPTIONAL="true">java.lang.Long</PARAMETER>
+            <PARAMETER NAME="preserveOriginalContent"
+                COMMENT="Should the document preserve the original content" DEFAULT="false">java.lang.Boolean</PARAMETER>
+            <PARAMETER NAME="collectRepositioningInfo"
+                COMMENT="Should the document collect repositioning information" DEFAULT="false">java.lang.Boolean</PARAMETER>
+            <PARAMETER NAME="loadStandoff"
+                COMMENT="Should standoff annotations be loaded" DEFAULT="true"
+                OPTIONAL="true" RUNTIME="false">java.lang.Boolean</PARAMETER>
+            <PARAMETER NAME="standoffASName"
+                COMMENT="Annotation set to add standoff tags to"
+                DEFAULT="Standoff markups" RUNTIME="false" OPTIONAL="true">java.lang.String</PARAMETER>
+            <PARAMETER NAME="standoffAnnotations" 
+                OPTIONAL="true" COMMENT="Standoff annotations to add"
+                DEFAULT="ptb">java.util.List</PARAMETER> <!-- nc;vc;ne;logical;s -->
+            <ICON>lr.gif</ICON>
+        </RESOURCE>
+		
 		<!-- 
 		
 		
@@ -210,7 +252,7 @@
 				COMMENT="Set containing annotations to save" RUNTIME="true"
 				OPTIONAL="true" DEFAULT="Standoff markups">java.lang.String</PARAMETER>
 			<PARAMETER NAME="standoffTags" OPTIONAL="true"
-				COMMENT="List of annoations types to be saved" RUNTIME="true">java.util.List</PARAMETER>
+				COMMENT="List of annotations types to be saved" RUNTIME="true">java.util.List</PARAMETER>
 			<PARAMETER NAME="encoding"
 				COMMENT="Character encoding to use when writing the file"
 				RUNTIME="true" OPTIONAL="true" DEFAULT="UTF-8">java.lang.String</PARAMETER>
