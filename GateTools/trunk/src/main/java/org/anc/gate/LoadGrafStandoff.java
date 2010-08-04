@@ -100,23 +100,23 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       content = document.getContent().toString();
       //get length of the document
       endOfContent = content.length();
-      System.out.println("standoffASName is " + standoffASName + " Content length is " + endOfContent);
-      System.out.println("There are " + annotations.size() + " GATE annotations.");
+     // System.out.println("standoffASName is " + standoffASName + " Content length is " + endOfContent);
+      //System.out.println("There are " + annotations.size() + " GATE annotations.");
       
       //URL url = this.getSourceUrl();
       //get the file path for the standoff file ( ie nc, vc etc ); sourceUrl comes from the gate gui
-//      File file = new File(sourceUrl.getPath());
-      File file = FileUtils.toFile(sourceUrl);
+      File file = new File(sourceUrl.getPath());
+      //File file = FileUtils.toFile(sourceUrl);
       //create empty graph to start
       IGraph graph = null;
       try
       {
          //set graph to the graph file
-         System.out.println("Loading the graph.");
+        // System.out.println("Loading the graph.");
          graph = parser.parse(file);
 
          //trying to add a Header to the graph ?
-         System.out.println("adding the header.");
+         //System.out.println("adding the header.");
          addHeader(graph);
          //graph.sort();
          //cycle through the nodes of the graph to get the annotations
@@ -127,7 +127,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             //feature map ( which has a string of child node ids, the graf annotation setName, graf annotation labels
             //this node's id, and any feature info from this node's feature structure)
             //basically 'annotations' has all the node's stuff in it, in a gate understandable AnnotationSet
-            System.out.println("Adding annotation for node " + node.getId());
+           // System.out.println("Adding annotation for node " + node.getId());
             addAnnotation(node);
          }
       }
