@@ -46,6 +46,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xces.graf.api.IGraph;
+import org.xces.graf.io.GraphParser;
 import org.xces.standoff.Annotation;
 import org.xces.standoff.AnnotationParser;
 import org.xces.standoff.Annotation.Feature;
@@ -59,8 +61,7 @@ import org.xml.sax.SAXException;
  * @author Keith Suderman
  * @version 1.0
  */
-public class ANCDocument extends gate.corpora.DocumentImpl implements
-      LanguageResource
+public class ANCDocument extends gate.corpora.DocumentImpl implements LanguageResource
 {
 
    public static final String LOAD_STANDOFF_PARAMETER_NAME = "loadStandoff";
@@ -141,39 +142,53 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
 //    System.out.println("Creating an XCES docuement.");
 //    if (true) throw new ResourceInstantiationException("WTF");
 
+      //from the gate gui
       URL url = getSourceUrl();
+      //get the path of url
       File fullPath = new File(url.getPath());
+      //get directory of url - minus the file name, get rid of any spaces
       String basePath = fullPath.getParent().replaceAll("%20", "\\ ");
+      System.out.println("basePath is " + basePath);
+      //originalMarkups is  the GATE Annotation set ( not anc )
       AnnotationSet originalMarkups = getAnnotations("Original markups");
+      //if empty gate annotation set; throw ResourceInstantiationException
       if (originalMarkups == null || originalMarkups.size() == 0)
       {
-         throw new ResourceInstantiationException(
-               "No elements found the in the header file " + fullPath.getPath());
+         throw new ResourceInstantiationException("No elements found the in the header file "
+               + fullPath.getPath());
       }
+      //from originalMarkups get the Gate annotation set tied to key "annotation"
       AnnotationSet annotationSet = originalMarkups.get("annotation");
+      //if annotationSet is empty, throw ResourceInstantiationException, get out
       if (annotationSet == null || annotationSet.size() == 0)
       {
-         throw new ResourceInstantiationException(
-               "No annotation elements found in the header "
-                     + fullPath.getPath());
+         throw new ResourceInstantiationException("No annotation elements found in the header "
+               + fullPath.getPath());
       }
-//    System.out.println("Unpacking markup.");
+      //System.out.println("Unpacking markup.");
 
+      //annotations is a hashtable<String,String>, where the type is the key and string file name
+      //of the stand off files are the values
       annotations = getAnnotationFiles(annotationSet);
+      //clear the original markups ? why ?
       originalMarkups.clear();
-//    originalMarkups.removeAll(new HashSet(annotationSet));
+      //originalMarkups.removeAll(new HashSet(annotationSet));
 
       // Get the text for the document
       String filename = getFileForType("content");
+      //file should be there...
       if (filename == null)
       {
          throw new ResourceInstantiationException("No document content found.");
       }
+      //get the original text, see getContent below
       String theContent = getContent(basePath + "/" + filename);
 
       // Replace the DocumentContent.  The current DocumentContent contains the
       // ANC header file, which not what we want the user to see.
+      //make a new gate Document Content object with the original text
       DocumentContent docContent = new DocumentContentImpl(theContent);
+      //set it to this object, and move on, nothing to see here...
       this.setContent(docContent);
 
 /*
@@ -186,44 +201,71 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
  * loader.setSourceUrl(standoff); loader.execute(); } catch (Exception e) {
  * throw new ResourceInstantiationException(e); } } }
  */
-
       // Get a parser for the standoff annotations
       AnnotationParser parser = new AnnotationParser();
+      try
+      {
+        GraphParser graphParser = new GraphParser();
+     
+      //stand-off annotations is a List coming from the gate gui, 
+      //if not empty ..what happens if empty? how is it filled, if not by user ?
+      System.out.println("standoffAnnotations.size() is " + standoffAnnotations.size());
       if (standoffAnnotations != null)
       {
+         //This is a gate Annotation set made using standoffASName, that comes from the
+         //gate GUI, Gate uses the setStandoffASName above to fill it, getAnnotations is a gate method, not ours
          AnnotationSet as = this.getAnnotations(standoffASName);
 //      parser.setAnnotationSet(as);
+         //get an iterator from the standoffAnnotations; ie iterate through the stand off file names
          Iterator<String> it = standoffAnnotations.iterator();
          while (it.hasNext())
 //      StringTokenizer tokens = new StringTokenizer(standoffAnnotations);
 //      while (tokens.hasMoreTokens())
          {
+            //ok get the file name for each standoff file type, remember we are working with a *.anc file here..
             String type = it.next();
-//         String type = tokens.nextToken();
+//          String type = tokens.nextToken();
             filename = getFileForType(type);
+            System.out.println("filename is " + filename);
             if (filename != null)
             {
-               // System.out.println("Adding annotations from " + basePath + "/" + filename);
+               System.out.println("Adding annotations from " + basePath + "/" + filename);
                List<Annotation> newAnnotations = null;// = new LinkedList<Annotation>();
                try
                {
+                  //get the file name from this iteration, call the parser for that file now...
+                  //and pull out the annotations from this iterations standoff file. 
                   newAnnotations = parser.parse(basePath + "/" + filename);
+                //  IGraph graph =  graphParser.parse(basePath + "/" + filename);
                }
+               //obligatory catch block
                catch (Exception e)
                {
                   throw new ResourceInstantiationException(e);
                }
+               //now that we have the annotations from this stand off file, 
+               //cycle through them to create a feature map for each annotation
+               Out.println("newAnnotations.size is " + newAnnotations.size());
                for (Annotation a : newAnnotations)
                {
+                  //get the start of the annotation, which gate will need
                   long start = a.getStart();
+                  //get the end of the annotation, which gate will need
                   long end = a.getEnd();
+                  //this factory is a gate factory, to make a new gate feature map
                   FeatureMap newFeatures = Factory.newFeatureMap();
+                  //cycle through the features using the anc annotation.getFeatures ( not gate )
+                  Out.println("a.getFeatures.size() is " + a.getFeatures().size());
                   for (Feature f : a.getFeatures())
                   {
+                     //put this feature in the newFeatures Feature map, using the name as the key; and the feature as the value 
                      newFeatures.put(f.getName().getLocalName(), f.getValue());
+                     System.out.println("feature name is " + f.getName().getLocalName() + " value is "
+                           + f.getValue());
                   }
                   try
                   {
+                     //add to gate annotation set, using start, end, name, and feature map ( uses name as key )
                      as.add(start, end, a.getType().getLocalName(), newFeatures);
                   }
                   catch (InvalidOffsetException e)
@@ -234,6 +276,14 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
             }
          }
       }
+      
+   }
+   catch (SAXException e1)
+   {
+      Out.println("Could not create GraphParser");
+   }
+     
+      
 
       return this;
    }
@@ -260,9 +310,15 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
 //    return this.toXml();
 //  }
 
-   protected String getFileForType(String type)
-         throws ResourceInstantiationException
+   /**
+    * given the string version of the file name of a standoff file, coming from
+    * the *.anc document, checks the string is in the annotations hash table and
+    * returns if it exists, otherwise prints err message..actually can return
+    * anything from annotations hash table if there is a key value pair
+    */
+   protected String getFileForType(String type) throws ResourceInstantiationException
    {
+      //returns the standoff file name tied to the key type..
       String result = annotations.get(type);
       if (result == null)
       {
@@ -272,8 +328,7 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
       return result;
    }
 
-   protected String getContent(String path)
-         throws ResourceInstantiationException
+   protected String getContent(String path) throws ResourceInstantiationException
    {
       StringBuffer sbuffer = new StringBuffer();
       InputStreamReader reader = null;
@@ -287,8 +342,7 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
 //       else
 //       {
          System.out.println("Loading content from " + path);
-         reader = new InputStreamReader(new FileInputStream(path),
-               contentEncoding);
+         reader = new InputStreamReader(new FileInputStream(path), contentEncoding);
 //       }
          char[] cbuffer = new char[8192];
          int size = reader.read(cbuffer, 0, 8192);
@@ -301,12 +355,19 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
       }
       catch (IOException ex)
       {
-         throw new ResourceInstantiationException(
-               "Error reading the document content from " + path);
+         throw new ResourceInstantiationException("Error reading the document content from " + path);
       }
       return sbuffer.toString();
    }
 
+   /**
+    * given gate Annotation set taken from *.anc document returns
+    * hashtable<String,String> with type as key and file name as string value
+    * 
+    * @param set
+    * @return
+    * @throws ResourceInstantiationException
+    */
    protected Hashtable<String, String> getAnnotationFiles(AnnotationSet set)
          throws ResourceInstantiationException
    {
@@ -318,8 +379,7 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
          FeatureMap theFeatures = a.getFeatures();
          if (theFeatures == null || theFeatures.size() == 0)
          {
-            throw new ResourceInstantiationException(
-                  "The annotation element does not contain any attributes");
+            throw new ResourceInstantiationException("The annotation element does not contain any attributes");
          }
 
          String type = (String) theFeatures.get("type");
@@ -329,8 +389,7 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
       return table;
    }
 
-   protected Hashtable<Node, Node> getAnnotationFiles(URL url)
-         throws DocumentFormatException
+   protected Hashtable<Node, Node> getAnnotationFiles(URL url) throws DocumentFormatException
    {
       Hashtable<Node, Node> table = new Hashtable<Node, Node>();
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -350,15 +409,13 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements
       }
       catch (ParserConfigurationException ex)
       {
-         throw new DocumentFormatException(
-               "Error create the XML document builder.", ex);
+         throw new DocumentFormatException("Error create the XML document builder.", ex);
       }
 
       NodeList nodes = document.getElementsByTagName("annotation");
       if (nodes == null || nodes.getLength() == 0)
       {
-         throw new DocumentFormatException(
-               "The header does not contain any annotation elements.");
+         throw new DocumentFormatException("The header does not contain any annotation elements.");
       }
 
       int n = nodes.getLength();
