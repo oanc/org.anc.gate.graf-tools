@@ -421,12 +421,16 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
    {
       try
       {
-         System.setProperty("gate.home", "d:/Applications/Gate-5.0");
+         System.setProperty("gate.home", "C:/Program Files (x86)/Gate-5.0");
          Gate.init();
+//         Document doc = Factory.newDocument(new URL(
+//               "file:/D:/corpora/masc/ptb/graf/110cyl067-ptb.xml"));
          Document doc = Factory.newDocument(new URL(
-               "file:/D:/corpora/masc/ptb/graf/110cyl067-ptb.xml"));
+         "file:/D:/cygwin/home/Keith/oanc2graf/graf/VOL15_1.txt"));
          System.out.println("Document loaded");
-         Resource res = Factory.createResource("org.anc.gate.LoadGrafStandoff");
+         FeatureMap fm = Factory.newFeatureMap();
+         fm.put(STANDOFFASNAME_PARAMETER, "hepple");
+         Resource res = Factory.createResource("org.anc.gate.LoadGrafStandoff", fm);
          LoadGrafStandoff load = (LoadGrafStandoff) res;
          System.out.println("Resource created.");
 //       List<String> types = new Vector<String> ();
@@ -506,6 +510,7 @@ class GetRangeFunction implements IFunction<INode, Offset>
 
    private void getRange(IRegion region)
    {
+//      System.out.println("Getting range for region " + region.getId());
       IAnchor startAnchor = region.getStart();
       IAnchor endAnchor = region.getEnd();
       if (!(startAnchor instanceof CharacterAnchor)
