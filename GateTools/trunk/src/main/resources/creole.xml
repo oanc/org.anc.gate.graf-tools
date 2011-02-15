@@ -126,6 +126,9 @@
 			<PARAMETER NAME="sourceUrl"
 				COMMENT="Location of the document containing standoff annotations"
 				RUNTIME="true" REQUIRED="true">java.net.URL</PARAMETER>
+			<PARAMETER NAME="annotationType"
+				COMMENT="Annotation type to be loaded."
+				RUNTIME="true" OPTIONAL="true">java.lang.String</PARAMETER>
 			<PARAMETER NAME="standoffASName"
 				COMMENT="Annotation set to add standoff tags to" RUNTIME="true"
 				DEFAULT="Standoff markups" OPTIONAL="true">java.lang.String</PARAMETER>

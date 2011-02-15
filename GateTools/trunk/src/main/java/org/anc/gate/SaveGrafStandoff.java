@@ -366,7 +366,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
                   {
                      //ok, if here we have found a feature of an annotation..right ?
                      //get the annotation from this iteration; see above
-                     String value = (String) att.getValue();
+                     String value = att.getValue().toString();
                      //if found
                      if (value != null)
                      {

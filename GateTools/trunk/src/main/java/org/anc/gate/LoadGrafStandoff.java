@@ -59,10 +59,12 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
 
    public static final String STANDOFFASNAME_PARAMETER = "standoffASName";
    public static final String SOURCE_URL_PARAMETER = "sourceUrl";
+   public static final String ANNOTATION_TYPE_PARAMETER = "annotationType";
 
    protected String standoffASName = null;
    protected URL sourceUrl = null;
-
+   protected String annotationType = null;
+   
    protected transient GraphParser parser;
    protected AnnotationSet annotations;
    protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
@@ -105,7 +107,31 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       
       //URL url = this.getSourceUrl();
       //get the file path for the standoff file ( ie nc, vc etc ); sourceUrl comes from the gate gui
+            
       File file = new File(sourceUrl.getPath());
+      if (file.isDirectory())
+      {
+         if (annotationType == null)
+         {
+            throw new ExecutionException("Source URL is a directory and no annotation type was specified.");
+         }
+         // TODO The annotation file should be determined from the 
+         // header file.
+         String name = document.getName();
+         System.out.println("Document name is " + name);
+         int index = name.lastIndexOf(".txt");
+         if (index > 0)
+         {
+            name = name.substring(0, index);
+         }
+         name = name + "-" + annotationType + ".xml";
+         file = new File(file, name);
+      }
+      if (!file.exists())
+      {
+         throw new ExecutionException("Unable to locate annotation file " + file.getPath());
+      }
+      
       //File file = FileUtils.toFile(sourceUrl);
       //create empty graph to start
       IGraph graph = null;
@@ -161,6 +187,12 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       sourceUrl = url;
    }
 
+   public String getAnnotationType() { return annotationType; }
+   public void setAnnotationType(String type)
+   {
+      this.annotationType = type;
+   }
+   
    protected void addAnnotation(INode node) throws InvalidOffsetException
    {
       getRangeFn.reset();

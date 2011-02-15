@@ -16,7 +16,8 @@ goto run
 
 :dax
 echo Running on Dax
-set DIR=%GATE_HOME%\Plugins\ANC
+rem set DIR=%GATE_HOME%\Plugins\ANC
+set DIR=c:\dev\gate-plugins\ANC
 goto run
 
 :scotty
