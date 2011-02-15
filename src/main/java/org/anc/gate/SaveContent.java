@@ -21,6 +21,7 @@ import gate.Resource;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -72,7 +73,19 @@ public class SaveContent extends org.anc.gate.ANCLanguageAnalyzer
 
       try
       {
-         FileOutputStream ofstream = new FileOutputStream(destination.getPath());
+         File outputFile = new File(destination.getPath());
+         if (outputFile.isDirectory())
+         {
+            String name = document.getName();
+            System.out.println("Using document name as file name: " + name);
+            int index = name.lastIndexOf(".txt");
+            if (index > 0)
+            {
+               name = name.substring(0, index) + ".txt";
+            }
+            outputFile = new File(outputFile, name);
+         }
+         FileOutputStream ofstream = new FileOutputStream(outputFile);
          OutputStreamWriter writer = new OutputStreamWriter(ofstream, encoding);
 //        System.out.println("Set encoding to " + writer.getEncoding());
 //        FileWriter writer = new FileWriter(destination.getPath());
@@ -87,8 +100,7 @@ public class SaveContent extends org.anc.gate.ANCLanguageAnalyzer
       }
       catch (IOException ex)
       {
-         throw new ExecutionException("SaveContent I/O Exception: "
-               + ex.getMessage());
+         throw new ExecutionException("SaveContent I/O Exception: ", ex);
       }
    }
 
