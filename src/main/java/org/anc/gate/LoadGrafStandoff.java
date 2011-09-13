@@ -26,9 +26,11 @@ import gate.Resource;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
 import gate.util.InvalidOffsetException;
+//import gate.util.Out;
 
 import java.io.File;
 import java.net.URL;
+import java.util.*;
 
 import org.anc.util.Pair;
 import org.apache.commons.io.FileUtils;
@@ -277,6 +279,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
                {
                   //if here, the offsets look ok, finally add the annotation to the
                   //gate annotations object using the start, end, anc graf annotation name and the gate feature map
+//                  Out.println(start + ", " + end + ": " + label);
                   annotations.add(start, end, label, newFeatures);
                   
                }
@@ -523,9 +526,15 @@ class Offset extends Pair<Long, Long>
 class GetRangeFunction implements IFunction<INode, Offset>
 {
    protected Offset offset = new Offset();
-
+   protected Set<INode> seen = new HashSet<INode>();
+   
    public Offset apply(INode item)
    {
+      if (seen.contains(item))
+      {
+         return offset;
+      }
+      seen.add(item);
       for (ILink link : item.links())
       {
          for (IRegion region : link)
@@ -565,6 +574,7 @@ class GetRangeFunction implements IFunction<INode, Offset>
 
    public void reset()
    {
+      seen.clear();
       offset.setStart(Long.MAX_VALUE);
       offset.setEnd(Long.MIN_VALUE);
    }
