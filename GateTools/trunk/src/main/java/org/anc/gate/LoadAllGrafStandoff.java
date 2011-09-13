@@ -9,28 +9,19 @@ import gate.Resource;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
 import gate.util.InvalidOffsetException;
-import gate.util.Out;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.net.URL;
 
-import org.anc.io.PrefixFilter;
-import org.anc.util.Pair;
 import org.apache.commons.io.FileUtils;
-import org.xces.graf.api.IAnchor;
 import org.xces.graf.api.IAnnotation;
 import org.xces.graf.api.IAnnotationSet;
 import org.xces.graf.api.IEdge;
 import org.xces.graf.api.IFeature;
 import org.xces.graf.api.IFeatureStructure;
 import org.xces.graf.api.IGraph;
-import org.xces.graf.api.ILink;
 import org.xces.graf.api.INode;
-import org.xces.graf.api.IRegion;
-import org.xces.graf.impl.CharacterAnchor;
 import org.xces.graf.io.GraphParser;
-import org.xces.graf.util.IFunction;
 import org.xml.sax.SAXException;
 
 public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
@@ -82,9 +73,8 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       content = document.getContent().toString();
       endOfContent = content.length();
 
+//      Out.prln("Loading standoff for : " + document.getName());
       File file = FileUtils.toFile(url);
-//      String path = url.getPath();
-//      File file = new File(path);
       if (!file.exists())
       {
          throw new ExecutionException("Could not locate original document: " + file.getAbsolutePath());
@@ -102,24 +92,21 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
             IGraph graph = null;
             try
             {
-//               Out.prln("Parsing " + soFile.getPath());
                graph = parser.parse(soFile);
-//               Out.prln("Graph parsed.");
                for (INode node : graph.nodes())
                {
-//                  Out.prln("Would add annotations for " + type + " " + node.getId());
                   addAnnotation(node, type);
                }
             }
             catch (Exception ex)
             {
-               Out.prln("Error loading standoff.");
-               ex.printStackTrace();
+//               Out.prln("Error loading standoff.");
+//               ex.printStackTrace();
                throw new ExecutionException(ex);
             }
          }
       }
-      Out.println("Execution complete.");
+//      Out.println("Execution complete.");
    }
 
    public String getStandoffASName()

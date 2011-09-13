@@ -10,6 +10,8 @@
 	<url>http://www.anc.org/projects/gate-tools</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<last.stable.version>2.0.3</last.stable.version>
+		<release.type>release</release.type>
 	</properties>
 	<issueManagement>
 		<system>Trac</system>
@@ -23,7 +25,7 @@
 	</licenses>
 	<ciManagement>
 		<system>Hudson</system>
-		<url>http://www.anc.org:8080/hudson/job/gate-tools</url>
+		<url>http://www.anc.org:8080/hudson/</url>
 	</ciManagement>
 	<scm>
 		<connection>scm:svn:http://www.anc.org/svn/GateTools/trunk</connection>
@@ -53,8 +55,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<!--  <version>2.3.1</version> -->
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -177,7 +179,7 @@
 		</snapshotRepository>
 		<site>
 			<id>anc-scp</id>
-			<url>scp://suderman@anc.org:/var/www/anc/projects/gate-tools</url>
+			<url>scp://suderman@anc.org:22022/home/www/anc/projects/gate-tools</url>
 		</site>
 	</distributionManagement>
 	<profiles>
