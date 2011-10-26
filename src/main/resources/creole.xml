@@ -10,7 +10,7 @@
 		-->
 		<RESOURCE>
 			<NAME>ANC Document</NAME>
-			<JAR>ANC-GATE.jar</JAR>
+			<JAR>ANC-GATE-${project.version}.jar</JAR>
 			<CLASS>org.anc.gate.ANCDocument</CLASS>
 			<COMMENT>ANC transient document</COMMENT>
 			<OR>
@@ -57,7 +57,7 @@
         -->
         <RESOURCE>
             <NAME>Graf Document</NAME>
-            <JAR>ANC-GATE.jar</JAR>
+			<JAR>ANC-GATE-${project.version}.jar</JAR>
             <CLASS>org.anc.gate.GrafDocument</CLASS>
             <COMMENT>ANC transient document</COMMENT>
             <OR>
@@ -97,7 +97,7 @@
 		-->
 		<RESOURCE>
 			<NAME>ANC Load XCES Standoff</NAME>
-			<JAR>ANC-GATE.jar</JAR>
+			<JAR>ANC-GATE-${project.version}.jar</JAR>
 			<CLASS>org.anc.gate.LoadStandoff</CLASS>
 			<COMMENT>Add standoff annotations to an open document</COMMENT>
 			<PARAMETER NAME="document" COMMENT="Document to be processed"
@@ -108,6 +108,9 @@
 			<PARAMETER NAME="standoffASName"
 				COMMENT="Annotation set to add standoff tags to" RUNTIME="true"
 				DEFAULT="Standoff markups" OPTIONAL="true">java.lang.String</PARAMETER>
+				<PARAMETER NAME="annotationType" RUNTIME="true"
+				COMMENT="Annotation type to be loaded. Required when loading a corpus"
+				OPTIONAL="true">java.lang.String</PARAMETER>
 		</RESOURCE>
 		<!-- 
 		
@@ -118,7 +121,7 @@
 		-->
 		<RESOURCE>
 			<NAME>ANC Load GrAF Standoff</NAME>
-			<JAR>ANC-GATE.jar</JAR>
+			<JAR>ANC-GATE-${project.version}.jar</JAR>
 			<CLASS>org.anc.gate.LoadGrafStandoff</CLASS>
 			<COMMENT>Add stand-off annotations to an open document</COMMENT>
 			<PARAMETER NAME="document" COMMENT="Document to be processed"
@@ -135,7 +138,7 @@
 		</RESOURCE>
 		<RESOURCE>
 			<NAME>ANC Load All GrAF Standoff</NAME>
-			<JAR>ANC-GATE.jar</JAR>
+			<JAR>ANC-GATE-${project.version}.jar</JAR>
 			<CLASS>org.anc.gate.LoadAllGrafStandoff</CLASS>
 			<COMMENT>Adds all stand-off annotations to an open document</COMMENT>
 			<PARAMETER NAME="document" COMMENT="Document to be processed"
@@ -152,7 +155,7 @@
 			<NAME>ANC Save Content</NAME>
 			<CLASS>org.anc.gate.SaveContent</CLASS>
 			<COMMENT>Save the textual content of a document to a text file</COMMENT>
-			<JAR>ANC-GATE.jar</JAR>
+			<JAR>ANC-GATE-${project.version}.jar</JAR>
 			<PARAMETER NAME="document"
 				COMMENT="The document to save"
 				REQUIRED="true"
@@ -174,7 +177,7 @@
 			<NAME>ANC Save XCES Standoff</NAME>
 			<CLASS>org.anc.gate.SaveStandoff</CLASS>
 			<COMMENT>Saves annotations to a standoff file</COMMENT>
-			<JAR>ANC-GATE.jar</JAR>
+			<JAR>ANC-GATE-${project.version}.jar</JAR>
 			<PARAMETER NAME="document" COMMENT="Document to save"
 				REQUIRED="true" RUNTIME="true">gate.Document</PARAMETER>
 			<PARAMETER NAME="destination" COMMENT="Location to write the file"
@@ -207,7 +210,7 @@
 			<NAME>ANC Save XCES Corpus Standoff</NAME>
 			<CLASS>org.anc.gate.SaveCorpusStandoff</CLASS>
 			<COMMENT>Saves annotations to a standoff file</COMMENT>
-			<JAR>ANC-GATE.jar</JAR>
+			<JAR>ANC-GATE-${project.version}.jar</JAR>
 			<PARAMETER NAME="document" COMMENT="Document to save"
 				REQUIRED="true" RUNTIME="true">gate.Document</PARAMETER>
 			<PARAMETER NAME="destination" COMMENT="Location to write the file"
@@ -246,7 +249,7 @@
 			<NAME>ANC Save GrAF Standoff</NAME>
 			<CLASS>org.anc.gate.SaveGrafStandoff</CLASS>
 			<COMMENT>Saves annotations to a standoff file</COMMENT>
-			<JAR>ANC-GATE.jar</JAR>
+			<JAR>ANC-GATE-${project.version}.jar</JAR>
 			<PARAMETER NAME="document" COMMENT="Document to save"
 				REQUIRED="true" RUNTIME="true">gate.Document</PARAMETER>
 			<PARAMETER NAME="destination" COMMENT="Location to write the file"

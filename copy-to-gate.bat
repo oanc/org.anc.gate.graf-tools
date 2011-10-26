@@ -1,4 +1,10 @@
 @echo off
+
+echo "This script no longer works."
+echo "Copy the Jar and creole.xml from the zip to"
+echo "the Gate plugins folder manually."
+exit
+
 setlocal
 
 if "%GATE_HOME%"=="" echo no-gate
@@ -27,7 +33,7 @@ goto run
 
 :run
 echo on
-copy target\ANC-GATE.jar %DIR%
+copy target\ANC-GATE*.jar %DIR%
 copy src\main\resources\creole.xml %DIR%
 @echo off
 goto end
