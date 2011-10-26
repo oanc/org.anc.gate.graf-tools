@@ -25,6 +25,7 @@ import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
 import gate.util.InvalidOffsetException;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
@@ -44,9 +45,12 @@ public class LoadStandoff extends ANCLanguageAnalyzer
    public static final long serialVersionUID = 1L;
    public static final String STANDOFFASNAME_PARAMETER = "standoffASName";
    public static final String SOURCE_URL_PARAMETER = "sourceUrl";
-
+   public static final String ANNOTATION_TYPE_PARAMETER = "annotationType";
+      
    protected transient String standoffASName = null;
    protected transient URL sourceUrl = null;
+   protected transient String annotationType = null;
+   
 //   private transient AnnotationParser<List<Annotation>> parser = null;
    private transient AnnotationParser parser;
 
@@ -64,8 +68,49 @@ public class LoadStandoff extends ANCLanguageAnalyzer
       List<Annotation> list = null; // = new LinkedList<Annotation>();
       try
       {
-         list = parser.parse(sourceUrl.toURI());
+         File file = new File(sourceUrl.getPath());
+         String name = document.getName();
+         if (file.isDirectory())
+         {
+            if (annotationType == null)
+            {
+               throw new ExecutionException("Source URL is a directory and no annotation type was specified.");
+            }
+            // TODO The annotation file should be determined from the 
+            // header file.
+            int index = name.lastIndexOf(".txt");
+            if (index > 0)
+            {
+               name = name.substring(0, index);
+            }
+            name = name + "-" + annotationType + ".xml";
+            file = new File(file, name);
+         }
+         if (!file.exists())
+         {
+            File docRoot = new File(document.getSourceUrl().getPath()).getParentFile();
+            file = new File(docRoot, name);
+            if (!file.exists())
+            {
+               System.err.println("Unable to locate annotation file " + file.getPath());
+               return;
+            }
+         }
+         if (file.length() == 0)
+         {
+            System.err.println("WARNING: " + file.getPath() + " is empty.");
+            return;
+         }
+         list = parser.parse(file.toURI());
 //         parser.parse(list, sourceUrl.getPath());
+      }
+      catch (ExecutionException e)
+      {
+         throw e;
+      }
+      catch (RuntimeException e)
+      {
+         throw e;
       }
       catch (Exception e)
       {
@@ -138,4 +183,7 @@ public class LoadStandoff extends ANCLanguageAnalyzer
    {
       sourceUrl = url;
    }
+   
+   public String getAnnotationType() { return annotationType; }
+   public void setAnnotationType(String type) { this.annotationType = type; }
 }

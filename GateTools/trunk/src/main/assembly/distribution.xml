@@ -1,5 +1,5 @@
 <assembly>
-	<id>dist</id>
+	<id>dist-${project.version}</id>
 	<formats>
 		<format>zip</format>
 		<format>tar.gz</format>
@@ -16,16 +16,22 @@
 			<directory>target</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
-				<include>ANC-GATE.jar</include>
+				<include>ANC-GATE-${project.version}.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>
 			<directory>/src/main/resources</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
-				<include>creole.xml</include>
 				<include>LICENSE.txt</include>
 			</includes>
 		</fileSet>
 	</fileSets>
+	<files>
+		<file>
+			<source>/src/main/resources/creole.xml</source>
+			<outputDirectory>/</outputDirectory>
+			<filtered>true</filtered>
+		</file>
+	</files>
 </assembly>
