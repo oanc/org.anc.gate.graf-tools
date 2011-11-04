@@ -20,7 +20,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>/src/main/resources</directory>
+			<directory>src/main/resources</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>LICENSE.txt</include>
@@ -29,7 +29,7 @@
 	</fileSets>
 	<files>
 		<file>
-			<source>/src/main/resources/creole.xml</source>
+			<source>src/main/resources/creole.xml</source>
 			<outputDirectory>/</outputDirectory>
 			<filtered>true</filtered>
 		</file>

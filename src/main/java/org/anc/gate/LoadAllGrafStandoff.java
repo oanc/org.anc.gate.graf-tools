@@ -9,6 +9,7 @@ import gate.Resource;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
 import gate.util.InvalidOffsetException;
+import gate.util.Out;
 
 import java.io.File;
 import java.net.URL;
@@ -73,7 +74,7 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       content = document.getContent().toString();
       endOfContent = content.length();
 
-//      Out.prln("Loading standoff for : " + document.getName());
+      Out.prln("Loading standoff for : " + document.getName());
       File file = FileUtils.toFile(url);
       if (!file.exists())
       {
@@ -88,7 +89,7 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
          File soFile = new File(parentDir, soFilename);
          if (soFile.exists())
          {
-//            Out.prln("Attempting to load " + soFile.getPath());
+            Out.prln("Attempting to load " + soFile.getPath());
             IGraph graph = null;
             try
             {

@@ -111,6 +111,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       //get the file path for the standoff file ( ie nc, vc etc ); sourceUrl comes from the gate gui
             
       File file = new File(sourceUrl.getPath());
+      String name = document.getName();
       if (file.isDirectory())
       {
          if (annotationType == null)
@@ -119,8 +120,6 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
          }
          // TODO The annotation file should be determined from the 
          // header file.
-         String name = document.getName();
-         System.out.println("Document name is " + name);
          int index = name.lastIndexOf(".txt");
          if (index > 0)
          {
@@ -131,7 +130,18 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       }
       if (!file.exists())
       {
-         throw new ExecutionException("Unable to locate annotation file " + file.getPath());
+         File docRoot = new File(document.getSourceUrl().getPath()).getParentFile();
+         file = new File(docRoot, name);
+         if (!file.exists())
+         {
+            System.err.println("Unable to locate annotation file " + file.getPath());
+            return;
+         }
+      }
+      if (file.length() == 0)
+      {
+         System.err.println("WARNING: " + file.getPath() + " is empty.");
+         return;
       }
       
       //File file = FileUtils.toFile(sourceUrl);
