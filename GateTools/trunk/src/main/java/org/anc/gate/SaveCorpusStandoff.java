@@ -117,6 +117,10 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
       {
          featureFilter = new HashSet<String>();
          featureFilter.add("isEmptyAndSpan");
+      }
+      
+      if (filterFeaturesList != null)
+      {
          for (String feature : filterFeaturesList)
          {
             featureFilter.add(feature);
@@ -127,7 +131,8 @@ public class SaveCorpusStandoff extends ANCLanguageAnalyzer
       {
          // Create the filename from the document name.
          String filename = document.getName();
-         int index = filename.indexOf(fileExtension);
+         //int index = filename.indexOf(fileExtension);
+         int index = filename.lastIndexOf('.');
          if (index > 0)
          {
             filename = filename.substring(0, index) + "-" + annotationType

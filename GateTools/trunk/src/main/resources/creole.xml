@@ -61,7 +61,7 @@
             <CLASS>org.anc.gate.GrafDocument</CLASS>
             <COMMENT>ANC transient document</COMMENT>
             <OR>
-                <PARAMETER NAME="sourceUrl" SUFFIXES="xces;anc" COMMENT="Source URL of the document header">java.net.URL</PARAMETER>
+                <PARAMETER NAME="sourceUrl" SUFFIXES="xces;anc;hdr" COMMENT="Source URL of the document header">java.net.URL</PARAMETER>
                 <PARAMETER NAME="stringContent" COMMENT="The content of the document">java.lang.String</PARAMETER>
             </OR>
             <PARAMETER COMMENT="Should the document read the original markup"
