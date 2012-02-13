@@ -37,6 +37,7 @@ import org.apache.commons.io.FileUtils;
 import org.xces.graf.api.IAnchor;
 import org.xces.graf.api.IAnnotation;
 import org.xces.graf.api.IAnnotationSet;
+import org.xces.graf.api.IAnnotationSpace;
 import org.xces.graf.api.IEdge;
 import org.xces.graf.api.IFeature;
 import org.xces.graf.api.IFeatureStructure;
@@ -235,7 +236,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             //we know since this is an anc standoff graph, use Standoff Markups as the annotation setName
             String aSetName = "Standoff Markups";
             //now get the set from the annotationSet associated with the graphs node
-            IAnnotationSet as = a.getAnnotationSet();
+            IAnnotationSpace as = a.getAnnotationSpace();
             //as long as the graf annotationSet is not null
             if (as != null)
             {

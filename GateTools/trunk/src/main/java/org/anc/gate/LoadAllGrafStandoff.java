@@ -17,6 +17,7 @@ import java.net.URL;
 import org.apache.commons.io.FileUtils;
 import org.xces.graf.api.IAnnotation;
 import org.xces.graf.api.IAnnotationSet;
+import org.xces.graf.api.IAnnotationSpace;
 import org.xces.graf.api.IEdge;
 import org.xces.graf.api.IFeature;
 import org.xces.graf.api.IFeatureStructure;
@@ -151,7 +152,7 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
          {
             FeatureMap newFeatures = Factory.newFeatureMap();
             String aSetName = "Standoff Markups";
-            IAnnotationSet as = a.getAnnotationSet();
+            IAnnotationSpace as = a.getAnnotationSpace();
             if (as != null)
             {
                aSetName = as.getName();
