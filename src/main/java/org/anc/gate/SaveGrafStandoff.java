@@ -43,23 +43,23 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
-//import org.anc.masc.MASC;
+import org.anc.masc.MASC;
 import org.anc.util.IDGenerator;
 import org.xces.graf.api.GrafException;
 import org.xces.graf.api.IAnchor;
 import org.xces.graf.api.IAnchorFactory;
 import org.xces.graf.api.IAnnotation;
-import org.xces.graf.api.IAnnotationSpace;
+import org.xces.graf.api.IAnnotationSet;
 import org.xces.graf.api.IGraph;
 import org.xces.graf.api.INode;
 import org.xces.graf.api.IRegion;
 import org.xces.graf.api.IStandoffHeader;
 import org.xces.graf.impl.Factory;
-//import org.xces.graf.impl.header.Media;
-//import org.xces.graf.impl.header.Medium;
+import org.xces.graf.impl.header.Media;
+import org.xces.graf.impl.header.Medium;
 import org.xces.graf.io.GrafRenderer;
 import org.xces.graf.io.XML;
-//import org.xces.graf.util.GraphUtils;
+import org.xces.graf.util.GraphUtils;
 
 /**
  */
@@ -181,13 +181,13 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
       IDGenerator id = new IDGenerator();
       IAnchorFactory anchorFactory = Factory.newCharacterAnchorFactory();
 
-      Map<String, IAnnotationSpace> grafAnnotationSetMap = new HashMap<String, IAnnotationSpace>();
+      Map<String, IAnnotationSet> grafAnnotationSetMap = new HashMap<String, IAnnotationSet>();
       //grafASName ( default on the gui is: http://www.xces.org/schema/2003 ) and
       //grafASType (default on the gui is: xces ) 
       //come from the gate gui, use them to make a new anc graf annotationSet out of them ( now empty )
-      IAnnotationSpace set = Factory.newAnnotationSpace(grafASName, grafASType);
+      IAnnotationSet set = Factory.newAnnotationSet(grafASName, grafASType);
       //add the set to the graf
-      graph.addAnnotationSpace(set);
+      graph.addAnnotationSet(set);
       //put the annotation set in the set map with the grafASName as key
       grafAnnotationSetMap.put(grafASName, set);
 
@@ -336,7 +336,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
                      //get the name of the set
                      String setName = att.getValue().toString();
                      //find it in the grafAnnotation set Map from above, ( set might be empty..no matter )
-                     IAnnotationSpace aset = grafAnnotationSetMap.get(setName);
+                     IAnnotationSet aset = grafAnnotationSetMap.get(setName);
 
                      //if not found, print error, set the type to a default anc graf annotation set type and make a new one..
                      if (aset == null)
@@ -354,7 +354,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
                            type = type + "/" + setName;
                         }
                         //come up with a new graf annotation set using setName and type only if set was found null
-                        aset = Factory.newAnnotationSpace(setName, type);
+                        aset = Factory.newAnnotationSet(setName, type);
                         //put it in the map of annotation sets
                         grafAnnotationSetMap.put(setName, set);
                      }
