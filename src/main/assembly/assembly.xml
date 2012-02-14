@@ -21,6 +21,9 @@
       	<include>org.anc:common</include>
       	<include>org.xces:xces-parser</include>
       	<include>org.tc37sc4.graf:graf-api</include>
+      	<include>org.tc37sc4.graf:graf-impl</include>
+      	<include>org.tc37sc4.graf:graf-io</include>
+      	<include>org.tc37sc4.graf:graf-util</include>
       	<include>commons-io:commons-io</include>
       </includes>
     </dependencySet>
