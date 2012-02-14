@@ -7,7 +7,7 @@ else
 	exit 1
 fi
 
-cp target/ANC-GATE.jar $DEST
+cp target/ANC-GATE-*.jar $DEST
 cp src/main/resources/creole.xml $DEST
 
 echo "ANC Plugin has been copied to Gate."
