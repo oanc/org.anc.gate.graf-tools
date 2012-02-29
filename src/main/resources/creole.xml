@@ -9,10 +9,10 @@
 		document in one step.  The XCES Document will appear in the "New Language Resource" menu in Gate.
 		-->
 		<RESOURCE>
-			<NAME>ANC Document</NAME>
+			<NAME>XCES Document</NAME>
 			<JAR>ANC-GATE-${project.version}.jar</JAR>
 			<CLASS>org.anc.gate.ANCDocument</CLASS>
-			<COMMENT>ANC transient document</COMMENT>
+			<COMMENT>XCES transient document</COMMENT>
 			<OR>
 				<PARAMETER NAME="sourceUrl" SUFFIXES="xces;anc" COMMENT="Source URL of the document header">java.net.URL</PARAMETER>
 				<PARAMETER NAME="stringContent" COMMENT="The content of the document">java.lang.String</PARAMETER>
