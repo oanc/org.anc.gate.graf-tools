@@ -36,7 +36,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -46,16 +45,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xces.graf.api.IGraph;
 import org.xces.graf.io.GraphParser;
 import org.xces.standoff.Annotation;
-import org.xces.standoff.AnnotationParser;
 import org.xces.standoff.Annotation.Feature;
+import org.xces.standoff.AnnotationParser;
 import org.xml.sax.SAXException;
-
-// import org.xces.gate.AnaParser;
-// import org.xces.gate.CesAnaParser;
-// import org.xces.gate.Token;
 
 /**
  * @author Keith Suderman
@@ -63,7 +57,8 @@ import org.xml.sax.SAXException;
  */
 public class ANCDocument extends gate.corpora.DocumentImpl implements LanguageResource
 {
-
+   private static final long serialVersionUID = 1L;
+   
    public static final String LOAD_STANDOFF_PARAMETER_NAME = "loadStandoff";
    public static final String STANDOFF_MARKUP_SET_NAME = "standoffASName";
    public static final String STANDOFF_ANNOTATIONS_PARAMETER_NAME = "standoffAnnotations";
@@ -131,17 +126,12 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements LanguageRe
 
    public ANCDocument()
    {
-//    Out.prln("XCES document constructor.");
-//    this.addDocumentListener(new XCESDocumentListener(this));
    }
 
    @Override
    public Resource init() throws ResourceInstantiationException
    {
       super.init();
-//    System.out.println("Creating an XCES docuement.");
-//    if (true) throw new ResourceInstantiationException("WTF");
-
       //from the gate gui
       URL url = getSourceUrl();
       //get the path of url
