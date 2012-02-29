@@ -43,7 +43,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
-import org.anc.masc.MASC;
+//import org.anc.masc.MASC;
 import org.anc.util.IDGenerator;
 import org.xces.graf.api.GrafException;
 import org.xces.graf.api.IAnchor;
