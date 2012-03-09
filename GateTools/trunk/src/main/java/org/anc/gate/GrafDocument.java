@@ -37,6 +37,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import org.anc.conf.AnnotationSpaces;
 import org.xces.graf.api.IAnnotation;
 import org.xces.graf.api.IAnnotationSet;
 import org.xces.graf.api.IAnnotationSpace;
@@ -58,8 +59,8 @@ import org.xml.sax.SAXException;
  */
 public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageResource
 {
-
-   private static final long serialVersionUID = 1L; //what is this ?
+   private static final long serialVersionUID = 1L; 
+   
    public static final String LOAD_STANDOFF_PARAMETER_NAME = "loadStandoff";
    public static final String STANDOFF_MARKUP_SET_NAME = "standoffASName";
    public static final String STANDOFF_ANNOTATIONS_PARAMETER_NAME = "standoffAnnotations";
@@ -212,6 +213,11 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       try
       {
          GraphParser graphParser = new GraphParser();
+         for (IAnnotationSpace aspace : AnnotationSpaces.ALL)
+         {
+            graphParser.addAnnotationSpace(aspace);
+         }
+         
          // GrafRenderer GrafRenderer = new GrafRenderer(System.out);
 
          //stand-off annotations is a List coming from the gate gui, 

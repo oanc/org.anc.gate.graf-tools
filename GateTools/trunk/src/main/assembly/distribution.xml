@@ -16,7 +16,7 @@
 			<directory>target</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
-				<include>ANC-GATE-${project.version}.jar</include>
+				<include>GrAF-GATE-${project.version}.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>

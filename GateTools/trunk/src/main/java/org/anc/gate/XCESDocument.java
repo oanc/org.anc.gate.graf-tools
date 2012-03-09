@@ -55,7 +55,7 @@ import org.xml.sax.SAXException;
  * @author Keith Suderman
  * @version 1.0
  */
-public class ANCDocument extends gate.corpora.DocumentImpl implements LanguageResource
+public class XCESDocument extends gate.corpora.DocumentImpl implements LanguageResource
 {
    private static final long serialVersionUID = 1L;
    
@@ -124,7 +124,7 @@ public class ANCDocument extends gate.corpora.DocumentImpl implements LanguageRe
       return contentEncoding;
    }
 
-   public ANCDocument()
+   public XCESDocument()
    {
    }
 

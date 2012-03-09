@@ -14,9 +14,12 @@ import gate.util.Out;
 import java.io.File;
 import java.net.URL;
 
+import org.anc.conf.AnnotationConfig;
+import org.anc.conf.AnnotationSpaces;
+import org.anc.conf.AnnotationType;
+import org.anc.conf.MascConfig;
 import org.apache.commons.io.FileUtils;
 import org.xces.graf.api.IAnnotation;
-import org.xces.graf.api.IAnnotationSet;
 import org.xces.graf.api.IAnnotationSpace;
 import org.xces.graf.api.IEdge;
 import org.xces.graf.api.IFeature;
@@ -33,10 +36,10 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
    public static final String STANDOFFASNAME_PARAMETER = "standoffASName";
    public static final String SOURCE_URL_PARAMETER = "sourceUrl";
 
-   public static final String[] TYPES =
-   {
-     "logical", "s", "ne", "vc", "nc", "ptb", "fn", "mpqa", "cb", "event", "penn" 
-   };
+//   public static final String[] _TYPES =
+//   {
+//     "logical", "s", "ne", "vc", "nc", "ptb", "fn", "mpqa", "cb", "event", "penn" 
+//   };
    
    protected String standoffASName = null;
    protected URL sourceUrl = null;
@@ -60,6 +63,10 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       {
          super.init();
          parser = new GraphParser();
+         for (IAnnotationSpace aspace : AnnotationSpaces.ALL)
+         {
+            parser.addAnnotationSpace(aspace);
+         }
       }
       catch (SAXException ex)
       {
@@ -84,7 +91,8 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       File parentDir = file.getParentFile();
       String filename = file.getName();
       String basename = filename.substring(0, filename.length() - 4);
-      for (String type : TYPES)
+      AnnotationConfig config = new MascConfig();
+      for (String type : config.types())
       {
          String soFilename = basename + "-" + type + ".xml";
          File soFile = new File(parentDir, soFilename);
