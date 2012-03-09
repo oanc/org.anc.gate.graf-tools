@@ -70,7 +70,7 @@
 						<descriptor>src/main/assembly/distribution.xml</descriptor>
 						<descriptor>src/main/assembly/source.xml</descriptor>
 					</descriptors>
-					<finalName>ANC</finalName>
+					<finalName>GrAF</finalName>
 					<appendAssemblyId>true</appendAssemblyId>
 				</configuration>
 				<executions>
@@ -153,6 +153,18 @@
 			<version>2.7.8</version>
 			<type>jar</type>
 			<optional>false</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.anc</groupId>
+			<artifactId>conf</artifactId>
+			<version>1.0.6</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.xces.graf</groupId>
+			<artifactId>graf-headers</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<repositories>

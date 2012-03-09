@@ -28,10 +28,12 @@ import gate.creole.ResourceInstantiationException;
 import gate.util.InvalidOffsetException;
 //import gate.util.Out;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
 
+import org.anc.conf.AnnotationSpaces;
 import org.anc.util.Pair;
 import org.apache.commons.io.FileUtils;
 import org.xces.graf.api.IAnchor;
@@ -86,6 +88,10 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       {
          super.init();
          parser = new GraphParser();
+         for (IAnnotationSpace as : AnnotationSpaces.ALL)
+         {
+            parser.addAnnotationSpace(as);
+         }
       }
       catch (SAXException ex)
       {
@@ -97,6 +103,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
    @Override
    public void execute() throws ExecutionException
    {
+      BufferedReader r;
       //annotations is gate annotations not graf annotations
       //getAnnotations comes from the parent class ANCLanguageAnalyzer
       //standoffASName comes from the gate gui; default is 'Standoff markups'
