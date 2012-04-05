@@ -140,6 +140,7 @@
 			<type>jar</type>
 			<optional>false</optional>
 		</dependency>
+		<!--  
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -147,6 +148,7 @@
 			<type>jar</type>
 			<optional>false</optional>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.anc</groupId>
 			<artifactId>common</artifactId>
@@ -161,11 +163,13 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
+		<!--  
 		<dependency>
 			<groupId>org.xces.graf</groupId>
 			<artifactId>graf-headers</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		-->
 	</dependencies>
 	<repositories>
 		<repository>
