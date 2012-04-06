@@ -26,19 +26,18 @@ import gate.Resource;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
 import gate.util.InvalidOffsetException;
-//import gate.util.Out;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.net.URL;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.anc.conf.AnnotationSpaces;
+import org.anc.gate.core.ANCLanguageAnalyzer;
 import org.anc.util.Pair;
-import org.apache.commons.io.FileUtils;
 import org.xces.graf.api.IAnchor;
 import org.xces.graf.api.IAnnotation;
-import org.xces.graf.api.IAnnotationSet;
 import org.xces.graf.api.IAnnotationSpace;
 import org.xces.graf.api.IEdge;
 import org.xces.graf.api.IFeature;

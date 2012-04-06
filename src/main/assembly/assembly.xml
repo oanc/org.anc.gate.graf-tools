@@ -18,10 +18,11 @@
       <unpack>true</unpack>
       <scope>runtime</scope>
       <includes>
+      	<include>org.anc.gate:graf-tools</include>
+      	<include>org.anc.gate:gate-core</include>
       	<include>org.anc:common</include>
       	<include>org.anc:conf</include>
-      	<include>org.xces.graf:graf-headers</include>
-      	<include>org.xces:xces-parser</include>
+      	<inlcude>org.anc:xml</inlcude>
       	<include>org.tc37sc4.graf:graf-api</include>
       	<include>org.tc37sc4.graf:graf-impl</include>
       	<include>org.tc37sc4.graf:graf-io</include>

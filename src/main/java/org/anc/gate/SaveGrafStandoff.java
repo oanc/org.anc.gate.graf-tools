@@ -44,6 +44,8 @@ import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 //import org.anc.masc.MASC;
+import org.anc.gate.core.ANCLanguageAnalyzer;
+import org.anc.gate.core.AnnotationComparer;
 import org.anc.util.IDGenerator;
 import org.xces.graf.api.GrafException;
 import org.xces.graf.api.IAnchor;
@@ -237,7 +239,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
       //create a startComparer ( implements java.util.Comparator ).  
       //this compares two GATE annotations by their start offsets. If the start offsets
       //are equal the annotations will be compared by end offsets.
-      Comparator<Annotation> comp = org.anc.gate.AnnotationComparer.createStartComparator();
+      Comparator<Annotation> comp = AnnotationComparer.createStartComparator();
       ArrayList<Annotation> sortedAnnotations = new ArrayList<Annotation>(annotations);
       //sort the arrayList of annotations using our comparator
       Collections.sort(sortedAnnotations, comp);

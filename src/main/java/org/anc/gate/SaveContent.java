@@ -26,11 +26,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import org.anc.gate.core.ANCLanguageAnalyzer;
+
 // import ANC.creole.ANCProcessingResource;
 // import ANC.creole.ANCLanguageAnalyser;
 
 /**  */
-public class SaveContent extends org.anc.gate.ANCLanguageAnalyzer
+public class SaveContent extends ANCLanguageAnalyzer
 {
    // Parameters passed by Gate.
    public static final String DESTINATION_PARAMETER_NAME = "destination";
@@ -42,6 +44,7 @@ public class SaveContent extends org.anc.gate.ANCLanguageAnalyzer
 
    public SaveContent()
    {
+      
    }
 
    @Override

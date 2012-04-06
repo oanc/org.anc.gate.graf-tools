@@ -4,8 +4,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.anc.gate</groupId>
-	<artifactId>GateTools</artifactId>
-	<name>ANC Gate Tools</name>
+	<artifactId>GrafTools</artifactId>
+	<name>GrAF Tools for Gate</name>
 	<version>3.0-SNAPSHOT</version>
 	<description>Plugins for loading and saving ANC files with standoff
 		markup</description>
@@ -106,13 +106,6 @@
 			<version>7.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.xces</groupId>
-			<artifactId>xces-parser</artifactId>
-			<version>1.1.5</version>
-			<type>jar</type>
-			<optional>false</optional>
-		</dependency>
-		<dependency>
 			<groupId>org.tc37sc4.graf</groupId>
 			<artifactId>graf-impl</artifactId>
 			<version>1.1.0-SNAPSHOT</version>
@@ -170,6 +163,20 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		-->
+		<dependency>
+			<groupId>org.anc.gate</groupId>
+			<artifactId>gate-core</artifactId>
+			<version>1.0.0</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.1</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>

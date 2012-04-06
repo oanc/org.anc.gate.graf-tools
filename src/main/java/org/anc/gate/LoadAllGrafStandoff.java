@@ -18,6 +18,7 @@ import org.anc.conf.AnnotationConfig;
 import org.anc.conf.AnnotationSpaces;
 import org.anc.conf.AnnotationType;
 import org.anc.conf.MascConfig;
+import org.anc.gate.core.ANCLanguageAnalyzer;
 import org.apache.commons.io.FileUtils;
 import org.xces.graf.api.IAnnotation;
 import org.xces.graf.api.IAnnotationSpace;
