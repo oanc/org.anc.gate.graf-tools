@@ -28,6 +28,7 @@ import org.xces.graf.api.IFeatureStructure;
 import org.xces.graf.api.IGraph;
 import org.xces.graf.api.INode;
 import org.xces.graf.io.GraphParser;
+import org.xces.graf.io.dom.ResourceHeader;
 import org.xml.sax.SAXException;
 
 public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
@@ -36,6 +37,7 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
 
    public static final String STANDOFFASNAME_PARAMETER = "standoffASName";
    public static final String SOURCE_URL_PARAMETER = "sourceUrl";
+   public static final String RESOURCE_HEADER_PARAMETER_NAME = "resourceHeader";
 
 //   public static final String[] _TYPES =
 //   {
@@ -44,6 +46,7 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
    
    protected String standoffASName = null;
    protected URL sourceUrl = null;
+   private URL resourceHeader;
 
    protected transient GraphParser parser;
 //   protected AnnotationSet annotations;
@@ -64,14 +67,16 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       {
          super.init();
          parser = new GraphParser();
-         for (IAnnotationSpace aspace : AnnotationSpaces.ALL)
+         File headerFile = FileUtils.toFile(resourceHeader);
+         ResourceHeader header = new ResourceHeader(headerFile);
+         for (IAnnotationSpace aspace : header.getAnnotationSpaces())
          {
             parser.addAnnotationSpace(aspace);
-         }
+         }         
       }
-      catch (SAXException ex)
+      catch (Exception ex)
       {
-         throw new ResourceInstantiationException(ex);
+         throw new ResourceInstantiationException("Unable to initialized the GraphParser", ex);
       }
       return this;
    }
@@ -118,6 +123,16 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
          }
       }
 //      Out.println("Execution complete.");
+   }
+
+   public void setResourceHeader(URL location)
+   {
+      this.resourceHeader = location;
+   }
+   
+   public URL getResourceHeader()
+   {
+      return resourceHeader;
    }
 
    public String getStandoffASName()

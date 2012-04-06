@@ -38,6 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.anc.conf.AnnotationSpaces;
+import org.apache.commons.io.FileUtils;
 import org.xces.graf.api.IAnnotation;
 import org.xces.graf.api.IAnnotationSet;
 import org.xces.graf.api.IAnnotationSpace;
@@ -47,6 +48,7 @@ import org.xces.graf.api.IFeatureStructure;
 import org.xces.graf.api.IGraph;
 import org.xces.graf.api.INode;
 import org.xces.graf.io.GraphParser;
+import org.xces.graf.io.dom.ResourceHeader;
 import org.xml.sax.SAXException;
 
 // import org.xces.gate.AnaParser;
@@ -67,6 +69,8 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    public static final String STANDOFF_LOADED_PARAMETER_NAME = "standoffLoaded";
    public static final String FACTORY_PROPERTY = "javax.xml.sax.SAXParserFactory";
    public static final String CONTENT_ENCODING_PARAMETER_NAME = "contentEncoding";
+   public static final String RESOURCE_HEADER_PARAMETER_NAME = "resourceHeader";
+   
    protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
    protected transient int endOfContent = 0;
 
@@ -75,11 +79,22 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    private List<String> standoffAnnotations = null;
    private boolean standoffLoaded = false;
    private String contentEncoding = "UTF-16";
-
+   private URL resourceHeader;
+   
    private Hashtable<String, String> ancAnnotations = null;
    protected AnnotationSet gateAnnotations;
    AnnotationSet as;
 
+   public void setResourceHeader(URL location)
+   {
+      this.resourceHeader = location;
+   }
+   
+   public URL getResourceHeader()
+   {
+      return resourceHeader;
+   }
+   
    public void setLoadStandoff(Boolean save)
    {
       loadStandoff = save;
@@ -141,8 +156,6 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    public Resource init() throws ResourceInstantiationException
    {
       super.init();
-//    System.out.println("Creating an XCES docuement.");
-//    if (true) throw new ResourceInstantiationException("WTF");
 
       IGraph graph;
       File fullPath;
@@ -162,11 +175,6 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       String basePath = fullPath.getParent().replaceAll("%20", "\\ ");
       //originalMarkups is  the GATE Annotation set ( not anc )
       AnnotationSet originalMarkups = getAnnotations("Original markups");
-
-      //annotations is gate annotations not graf annotations
-      //getAnnotations comes from the parent class ANCLanguageAnalyzer
-      //standoffASName comes from the gate gui; default is 'Standoff markups'
-      // annotations = getAnnotations(standoffASName);
 
       //if empty gate annotation set; throw ResourceInstantiationException
       if (originalMarkups == null || originalMarkups.size() == 0)
@@ -213,16 +221,14 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       try
       {
          GraphParser graphParser = new GraphParser();
-         for (IAnnotationSpace aspace : AnnotationSpaces.ALL)
+         File headerFile = FileUtils.toFile(resourceHeader);
+         ResourceHeader header = new ResourceHeader(headerFile);
+         for (IAnnotationSpace aspace : header.getAnnotationSpaces())
          {
             graphParser.addAnnotationSpace(aspace);
-         }
+         }         
          
-         // GrafRenderer GrafRenderer = new GrafRenderer(System.out);
-
-         //stand-off annotations is a List coming from the gate gui, 
-         //if not empty ..what happens if empty? how is it filled, if not by user ?
-         // System.out.println("standoffAnnotations.size() is " + standoffAnnotations.size());
+         // stand-off annotations is a List provided by the Gate gui, 
          if (standoffAnnotations != null)
          {
             //This is a gate Annotation set made using standoffASName, that comes from the

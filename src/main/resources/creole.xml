@@ -5,7 +5,7 @@
 
         Graf Document
 
-        A language resource that loads an ANC/XCES document with standoff markup into GATE as a single 
+        A language resource that loads a GrAF document with standoff markup into GATE as a single 
         document in one step.  The Graf Document will appear in the "New Language Resource" menu in Gate.
         -->
         <RESOURCE>
@@ -38,6 +38,9 @@
             <PARAMETER NAME="standoffAnnotations" 
                 OPTIONAL="true" COMMENT="Standoff annotations to add"
                 DEFAULT="ptb">java.util.List</PARAMETER> <!-- nc;vc;ne;logical;s -->
+			<PARAMETER NAME="resourceHeader" OPTIONAL="false" 
+				COMMENT="Location of the resource header"
+				RUNTIME="false">java.net.URL</PARAMETER>             	
             <ICON>lr.gif</ICON>
         </RESOURCE>
 		
@@ -64,18 +67,24 @@
 			<PARAMETER NAME="standoffASName"
 				COMMENT="Annotation set to add standoff tags to" RUNTIME="true"
 				DEFAULT="Standoff markups" OPTIONAL="true">java.lang.String</PARAMETER>
+			<PARAMETER NAME="resourceHeader" OPTIONAL="false" 
+				COMMENT="Location of the resource header"
+				RUNTIME="false">java.net.URL</PARAMETER>             	
 		</RESOURCE>
 		<RESOURCE>
 			<NAME>Load All GrAF Standoff (1.0)</NAME>
 			<JAR>GrAF-GATE-${project.version}.jar</JAR>
 			<CLASS>org.anc.gate.LoadAllGrafStandoff</CLASS>
 			<COMMENT>Adds all stand-off annotations to an open document</COMMENT>
-			<PARAMETER NAME="document" COMMENT="Document to be processed"
+			<PARAMETER NAME="document" COMMENT="Document header for the document to be loaded"
 				RUNTIME="true" REQUIRED="true">gate.Document</PARAMETER>
+			<PARAMETER NAME="resourceHeader" OPTIONAL="false" 
+				COMMENT="Location of the resource header"
+				RUNTIME="false">java.net.URL</PARAMETER>             	
 		</RESOURCE>
 		<!-- 
 		
-		ANC Save Graf Standoff Markup
+		Save Graf Standoff Markup
 		-->
 		<RESOURCE>
 			<NAME>Save GrAF Standoff (1.0)</NAME>
