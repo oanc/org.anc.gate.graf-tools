@@ -33,9 +33,10 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.anc.conf.AnnotationSpaces;
+//import org.anc.conf.AnnotationSpaces;
 import org.anc.gate.core.ANCLanguageAnalyzer;
 import org.anc.util.Pair;
+import org.apache.commons.io.FileUtils;
 import org.xces.graf.api.IAnchor;
 import org.xces.graf.api.IAnnotation;
 import org.xces.graf.api.IAnnotationSpace;
@@ -49,8 +50,8 @@ import org.xces.graf.api.IRegion;
 import org.xces.graf.api.IStandoffHeader;
 import org.xces.graf.impl.CharacterAnchor;
 import org.xces.graf.io.GraphParser;
+import org.xces.graf.io.dom.ResourceHeader;
 import org.xces.graf.util.IFunction;
-import org.xml.sax.SAXException;
 
 /**
  * 
@@ -64,10 +65,12 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
    public static final String STANDOFFASNAME_PARAMETER = "standoffASName";
    public static final String SOURCE_URL_PARAMETER = "sourceUrl";
    public static final String ANNOTATION_TYPE_PARAMETER = "annotationType";
+   public static final String RESOURCE_HEADER_PARAMETER_NAME = "resourceHeader";
 
    protected String standoffASName = null;
    protected URL sourceUrl = null;
    protected String annotationType = null;
+   private URL resourceHeader;
    
    protected transient GraphParser parser;
    protected AnnotationSet annotations;
@@ -87,14 +90,16 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       {
          super.init();
          parser = new GraphParser();
-         for (IAnnotationSpace as : AnnotationSpaces.ALL)
+         File headerFile = FileUtils.toFile(resourceHeader);
+         ResourceHeader header = new ResourceHeader(headerFile);
+         for (IAnnotationSpace aspace : header.getAnnotationSpaces())
          {
-            parser.addAnnotationSpace(as);
-         }
+            parser.addAnnotationSpace(aspace);
+         }         
       }
-      catch (SAXException ex)
+      catch (Exception ex)
       {
-         throw new ResourceInstantiationException(ex);
+         throw new ResourceInstantiationException("Unable to initialize the GraphParser", ex);
       }
       return this;
    }
@@ -184,6 +189,16 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
          throw new ExecutionException(ex);
       }
       System.out.println("Execution complete.");
+   }
+
+   public void setResourceHeader(URL location)
+   {
+      this.resourceHeader = location;
+   }
+   
+   public URL getResourceHeader()
+   {
+      return resourceHeader;
    }
 
    public String getStandoffASName()
