@@ -172,7 +172,6 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
          //cycle through the nodes of the graph to get the annotations
          for (INode node : graph.nodes())
          {
-            //String type = node.getFeature("ptb", "label")
             //node by node adds a gate annotation object ( annotations above ) with a gate
             //feature map ( which has a string of child node ids, the graf annotation setName, graf annotation labels
             //this node's id, and any feature info from this node's feature structure)
@@ -185,10 +184,9 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       {
          System.out.println("Error loading standoff.");
          ex.printStackTrace();
-         //System.out.println(ex.getMessage());
          throw new ExecutionException(ex);
       }
-      System.out.println("Execution complete.");
+//      System.out.println("Execution complete.");
    }
 
    public void setResourceHeader(URL location)
