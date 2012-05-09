@@ -9,7 +9,7 @@
         document in one step.  The Graf Document will appear in the "New Language Resource" menu in Gate.
         -->
         <RESOURCE>
-            <NAME>Graf Document (1.0)</NAME>
+            <NAME>GrAF Document (1.0)</NAME>
 			<JAR>GrAF-GATE-${project.version}.jar</JAR>
             <CLASS>org.anc.gate.GrafDocument</CLASS>
             <COMMENT>ANC transient document</COMMENT>
@@ -52,7 +52,7 @@
 		Loads annotations from a standoff file (cesAna) and adds them to an open document.
 		-->
 		<RESOURCE>
-			<NAME>Load GrAF Standoff (1.0)</NAME>
+			<NAME>GrAF Load Standoff (1.0)</NAME>
 			<JAR>GrAF-GATE-${project.version}.jar</JAR>
 			<CLASS>org.anc.gate.LoadGrafStandoff</CLASS>
 			<COMMENT>Add stand-off annotations to an open document</COMMENT>
@@ -72,7 +72,7 @@
 				RUNTIME="false">java.net.URL</PARAMETER>             	
 		</RESOURCE>
 		<RESOURCE>
-			<NAME>Load All GrAF Standoff (1.0)</NAME>
+			<NAME>GrAF Load All Standoff (1.0)</NAME>
 			<JAR>GrAF-GATE-${project.version}.jar</JAR>
 			<CLASS>org.anc.gate.LoadAllGrafStandoff</CLASS>
 			<COMMENT>Adds all stand-off annotations to an open document</COMMENT>
@@ -80,14 +80,14 @@
 				RUNTIME="true" REQUIRED="true">gate.Document</PARAMETER>
 			<PARAMETER NAME="resourceHeader" OPTIONAL="false" 
 				COMMENT="Location of the resource header"
-				RUNTIME="false">java.net.URL</PARAMETER>             	
+				RUNTIME="false" REQUIRED="true">java.net.URL</PARAMETER>             	
 		</RESOURCE>
 		<!-- 
 		
 		Save Graf Standoff Markup
 		-->
 		<RESOURCE>
-			<NAME>Save GrAF Standoff (1.0)</NAME>
+			<NAME>GrAF Save Standoff (1.0)</NAME>
 			<CLASS>org.anc.gate.SaveGrafStandoff</CLASS>
 			<COMMENT>Saves annotations to a standoff file</COMMENT>
 			<JAR>GrAF-GATE-${project.version}.jar</JAR>

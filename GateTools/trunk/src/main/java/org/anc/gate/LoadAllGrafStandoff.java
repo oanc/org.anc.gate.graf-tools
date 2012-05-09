@@ -12,6 +12,7 @@ import gate.util.InvalidOffsetException;
 import gate.util.Out;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
 
 import org.anc.conf.AnnotationConfig;
@@ -20,6 +21,7 @@ import org.anc.conf.AnnotationType;
 import org.anc.conf.MascConfig;
 import org.anc.gate.core.ANCLanguageAnalyzer;
 import org.apache.commons.io.FileUtils;
+import org.xces.graf.api.GrafException;
 import org.xces.graf.api.IAnnotation;
 import org.xces.graf.api.IAnnotationSpace;
 import org.xces.graf.api.IEdge;
@@ -27,7 +29,9 @@ import org.xces.graf.api.IFeature;
 import org.xces.graf.api.IFeatureStructure;
 import org.xces.graf.api.IGraph;
 import org.xces.graf.api.INode;
+import org.xces.graf.io.GrafParser;
 import org.xces.graf.io.GraphParser;
+import org.xces.graf.io.dom.DocumentHeader;
 import org.xces.graf.io.dom.ResourceHeader;
 import org.xml.sax.SAXException;
 
@@ -48,7 +52,7 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
    protected URL sourceUrl = null;
    private URL resourceHeader;
 
-   protected transient GraphParser parser;
+   protected transient GrafParser parser;
 //   protected AnnotationSet annotations;
 //   protected Map<String, AnnotationSet> annotations = new HashMap<String,AnnotationSet>();
    protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
@@ -66,13 +70,15 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       try
       {
          super.init();
-         parser = new GraphParser();
-         File headerFile = FileUtils.toFile(resourceHeader);
-         ResourceHeader header = new ResourceHeader(headerFile);
-         for (IAnnotationSpace aspace : header.getAnnotationSpaces())
-         {
-            parser.addAnnotationSpace(aspace);
-         }         
+//         parser = new GraphParser();
+//         File headerFile = FileUtils.toFile(resourceHeader);
+         
+         ResourceHeader header = new ResourceHeader(resourceHeader.openStream());
+         parser = new GrafParser(header);
+//         for (IAnnotationSpace aspace : header.getAnnotationSpaces())
+//         {
+//            parser.addAnnotationSpace(aspace);
+//         }         
       }
       catch (Exception ex)
       {
@@ -97,37 +103,61 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       File parentDir = file.getParentFile();
       String filename = file.getName();
       String basename = filename.substring(0, filename.length() - 4);
-      AnnotationConfig config = new MascConfig();
-      for (String type : config.types())
+      String headerName = basename + ".hdr";
+      File headerFile = new File(parentDir, headerName);
+      if (!headerFile.exists())
       {
-         String soFilename = basename + "-" + type + ".xml";
-         File soFile = new File(parentDir, soFilename);
-         if (soFile.exists())
+         throw new ExecutionException("Unable to locate document header for file " + file.getPath());
+      }
+      
+      DocumentHeader docHeader = null;
+      try
+      {
+         docHeader = new DocumentHeader(headerFile);
+      }
+      catch (FileNotFoundException e)
+      {
+         // This should not happen since we check that the file exists. So
+         // this means something really bad went wrong.
+         throw new RuntimeException("Could not locate header file " + headerFile.getPath());
+      }
+      
+      try
+      {
+         for (String type : docHeader.getAnnotationTypes())
          {
-            Out.prln("Attempting to load " + soFile.getPath());
-            IGraph graph = null;
-            try
+            File soFile = new File(parentDir, docHeader.getAnnotationLocation(type));
+            if (soFile.exists())
             {
-               graph = parser.parse(soFile);
-               for (INode node : graph.nodes())
+               Out.prln("Attempting to load " + soFile.getPath());
+               IGraph graph = null;
+               try
                {
-                  addAnnotation(node, type);
+                  graph = parser.parse(soFile);
+                  for (INode node : graph.nodes())
+                  {
+                     addAnnotation(node, type);
+                  }
                }
-            }
-            catch (Exception ex)
-            {
+               catch (Exception ex)
+               {
 //               Out.prln("Error loading standoff.");
 //               ex.printStackTrace();
-               throw new ExecutionException(ex);
+                  throw new ExecutionException(ex);
+               }
             }
          }
+      }
+      catch (GrafException e)
+      {
+         throw new ExecutionException("Error getting annotation types from the header.");
       }
 //      Out.println("Execution complete.");
    }
 
    public void setResourceHeader(URL location)
    {
-      this.resourceHeader = location;
+      resourceHeader = location;
    }
    
    public URL getResourceHeader()

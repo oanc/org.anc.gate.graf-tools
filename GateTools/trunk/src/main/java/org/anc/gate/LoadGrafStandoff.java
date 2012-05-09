@@ -49,7 +49,7 @@ import org.xces.graf.api.INode;
 import org.xces.graf.api.IRegion;
 import org.xces.graf.api.IStandoffHeader;
 import org.xces.graf.impl.CharacterAnchor;
-import org.xces.graf.io.GraphParser;
+import org.xces.graf.io.GrafParser;
 import org.xces.graf.io.dom.ResourceHeader;
 import org.xces.graf.util.IFunction;
 
@@ -72,7 +72,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
    protected String annotationType = null;
    private URL resourceHeader;
    
-   protected transient GraphParser parser;
+   protected transient GrafParser parser;
    protected AnnotationSet annotations;
    protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
    protected transient String content = null;
@@ -89,7 +89,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       try
       {
          super.init();
-         parser = new GraphParser();
+         parser = new GrafParser();
          File headerFile = FileUtils.toFile(resourceHeader);
          ResourceHeader header = new ResourceHeader(headerFile);
          for (IAnnotationSpace aspace : header.getAnnotationSpaces())
@@ -191,7 +191,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
 
    public void setResourceHeader(URL location)
    {
-      this.resourceHeader = location;
+      resourceHeader = location;
    }
    
    public URL getResourceHeader()
