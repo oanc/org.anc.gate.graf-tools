@@ -23,6 +23,7 @@
       	<include>org.anc:common</include>
       	<include>org.anc:conf</include>
       	<include>org.anc:xml</include>
+      	<include>org.anc:dom</include>
       	<include>org.tc37sc4.graf:graf-api</include>
       	<include>org.tc37sc4.graf:graf-impl</include>
       	<include>org.tc37sc4.graf:graf-io</include>

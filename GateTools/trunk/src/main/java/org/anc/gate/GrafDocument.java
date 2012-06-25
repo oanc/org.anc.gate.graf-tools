@@ -34,13 +34,21 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.anc.conf.AnnotationSpaces;
+import org.anc.dom.Dom3Exception;
+import org.anc.dom.Dom3LoadSave;
 import org.anc.io.UTF8Reader;
 import org.apache.commons.io.FileUtils;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 import org.xces.graf.api.GrafException;
 import org.xces.graf.api.IAnnotation;
 import org.xces.graf.api.IAnnotationSet;
@@ -87,9 +95,10 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    private URL resourceHeader;
    
    private Hashtable<String, String> ancAnnotations = null;
-   protected AnnotationSet gateAnnotations;
+   protected AnnotationSet gateAnnotations = null;
+   protected Set<String> seen = new HashSet<String>();
    AnnotationSet as;
-
+   
    public void setResourceHeader(URL location)
    {
       Out.prln("Setting resource header " + location.toExternalForm()); 
@@ -168,7 +177,6 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       File fullPath;
       //from the gate gui
       URL url = getSourceUrl();
-      //get the path of url
       if (url != null)
       {
          fullPath = FileUtils.toFile(url);
@@ -186,9 +194,22 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       }
       catch (FileNotFoundException e)
       {
-         e.printStackTrace();
+         throw new ResourceInstantiationException("Error loading document header.", e);        
       }
 
+//      OutputFormat format = new OutputFormat();
+//      format.setIndenting(true);
+//      format.setIndent(4);
+//      XMLSerializer serializer = new XMLSerializer(System.out, format);
+//      try
+//      {
+//         serializer.serialize(docHeader.getDomDocument());
+//      }
+//      catch (IOException e)
+//      {
+//         throw new ResourceInstantiationException("Unable to serialize document header.",e);
+//      }
+      
       AnnotationSet originalMarkups = getAnnotations("Original markups");
 
       //if empty gate annotation set; throw ResourceInstantiationException
@@ -228,10 +249,19 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
          throw new ResourceInstantiationException("No document content found.");
       }
       
-      Out.prln("Loading text.");
       //get the original text, see getContent below
+      File txtFile = new File(fullPath.getParentFile(), filename);
+      if (!txtFile.exists())
+      {
+         throw new ResourceInstantiationException("Primary data not found: " + txtFile.getPath());
+      }
+      Out.prln("Loading text from " + txtFile.getPath());
       String theContent = getContent(new File(fullPath.getParentFile(), filename));
-
+      endOfContent = theContent.length();
+      if (endOfContent == 0)
+      {
+         throw new ResourceInstantiationException("Text file is empty");
+      }
       // Replace the DocumentContent.  The current DocumentContent contains the
       // ANC header file, which not what we want the user to see.
       //make a new gate Document Content object with the original text
@@ -244,21 +274,25 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       try
       {
          ResourceHeader header = new ResourceHeader(resourceHeader.openStream());
-         GrafParser graphParser = new GrafParser(header);
-//         for (IAnnotationSpace aspace : header.getAnnotationSpaces())
-//         {
-//            graphParser.addAnnotationSpace(aspace);
-//         }         
+         GrafParser graphParser = new GrafParser();
+         for (IAnnotationSpace aspace : header.getAnnotationSpaces())
+         {
+            graphParser.addAnnotationSpace(aspace);
+         }         
          
          // stand-off annotations is a List provided by the Gate gui, 
 //         if (standoffAnnotations != null)
 //         {
             //This is a gate Annotation set made using standoffASName, that comes from the
             //gate GUI, Gate uses the setStandoffASName above to fill it, getAnnotations is a gate method, not ours
-//            gateAnnotations = this.getAnnotations(standoffASName);
+            gateAnnotations = this.getAnnotations(standoffASName);
             //get an iterator from the standoffAnnotations; ie iterate through the stand off file names
 //            Iterator<String> it = standoffAnnotations.iterator();
 //            while (it.hasNext())
+            if (standoffAnnotations == null || standoffAnnotations.size() == 0)
+            {
+               standoffAnnotations = docHeader.getAnnotationTypes();
+            }
             for (String type : docHeader.getAnnotationTypes())
             {
                //ok get the file name for each standoff file type, remember we are working with a *.anc file here..
@@ -278,7 +312,6 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
                      graph = graphParser.parse(new File(fullPath.getParentFile(), filename));
                      // GrafRenderer.render(graph);
                   }
-                  //obligatory catch block
                   catch (Exception e)
                   {
                      Out.println("Could not load graph from " + filename);
@@ -313,7 +346,7 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
     * returns if it exists, otherwise prints err message..actually can return
     * anything from annotations hash table if there is a key value pair
     */
-   protected String getFileForType(String type) throws ResourceInstantiationException
+   protected String _getFileForType(String type) throws ResourceInstantiationException
    {
       //returns the standoff file name tied to the key type..
       String result = ancAnnotations.get(type);
@@ -376,7 +409,7 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
     * @return
     * @throws ResourceInstantiationException
     */
-   protected Hashtable<String, String> getAnnotationFiles(AnnotationSet set)
+   protected Hashtable<String, String> _getAnnotationFiles(AnnotationSet set)
          throws ResourceInstantiationException
    {
       Hashtable<String, String> table = new Hashtable<String, String>();
@@ -442,6 +475,11 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       //cycle through the annotations of aformented node
       for (IAnnotation a : node.annotations())
       {
+//         if (seen.contains(a.getId()))
+//         {
+//            continue;
+//         }
+//         seen.add(a.getId());
          //create a gate object, FeatureMap, 
          FeatureMap newFeatures = Factory.newFeatureMap();
          //we know since this is an anc standoff graph, use Standoff Markups as the annotation setName
@@ -493,14 +531,26 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
                //gate annotations object using the start, end, anc graf annotation name and the gate feature map
 //               Out.println("start: " + start + " end: " + end + " label: " + label + " newFeatures: "
 //                     + newFeatures.toString());
-               try
-               {
+//               try
+//               {
+                  if (gateAnnotations == null)
+                  {
+                     throw new NullPointerException("gateAnnotations is null");
+                  }
+                  if (label == null)
+                  {
+                     throw new NullPointerException("The label is null");
+                  }
+                  if (newFeatures == null)
+                  {
+                     throw new NullPointerException("newFeatures is null");
+                  }
                   gateAnnotations.add(start, end, label, newFeatures);
-               }
-               catch (NullPointerException e)
-               {
-                  Out.println("null pointer exception");
-               }
+//               }
+//               catch (NullPointerException e)
+//               {
+//                  Out.println("null pointer exception");
+//               }
             }
          }
          catch (InvalidOffsetException e)
