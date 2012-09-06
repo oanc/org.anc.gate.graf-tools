@@ -116,5 +116,17 @@
 				COMMENT="Default type URI for the other annotation sets encountered.">java.lang.String</PARAMETER>
 				
 		</RESOURCE>
+		<RESOURCE>
+			<NAME>Save Document Content</NAME>
+			<CLASS>org.anc.gate.SaveContent</CLASS>
+			<COMMENT>Saves the docuemtn content to a text file.</COMMENT>
+			<JAR>GrAF-GATE-${project.version}.jar</JAR>
+			<PARAMETER NAME="document" COMMENT="Document to save"
+				REQUIRED="true" RUNTIME="true">gate.Document</PARAMETER>
+			<PARAMETER NAME="destination" COMMENT="Location to write the file"
+				REQUIRED="true" RUNTIME="true">java.net.URL</PARAMETER>
+			<PARAMETER NAME="encoding" COMMENT="Character encoding to use." 
+				RUNTIME="true" OPTIONAL="true" DEFAULT="UTF-8">java.lang.String</PARAMETER>
+		</RESOURCE>
 	</CREOLE>
 </CREOLE-DIRECTORY>
