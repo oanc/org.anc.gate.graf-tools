@@ -5,13 +5,13 @@
 	<parent>
 		<artifactId>parent-pom</artifactId>
 		<groupId>org.anc.maven</groupId>
-		<version>2.0.0</version>
+		<version>2.0.1</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.anc.gate</groupId>
 	<artifactId>GrafTools</artifactId>
 	<name>GrAF Tools for Gate</name>
-	<version>3.0-SNAPSHOT</version>
+	<version>3.0.1</version>
 	<description>Plugins for loading and saving ANC files with standoff
 		markup</description>
 	<url>http://www.anc.org/projects/gate-tools</url>
@@ -69,7 +69,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2-beta-2</version>
+				<version>2.3</version>
 				<configuration>
 					<descriptors>
 						<descriptor>src/main/assembly/assembly.xml</descriptor>
@@ -203,6 +203,25 @@
 			<groupId>org.anc</groupId>
 			<artifactId>dom</artifactId>
 			<version>1.0.1</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.0.6</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>

@@ -86,6 +86,10 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
    @Override
    public Resource init() throws ResourceInstantiationException
    {
+      if (resourceHeader == null)
+      {
+         throw new ResourceInstantiationException("The resource header has not been set.");
+      }
       try
       {
          super.init();
