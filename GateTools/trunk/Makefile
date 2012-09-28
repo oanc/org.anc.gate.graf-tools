@@ -17,9 +17,7 @@ skip:
 install:
 	$(eval version := $(shell cat VERSION))
 	echo "Copying GrAF Tools version "$(version)
-	tar -xzf target/GrAF-dist-$(VERSION).tar.gz
-	if [ -d $(GRAF) ] ; then
-		rm -rf $(GRAF)
-	fi
+	tar -xzf target/GrAF-dist-$(version).tar.gz
+	if [ -d $(GRAF) ] ; then rm -rf $(GRAF) ; fi
 	mv GrAF $(PLUGINS)
 
