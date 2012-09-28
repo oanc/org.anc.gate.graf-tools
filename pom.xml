@@ -9,7 +9,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.anc.gate</groupId>
-	<artifactId>GrafTools</artifactId>
+	<artifactId>graf-tools</artifactId>
 	<name>GrAF Tools for Gate</name>
 	<version>3.0.1</version>
 	<description>Plugins for loading and saving ANC files with standoff
