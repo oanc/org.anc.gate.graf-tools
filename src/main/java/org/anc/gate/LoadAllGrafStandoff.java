@@ -15,10 +15,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 
-import org.anc.conf.AnnotationConfig;
-import org.anc.conf.AnnotationSpaces;
-import org.anc.conf.AnnotationType;
-import org.anc.conf.MascConfig;
 import org.anc.gate.core.ANCLanguageAnalyzer;
 import org.apache.commons.io.FileUtils;
 import org.xces.graf.api.GrafException;
@@ -30,10 +26,8 @@ import org.xces.graf.api.IFeatureStructure;
 import org.xces.graf.api.IGraph;
 import org.xces.graf.api.INode;
 import org.xces.graf.io.GrafParser;
-import org.xces.graf.io.GraphParser;
 import org.xces.graf.io.dom.DocumentHeader;
 import org.xces.graf.io.dom.ResourceHeader;
-import org.xml.sax.SAXException;
 
 public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
 {
@@ -43,18 +37,11 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
    public static final String SOURCE_URL_PARAMETER = "sourceUrl";
    public static final String RESOURCE_HEADER_PARAMETER_NAME = "resourceHeader";
 
-//   public static final String[] _TYPES =
-//   {
-//     "logical", "s", "ne", "vc", "nc", "ptb", "fn", "mpqa", "cb", "event", "penn" 
-//   };
-   
    protected String standoffASName = null;
    protected URL sourceUrl = null;
    private URL resourceHeader;
 
    protected transient GrafParser parser;
-//   protected AnnotationSet annotations;
-//   protected Map<String, AnnotationSet> annotations = new HashMap<String,AnnotationSet>();
    protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
    protected transient String content = null;
    protected transient int endOfContent = 0;
@@ -70,15 +57,9 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       try
       {
          super.init();
-//         parser = new GraphParser();
-//         File headerFile = FileUtils.toFile(resourceHeader);
          
          ResourceHeader header = new ResourceHeader(resourceHeader.openStream());
          parser = new GrafParser(header);
-//         for (IAnnotationSpace aspace : header.getAnnotationSpaces())
-//         {
-//            parser.addAnnotationSpace(aspace);
-//         }         
       }
       catch (Exception ex)
       {
@@ -94,7 +75,7 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       content = document.getContent().toString();
       endOfContent = content.length();
 
-      Out.prln("Loading standoff for : " + document.getName());
+//      Out.prln("Loading standoff for : " + document.getName());
       File file = FileUtils.toFile(url);
       if (!file.exists())
       {
@@ -141,8 +122,6 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
                }
                catch (Exception ex)
                {
-//               Out.prln("Error loading standoff.");
-//               ex.printStackTrace();
                   throw new ExecutionException(ex);
                }
             }
@@ -152,7 +131,6 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       {
          throw new ExecutionException("Error getting annotation types from the header.");
       }
-//      Out.println("Execution complete.");
    }
 
    public void setResourceHeader(URL location)
@@ -199,9 +177,6 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       {
          ids.append(e.getTo().getId() + " ");
       }
-//      for (IAnnotationSet aSet : node.annotationSets())
-//      {
-//         String aSetName = aSet.getType();
          for (IAnnotation a : node.annotations())
          {
             FeatureMap newFeatures = Factory.newFeatureMap();
@@ -221,15 +196,6 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
             addFeatures(a.getFeatures(), newFeatures, null);
             
             AnnotationSet annotations = getAnnotations(type);
-            //for (IFeatureStructureElement fse : a.features())
-            //for (IFeature fse : a.features())
-            //{
-              // addFeatures((IFeatureStructure) a.features(), features, null);
-//             addFeatures(fse.feature)
-//             System.out.println(fse.toString());
-            //}
-//            System.out.println("Adding annotation " + label + " from "
-//                  + offset.getStart() + " to " + offset.getEnd());
             long start = offset.getStart();
             long end = offset.getEnd();
             try
@@ -259,7 +225,6 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
                      + " from " + offset.getStart() + " to " + offset.getEnd());
             }
          }
-      //}
    }
 
    protected void addFeatures(IFeatureStructure featStruc, FeatureMap fm,
@@ -297,79 +262,10 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
             }
             addFeatures(childFS, fm, childName);
          }
-//       if (e instanceof IFeature)
-//       {
-//       IFeature f = (IFeature) e;
-//       if (type == null)
-//       {
-//       features.put(f.getName(), f.getValue());
-//       }
-//       else
-//       {
-//       features.put(type + "." + f.getName(), f.getValue());
-//       }
-//       }
-//       else
-//       {
-//       IFeatureStructure childFS = (IFeatureStructure) e;
-//       String childType = childFS.getType();
-//       if (childType == null)
-//       {
-//       childType = type;
-//       }
-//       else
-//       {
-//       if (type != null)
-//       {
-//       childType = type + "." + childType;
-//       }
-//       }
-//       addFeatures(childFS, features, childType);
-//       }
       }
    }
 
-   /*
-   @Deprecated
-   protected Offset getOffset(INode node)
-   {
-      Offset offset = (Offset) node.getUserObject();
-      if (offset != null)
-      {
-         return offset;
-      }
 
-      long start = Long.MAX_VALUE;
-      long end = Long.MIN_VALUE;
-      for (IEdge e : node.getOutEdges())
-      {
-         INode to = e.getTo();
-         offset = getOffset(to);
-         if (offset != null)
-         {
-            if (offset.getStart() < start)
-            {
-               start = offset.getStart();
-            }
-            if (offset.getEnd() > end)
-            {
-               end = offset.getEnd();
-            }
-         }
-      }
-      if (end <= start)
-      {
-         return null;
-      }
-
-      offset = new Offset(start, end);
-//    System.out.print("Creating offset for node " + node.getId());
-//System.out.println(" from " + offset.getStart() + " to " +
-//    offset.getEnd());
-      node.setUserObject(offset);
-      return offset;
-   }
-*/
    protected void test()
    {
       try
@@ -382,9 +278,6 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
          Resource res = Factory.createResource("org.anc.gate.LoadGrafStandoff");
          LoadGrafStandoff load = (LoadGrafStandoff) res;
          System.out.println("Resource created.");
-//       List<String> types = new Vector<String> ();
-//       types.add("ptb");
-//       load.setTypes(types);
          load.setDocument(doc);
          load.execute();
          System.out.println("Done");
@@ -403,104 +296,3 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
    }
 }
 
-//class Offset extends Pair<Long, Long>
-//{
-//   public Offset()
-//   {
-//      super(Long.MAX_VALUE, Long.MIN_VALUE);
-//   }
-//
-//   public Offset(long start, long end)
-//   {
-//      super(start, end);
-//   }
-//
-//   public Long getStart()
-//   {
-//      return first;
-//   }
-//
-//   public Long getEnd()
-//   {
-//      return second;
-//   }
-//
-//   public void setStart(long start)
-//   {
-//      setFirst(start);
-//   }
-//
-//   public void setEnd(long end)
-//   {
-//      setSecond(end);
-//   }
-//
-//}
-//
-//class GetRangeFunction implements IFunction<INode, Offset>
-//{
-//   protected Offset offset = new Offset();
-//
-//   public Offset apply(INode item)
-//   {
-//      for (ILink link : item.links())
-//      {
-//         for (IRegion region : link)
-//         {
-//            getRange(region);
-//         }
-//      }
-//      for (IEdge e : item.getOutEdges())
-//      {
-//         apply(e.getTo());
-//      }
-//      return offset;
-//   }
-//
-//   private void getRange(IRegion region)
-//   {
-//      IAnchor startAnchor = region.getStart();
-//      IAnchor endAnchor = region.getEnd();
-//      if (!(startAnchor instanceof CharacterAnchor)
-//            || !(endAnchor instanceof CharacterAnchor))
-//      {
-//         return;
-//      }
-//
-//      CharacterAnchor start = (CharacterAnchor) startAnchor;
-//      CharacterAnchor end = (CharacterAnchor) endAnchor;
-//      if (start.getOffset() < offset.getStart())
-//      {
-//         offset.setStart(start.getOffset());
-//      }
-//      if (end.getOffset() > offset.getEnd())
-//      {
-//         offset.setEnd(end.getOffset());
-//      }
-//   }
-//
-//   public void reset()
-//   {
-//      offset.setStart(Long.MAX_VALUE);
-//      offset.setEnd(Long.MIN_VALUE);
-//   }
-//}
-//
-//class StandoffFilter extends PrefixFilter
-//{
-//
-//   public StandoffFilter(String prefix)
-//   {
-//      super(prefix);
-//   }
-//
-//   @Override
-//   public boolean accept(File file)
-//   {
-//      if (!file.getName().endsWith(".xml"))
-//      {
-//         return false;
-//      }
-//      return super.accept(file);
-//   }
-//}
