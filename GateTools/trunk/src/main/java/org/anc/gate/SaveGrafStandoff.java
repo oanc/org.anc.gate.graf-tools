@@ -1,8 +1,8 @@
 /*-
- * Copyright (c) 2009 American National Corpus
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * Copyright (c) 2009 American National Corpus
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -78,7 +78,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
    public static final String ENCODING_PARAMETER_NAME = "encoding";
    /** The type suffix that will be added to the file name. */
    public static final String ANNOTYPE_PARAMETER_NAME = "annotationType";
-   public static final String VERSION_PARAMETER_NAME = "version";
+//   public static final String VERSION_PARAMETER_NAME = "version";
    /** The name of the GrAF annotation set. */
    public static final String GRAF_AS_NAME = "grafASName";
    /** The type URI for the above GrAF annotation set name. */
@@ -94,7 +94,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
    private String inputASName = null;
    private java.util.List<String> standoffTags = null;
    private String annotationType = "standoff";
-   private String version = null;
+//   private String version = null;
    private String encoding = null;
    private String grafASName = null;
    private String grafASType = null;
@@ -453,15 +453,15 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
       return encoding;
    }
 
-   public void setVersion(String version)
-   {
-      this.version = version;
-   }
-
-   public String getVersion()
-   {
-      return version;
-   }
+//   public void setVersion(String version)
+//   {
+//      this.version = version;
+//   }
+//
+//   public String getVersion()
+//   {
+//      return version;
+//   }
 
    public void setAnnotationType(String type)
    {
