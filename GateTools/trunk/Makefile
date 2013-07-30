@@ -1,7 +1,7 @@
-# A simple make file that automates many common tasks when building Grate.
+# A simple make file that automates many common tasks when building the GrAF
+# tools for GATE
 
-## CHANGE. This is the startup script that will be generated. This path can
-## point anywhere, but should be on your (the user's) default $PATH.
+## Where the plugins will be installed.
 GRAF=$(PLUGINS)/GrAF
 
 jar:
@@ -18,7 +18,8 @@ install:
 	echo "Copying GrAF Tools version "$(version)
 	tar -xzf target/GrAF-dist-$(version).tar.gz
 	if [ -d $(GRAF) ] ; then rm -rf $(GRAF) ; fi
-	mv GrAF-GATE-$(version).jar $(PLUGINS)
+	mv GrAF $(PLUGINS)
+	#mv GrAF-GATE-$(version).jar $(PLUGINS)
 
 upload:
 	$(eval version := $(shell cat VERSION))

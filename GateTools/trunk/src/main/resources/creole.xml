@@ -37,13 +37,19 @@
                 DEFAULT="Standoff markups" RUNTIME="false" OPTIONAL="true">java.lang.String</PARAMETER>
             <PARAMETER NAME="standoffAnnotations" 
                 OPTIONAL="true" COMMENT="Standoff annotations to add"
-                DEFAULT="ptb">java.util.List</PARAMETER> <!-- nc;vc;ne;logical;s -->
+                DEFAULT="f.logical">java.util.List</PARAMETER> <!-- nc;vc;ne;logical;s -->
 			<PARAMETER NAME="resourceHeader" OPTIONAL="false" 
 				COMMENT="Location of the resource header"
 				RUNTIME="false">java.net.URL</PARAMETER>             	
             <ICON>lr.gif</ICON>
         </RESOURCE>
-		
+		<RESOURCE>
+			<NAME>GrAF Document Format</NAME>
+			<JAR>GrAF-GATE-${project.version}.jar</JAR>
+			<CLASS>org.anc.gate.GrafDocumentFormat</CLASS>
+			<AUTOINSTANCE/>
+			<PRIVATE/>
+		</RESOURCE>
 		<!-- 
 		
 		
