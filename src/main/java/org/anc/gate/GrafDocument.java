@@ -48,9 +48,11 @@ import org.xces.graf.api.IFeature;
 import org.xces.graf.api.IFeatureStructure;
 import org.xces.graf.api.IGraph;
 import org.xces.graf.api.INode;
+import org.xces.graf.api.IRegion;
 import org.xces.graf.io.GrafParser;
 import org.xces.graf.io.dom.DocumentHeader;
 import org.xces.graf.io.dom.ResourceHeader;
+import org.xces.graf.util.GraphUtils;
 import org.xml.sax.SAXException;
 
 // import org.xces.gate.AnaParser;
@@ -73,7 +75,7 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    public static final String CONTENT_ENCODING_PARAMETER_NAME = "contentEncoding";
    public static final String RESOURCE_HEADER_PARAMETER_NAME = "resourceHeader";
    
-   protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
+//   protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
    protected transient int endOfContent = 0;
 
    private Boolean loadStandoff = Boolean.TRUE;
@@ -161,7 +163,7 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    {
       Out.prln("Initializing GrafDocument.");
       super.init();
-
+      
       IGraph graph;
       File fullPath;
       //from the gate gui
@@ -282,7 +284,7 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
             {
                standoffAnnotations = docHeader.getAnnotationTypes();
             }
-            for (String type : docHeader.getAnnotationTypes())
+            for (String type : standoffAnnotations)
             {
                //ok get the file name for each standoff file type, remember we are working with a *.anc file here..
 //               String type = it.next();
@@ -445,13 +447,19 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
     */
    protected void addAnnotation(INode node) throws InvalidOffsetException
    {
-      getRangeFn.reset();
-      //offset object extends pair, first is start (long), second is end (long),
-      Offset offset = getRangeFn.apply(node);
-      if (offset.getEnd() < offset.getStart())
+//      getRangeFn.reset();
+//      //offset object extends pair, first is start (long), second is end (long),
+//      Offset offset = getRangeFn.apply(node);
+//      if (offset.getEnd() < offset.getStart())
+//      {
+//         return;
+//      }
+      IRegion span = GraphUtils.getSpan(node);
+      if (span.getStart().compareTo(span.getEnd()) < 0)
       {
          return;
       }
+      
       //node ids from out edges ( children node ids ) will end up as a long string
       //separated by spaces
       StringBuilder ids = new StringBuilder();
@@ -464,11 +472,11 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       //cycle through the annotations of aformented node
       for (IAnnotation a : node.annotations())
       {
-//         if (seen.contains(a.getId()))
-//         {
-//            continue;
-//         }
-//         seen.add(a.getId());
+         if (seen.contains(a.getId()))
+         {
+            continue;
+         }
+         seen.add(a.getId());
          //create a gate object, FeatureMap, 
          FeatureMap newFeatures = Factory.newFeatureMap();
          //we know since this is an anc standoff graph, use Standoff Markups as the annotation setName
@@ -498,10 +506,12 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
          //gate FeatureMap newFeatures, null sent in as the base feature
          addFeatures(a.getFeatures(), newFeatures, null);
 
-         long start = offset.getStart();
-         long end = offset.getEnd();
+         long start = 0; //offset.getStart();
+         long end = 0; //offset.getEnd();
          try
          {
+            start = (Long) span.getStart().getOffset();
+            end = (Long) span.getEnd().getOffset();
             if (end > endOfContent)
             {
                System.err.println("Invalid end offset for " + label + " " + end + ", end of content = "
@@ -542,12 +552,12 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
 //               }
             }
          }
-         catch (InvalidOffsetException e)
+         catch (Exception e)
          {
             System.err.println("Invalid offsets for " + label);
             System.err.println("Annotation span : " + start + " - " + end);
-            throw new InvalidOffsetException("Invalid offsets for " + label + " from " + offset.getStart()
-                  + " to " + offset.getEnd());
+            throw new InvalidOffsetException("Invalid offsets for " + label + 
+                  " from " + start + " to " + end);
          }
       }
    }

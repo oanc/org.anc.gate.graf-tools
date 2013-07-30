@@ -9,7 +9,6 @@ import gate.Resource;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
 import gate.util.InvalidOffsetException;
-import gate.util.Out;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,9 +24,11 @@ import org.xces.graf.api.IFeature;
 import org.xces.graf.api.IFeatureStructure;
 import org.xces.graf.api.IGraph;
 import org.xces.graf.api.INode;
+import org.xces.graf.api.IRegion;
 import org.xces.graf.io.GrafParser;
 import org.xces.graf.io.dom.DocumentHeader;
 import org.xces.graf.io.dom.ResourceHeader;
+import org.xces.graf.util.GraphUtils;
 
 public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
 {
@@ -42,7 +43,7 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
    private URL resourceHeader;
 
    protected transient GrafParser parser;
-   protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
+//   protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
    protected transient String content = null;
    protected transient int endOfContent = 0;
 
@@ -57,13 +58,14 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       try
       {
          super.init();
-         
+
          ResourceHeader header = new ResourceHeader(resourceHeader.openStream());
          parser = new GrafParser(header);
       }
       catch (Exception ex)
       {
-         throw new ResourceInstantiationException("Unable to initialized the GraphParser", ex);
+         throw new ResourceInstantiationException(
+               "Unable to initialized the GraphParser", ex);
       }
       return this;
    }
@@ -79,7 +81,8 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       File file = FileUtils.toFile(url);
       if (!file.exists())
       {
-         throw new ExecutionException("Could not locate original document: " + file.getAbsolutePath());
+         throw new ExecutionException("Could not locate original document: "
+               + file.getAbsolutePath());
       }
       File parentDir = file.getParentFile();
       String filename = file.getName();
@@ -88,9 +91,10 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       File headerFile = new File(parentDir, headerName);
       if (!headerFile.exists())
       {
-         throw new ExecutionException("Unable to locate document header for file " + file.getPath());
+         throw new ExecutionException(
+               "Unable to locate document header for file " + file.getPath());
       }
-      
+
       DocumentHeader docHeader = null;
       try
       {
@@ -100,17 +104,19 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       {
          // This should not happen since we check that the file exists. So
          // this means something really bad went wrong.
-         throw new RuntimeException("Could not locate header file " + headerFile.getPath());
+         throw new RuntimeException("Could not locate header file "
+               + headerFile.getPath());
       }
-      
+
       try
       {
          for (String type : docHeader.getAnnotationTypes())
          {
-            File soFile = new File(parentDir, docHeader.getAnnotationLocation(type));
+            File soFile = new File(parentDir,
+                  docHeader.getAnnotationLocation(type));
             if (soFile.exists())
             {
-               Out.prln("Attempting to load " + soFile.getPath());
+               //Out.prln("Attempting to load " + soFile.getPath());
                IGraph graph = null;
                try
                {
@@ -129,7 +135,8 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       }
       catch (GrafException e)
       {
-         throw new ExecutionException("Error getting annotation types from the header.");
+         throw new ExecutionException(
+               "Error getting annotation types from the header.");
       }
    }
 
@@ -137,7 +144,7 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
    {
       resourceHeader = location;
    }
-   
+
    public URL getResourceHeader()
    {
       return resourceHeader;
@@ -163,68 +170,76 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       sourceUrl = url;
    }
 
-   protected void addAnnotation(INode node, String type) throws InvalidOffsetException, ExecutionException
+   protected void addAnnotation(INode node, String type)
+         throws InvalidOffsetException, ExecutionException
    {
-      getRangeFn.reset();
-      Offset offset = getRangeFn.apply(node);
-      if (offset.getEnd() < offset.getStart())
+//      getRangeFn.reset();
+//      Offset offset = getRangeFn.apply(node);
+//      if (offset.getEnd() < offset.getStart())
+//      {
+//         return;
+//      }
+      IRegion span = GraphUtils.getSpan(node);
+      if (span.getStart().compareTo(span.getEnd()) < 0)
       {
          return;
       }
-
+      
       StringBuilder ids = new StringBuilder();
-      for (IEdge e :node.getOutEdges())
+      for (IEdge e : node.getOutEdges())
       {
          ids.append(e.getTo().getId() + " ");
       }
-         for (IAnnotation a : node.annotations())
+      for (IAnnotation a : node.annotations())
+      {
+         FeatureMap newFeatures = Factory.newFeatureMap();
+         String aSetName = "Standoff Markups";
+         IAnnotationSpace as = a.getAnnotationSpace();
+         if (as != null)
          {
-            FeatureMap newFeatures = Factory.newFeatureMap();
-            String aSetName = "Standoff Markups";
-            IAnnotationSpace as = a.getAnnotationSpace();
-            if (as != null)
-            {
-               aSetName = as.getName();
-               newFeatures.put(Graf.GRAF_SET, aSetName);
-            }
-            if(node.getOutEdges().size() > 0)
-            {
-               newFeatures.put(Graf.GRAF_EDGE, ids.toString());
-            }
-            newFeatures.put(Graf.GRAF_ID, node.getId());
-            String label = a.getLabel();
-            addFeatures(a.getFeatures(), newFeatures, null);
-            
-            AnnotationSet annotations = getAnnotations(type);
-            long start = offset.getStart();
-            long end = offset.getEnd();
-            try
-            {
-               if (end > endOfContent)
-               {
-                  System.err.println("Invalid end offset for " + label + " "
-                        + end + ", end of content = " + endOfContent);
+            aSetName = as.getName();
+            newFeatures.put(Graf.GRAF_SET, aSetName);
+         }
+         if (node.getOutEdges().size() > 0)
+         {
+            newFeatures.put(Graf.GRAF_EDGE, ids.toString());
+         }
+         newFeatures.put(Graf.GRAF_ID, node.getId());
+         String label = a.getLabel();
+         addFeatures(a.getFeatures(), newFeatures, null);
 
-                  end = endOfContent;
-               }
-               if (start > end )
-               {
-                  System.err.println("Invalid start offset for " + label + " "
-                        + start + ", end of content = " + endOfContent);
-               }
-               else
-               {
-                  annotations.add(start, end, label, newFeatures);
-               }
-            }
-            catch (InvalidOffsetException e)
+         AnnotationSet annotations = getAnnotations(type);
+         long start = 0; //offset.getStart();
+         long end = 0; //offset.getEnd();
+         try
+         {
+            start = (Long) span.getStart().getOffset();
+            end = (Long) span.getEnd().getOffset();
+            if (end > endOfContent)
             {
-               System.err.println("Invalid offsets for " + label);
-               System.err.println("Annotation span : " + start + " - " + end);
-               throw new InvalidOffsetException("Invalid offsets for " + label
-                     + " from " + offset.getStart() + " to " + offset.getEnd());
+               System.err.println("Invalid end offset for " + label + " " + end
+                     + ", end of content = " + endOfContent);
+
+               end = endOfContent;
+            }
+            if (start > end)
+            {
+               System.err.println("Invalid start offset for " + label + " "
+                     + start + ", end of content = " + endOfContent);
+            }
+            else
+            {
+               annotations.add(start, end, label, newFeatures);
             }
          }
+         catch (Exception e)
+         {
+            System.err.println("Invalid offsets for " + label);
+            System.err.println("Annotation span : " + start + " - " + end);
+            throw new InvalidOffsetException("Invalid offsets for " + label
+                  + " from " + start + " to " + end);
+         }
+      }
    }
 
    protected void addFeatures(IFeatureStructure featStruc, FeatureMap fm,
@@ -258,13 +273,12 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
             }
             else
             {
-               childName = base + "/" + f.getName();               
+               childName = base + "/" + f.getName();
             }
             addFeatures(childFS, fm, childName);
          }
       }
    }
-
 
    protected void test()
    {
@@ -295,4 +309,3 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       app.test();
    }
 }
-
