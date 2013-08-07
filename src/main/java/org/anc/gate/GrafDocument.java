@@ -352,7 +352,7 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    /**
     * gets the original text document
     * 
-    * @param path
+    * @param file
     * @return
     * @throws ResourceInstantiationException
     */
