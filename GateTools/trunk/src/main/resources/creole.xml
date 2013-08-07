@@ -11,6 +11,8 @@
         <RESOURCE>
             <NAME>GrAF Document (1.0)</NAME>
 			<JAR>GrAF-GATE-${project.version}.jar</JAR>
+            <JAR>commons-io-2.2.jar</JAR>
+            <JAR>logback-classic-1.0.11.jar</JAR>
             <CLASS>org.anc.gate.GrafDocument</CLASS>
             <COMMENT>ANC transient document</COMMENT>
             <OR>

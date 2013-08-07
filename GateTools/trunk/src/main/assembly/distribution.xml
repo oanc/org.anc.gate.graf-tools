@@ -26,6 +26,14 @@
 				<include>LICENSE.txt</include>
 			</includes>
 		</fileSet>
+        <fileSet>
+            <directory>libs</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>commons-io-2.2.jar</include>
+                <include>logback-classic-1.0.11.jar</include>
+            </includes>
+        </fileSet>
 	</fileSets>
 	<files>
 		<file>
