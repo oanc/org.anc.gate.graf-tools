@@ -28,10 +28,15 @@
 		</fileSet>
         <fileSet>
             <directory>libs</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>/lib</outputDirectory>
             <includes>
+                <include>*.jar</include>
+                <!--
                 <include>commons-io-2.2.jar</include>
                 <include>logback-classic-1.0.11.jar</include>
+                <include>logback-core-1.0.11.jar</include>
+                <include>slf4j-api-1.7.2.jar</include>
+                -->
             </includes>
         </fileSet>
 	</fileSets>

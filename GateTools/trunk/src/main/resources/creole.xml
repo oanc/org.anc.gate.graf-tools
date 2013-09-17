@@ -1,4 +1,4 @@
-<CREOLE-DIRECTORY ID="org.anc.gate.graf-tools" VERSION="3.0.2">
+<CREOLE-DIRECTORY ID="org.anc.gate.GrAF Tools" VERSION="3.0.3-SNAPSHOT">
 	<CREOLE>
 		<!--
 
@@ -11,8 +11,10 @@
         <RESOURCE>
             <NAME>GrAF Document (1.0)</NAME>
 			<JAR>GrAF-GATE-${project.version}.jar</JAR>
-            <JAR>commons-io-2.2.jar</JAR>
-            <JAR>logback-classic-1.0.11.jar</JAR>
+            <JAR>lib/commons-io-2.2.jar</JAR>
+            <JAR>lib/logback-classic-1.0.11.jar</JAR>
+            <JAR>lib/logback-core-1.0.11.jar</JAR>
+            <JAR>lib/slf4j-api-1.7.2.jar</JAR>
             <CLASS>org.anc.gate.GrafDocument</CLASS>
             <COMMENT>ANC transient document</COMMENT>
             <OR>
@@ -62,7 +64,11 @@
 		<RESOURCE>
 			<NAME>GrAF Load Standoff (1.0)</NAME>
 			<JAR>GrAF-GATE-${project.version}.jar</JAR>
-			<CLASS>org.anc.gate.LoadGrafStandoff</CLASS>
+            <JAR>lib/commons-io-2.2.jar</JAR>
+            <JAR>lib/logback-classic-1.0.11.jar</JAR>
+            <JAR>lib/logback-core-1.0.11.jar</JAR>
+            <JAR>lib/slf4j-api-1.7.2.jar</JAR>
+            <CLASS>org.anc.gate.LoadGrafStandoff</CLASS>
 			<COMMENT>Add stand-off annotations to an open document</COMMENT>
 			<PARAMETER NAME="document" COMMENT="Document to be processed"
 				RUNTIME="true" REQUIRED="true">gate.Document</PARAMETER>
@@ -82,6 +88,10 @@
 		<RESOURCE>
 			<NAME>GrAF Load All Standoff (1.0)</NAME>
 			<JAR>GrAF-GATE-${project.version}.jar</JAR>
+            <JAR>lib/commons-io-2.2.jar</JAR>
+            <JAR>lib/logback-classic-1.0.11.jar</JAR>
+            <JAR>lib/logback-core-1.0.11.jar</JAR>
+            <JAR>lib/slf4j-api-1.7.2.jar</JAR>
 			<CLASS>org.anc.gate.LoadAllGrafStandoff</CLASS>
 			<COMMENT>Adds all stand-off annotations to an open document</COMMENT>
 			<PARAMETER NAME="document" COMMENT="Document header for the document to be loaded"
@@ -99,7 +109,11 @@
 			<CLASS>org.anc.gate.SaveGrafStandoff</CLASS>
 			<COMMENT>Saves annotations to a standoff file</COMMENT>
 			<JAR>GrAF-GATE-${project.version}.jar</JAR>
-			<PARAMETER NAME="document" COMMENT="Document to save"
+            <JAR>lib/commons-io-2.2.jar</JAR>
+            <JAR>lib/logback-classic-1.0.11.jar</JAR>
+            <JAR>lib/logback-core-1.0.11.jar</JAR>
+            <JAR>lib/slf4j-api-1.7.2.jar</JAR>
+            <PARAMETER NAME="document" COMMENT="Document to save"
 				REQUIRED="true" RUNTIME="true">gate.Document</PARAMETER>
 			<PARAMETER NAME="destination" COMMENT="Location to write the file"
 				REQUIRED="true" RUNTIME="true">java.net.URL</PARAMETER>
@@ -129,6 +143,10 @@
 			<CLASS>org.anc.gate.SaveContent</CLASS>
 			<COMMENT>Saves the docuemtn content to a text file.</COMMENT>
 			<JAR>GrAF-GATE-${project.version}.jar</JAR>
+            <JAR>lib/commons-io-2.2.jar</JAR>
+            <JAR>lib/logback-classic-1.0.11.jar</JAR>
+            <JAR>lib/logback-core-1.0.11.jar</JAR>
+            <JAR>lib/slf4j-api-1.7.2.jar</JAR>
 			<PARAMETER NAME="document" COMMENT="Document to save"
 				REQUIRED="true" RUNTIME="true">gate.Document</PARAMETER>
 			<PARAMETER NAME="destination" COMMENT="Location to write the file"
