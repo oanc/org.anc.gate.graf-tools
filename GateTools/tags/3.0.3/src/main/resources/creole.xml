@@ -1,0 +1,158 @@
+<CREOLE-DIRECTORY ID="org.anc.gate.GrAF Tools" VERSION="3.0.3-SNAPSHOT">
+	<CREOLE>
+		<!--
+
+
+        Graf Document
+
+        A language resource that loads a GrAF document with standoff markup into GATE as a single 
+        document in one step.  The Graf Document will appear in the "New Language Resource" menu in Gate.
+        -->
+        <RESOURCE>
+            <NAME>GrAF Document (1.0)</NAME>
+			<JAR>GrAF-GATE-${project.version}.jar</JAR>
+            <JAR>lib/commons-io-2.2.jar</JAR>
+            <JAR>lib/logback-classic-1.0.11.jar</JAR>
+            <JAR>lib/logback-core-1.0.11.jar</JAR>
+            <JAR>lib/slf4j-api-1.7.2.jar</JAR>
+            <CLASS>org.anc.gate.GrafDocument</CLASS>
+            <COMMENT>ANC transient document</COMMENT>
+            <OR>
+                <PARAMETER NAME="sourceUrl" SUFFIXES="hdr" COMMENT="Source URL of the document header">java.net.URL</PARAMETER>
+                <PARAMETER NAME="stringContent" COMMENT="The content of the document">java.lang.String</PARAMETER>
+            </OR>
+            <PARAMETER COMMENT="Should the document read the original markup"
+                NAME="markupAware" DEFAULT="true">java.lang.Boolean</PARAMETER>
+            <PARAMETER NAME="encoding" OPTIONAL="true" COMMENT="Encoding (header)" DEFAULT="">java.lang.String</PARAMETER>
+            <PARAMETER NAME="contentEncoding" OPTIONAL="true" COMMENT="Content encoding" DEFAULT="UTF-8">java.lang.String</PARAMETER>
+            <PARAMETER NAME="sourceUrlStartOffset"
+                COMMENT="Start offset for documents based on ranges" OPTIONAL="true">java.lang.Long</PARAMETER>
+            <PARAMETER NAME="sourceUrlEndOffset"
+                COMMENT="End offset for documents based on ranges" OPTIONAL="true">java.lang.Long</PARAMETER>
+            <PARAMETER NAME="preserveOriginalContent"
+                COMMENT="Should the document preserve the original content" DEFAULT="false">java.lang.Boolean</PARAMETER>
+            <PARAMETER NAME="collectRepositioningInfo"
+                COMMENT="Should the document collect repositioning information" DEFAULT="false">java.lang.Boolean</PARAMETER>
+            <PARAMETER NAME="loadStandoff"
+                COMMENT="Should standoff annotations be loaded" DEFAULT="true"
+                OPTIONAL="true" RUNTIME="false">java.lang.Boolean</PARAMETER>
+            <PARAMETER NAME="standoffASName"
+                COMMENT="Annotation set to add standoff tags to"
+                DEFAULT="Standoff markups" RUNTIME="false" OPTIONAL="true">java.lang.String</PARAMETER>
+            <PARAMETER NAME="standoffAnnotations" 
+                OPTIONAL="true" COMMENT="Standoff annotations to add"
+                DEFAULT="f.logical">java.util.List</PARAMETER> <!-- nc;vc;ne;logical;s -->
+			<PARAMETER NAME="resourceHeader" OPTIONAL="false" 
+				COMMENT="Location of the resource header"
+				RUNTIME="false">java.net.URL</PARAMETER>             	
+            <ICON>lr.gif</ICON>
+        </RESOURCE>
+		<RESOURCE>
+			<NAME>GrAF Document Format</NAME>
+			<JAR>GrAF-GATE-${project.version}.jar</JAR>
+			<CLASS>org.anc.gate.GrafDocumentFormat</CLASS>
+			<AUTOINSTANCE/>
+			<PRIVATE/>
+		</RESOURCE>
+		<!-- 
+		
+		
+		Load Graf Standoff
+		
+		Loads annotations from a standoff file (cesAna) and adds them to an open document.
+		-->
+		<RESOURCE>
+			<NAME>GrAF Load Standoff (1.0)</NAME>
+			<JAR>GrAF-GATE-${project.version}.jar</JAR>
+            <JAR>lib/commons-io-2.2.jar</JAR>
+            <JAR>lib/logback-classic-1.0.11.jar</JAR>
+            <JAR>lib/logback-core-1.0.11.jar</JAR>
+            <JAR>lib/slf4j-api-1.7.2.jar</JAR>
+            <CLASS>org.anc.gate.LoadGrafStandoff</CLASS>
+			<COMMENT>Add stand-off annotations to an open document</COMMENT>
+			<PARAMETER NAME="document" COMMENT="Document to be processed"
+				RUNTIME="true" REQUIRED="true">gate.Document</PARAMETER>
+			<PARAMETER NAME="sourceUrl"
+				COMMENT="Location of the document containing standoff annotations"
+				RUNTIME="true" REQUIRED="true">java.net.URL</PARAMETER>
+			<PARAMETER NAME="annotationType"
+				COMMENT="Annotation type to be loaded."
+				RUNTIME="true" OPTIONAL="true">java.lang.String</PARAMETER>
+			<PARAMETER NAME="standoffASName"
+				COMMENT="Annotation set to add standoff tags to" RUNTIME="true"
+				DEFAULT="Standoff markups" OPTIONAL="true">java.lang.String</PARAMETER>
+			<PARAMETER NAME="resourceHeader" OPTIONAL="false" 
+				COMMENT="Location of the resource header"
+				RUNTIME="false">java.net.URL</PARAMETER>             	
+		</RESOURCE>
+		<RESOURCE>
+			<NAME>GrAF Load All Standoff (1.0)</NAME>
+			<JAR>GrAF-GATE-${project.version}.jar</JAR>
+            <JAR>lib/commons-io-2.2.jar</JAR>
+            <JAR>lib/logback-classic-1.0.11.jar</JAR>
+            <JAR>lib/logback-core-1.0.11.jar</JAR>
+            <JAR>lib/slf4j-api-1.7.2.jar</JAR>
+			<CLASS>org.anc.gate.LoadAllGrafStandoff</CLASS>
+			<COMMENT>Adds all stand-off annotations to an open document</COMMENT>
+			<PARAMETER NAME="document" COMMENT="Document header for the document to be loaded"
+				RUNTIME="true" REQUIRED="true">gate.Document</PARAMETER>
+			<PARAMETER NAME="resourceHeader" OPTIONAL="false" 
+				COMMENT="Location of the resource header"
+				RUNTIME="false" REQUIRED="true">java.net.URL</PARAMETER>             	
+		</RESOURCE>
+		<!-- 
+		
+		Save Graf Standoff Markup
+		-->
+		<RESOURCE>
+			<NAME>GrAF Save Standoff (1.0)</NAME>
+			<CLASS>org.anc.gate.SaveGrafStandoff</CLASS>
+			<COMMENT>Saves annotations to a standoff file</COMMENT>
+			<JAR>GrAF-GATE-${project.version}.jar</JAR>
+            <JAR>lib/commons-io-2.2.jar</JAR>
+            <JAR>lib/logback-classic-1.0.11.jar</JAR>
+            <JAR>lib/logback-core-1.0.11.jar</JAR>
+            <JAR>lib/slf4j-api-1.7.2.jar</JAR>
+            <PARAMETER NAME="document" COMMENT="Document to save"
+				REQUIRED="true" RUNTIME="true">gate.Document</PARAMETER>
+			<PARAMETER NAME="destination" COMMENT="Location to write the file"
+				REQUIRED="true" RUNTIME="true">java.net.URL</PARAMETER>
+			<PARAMETER NAME="inputASName"
+				COMMENT="Set containing annotations to save" RUNTIME="true"
+				OPTIONAL="true" DEFAULT="Standoff markups">java.lang.String</PARAMETER>
+			<PARAMETER NAME="standoffTags" OPTIONAL="true"
+				COMMENT="List of annotations types to be saved" RUNTIME="true">java.util.List</PARAMETER>
+			<PARAMETER NAME="encoding"
+				COMMENT="Character encoding to use when writing the file"
+				RUNTIME="true" OPTIONAL="true" DEFAULT="UTF-8">java.lang.String</PARAMETER>
+			<PARAMETER NAME="annotationType"
+				COMMENT="Annotation type suffix to use when generating file names."
+				RUNTIME="true" OPTIONAL="true" DEFAULT="standoff">java.lang.String</PARAMETER>			
+			<PARAMETER NAME="version" RUNTIME="true" DEFAULT="1.0"
+				OPTIONAL="true" COMMENT="Version number assigned to the document">java.lang.String</PARAMETER>
+			<PARAMETER NAME="grafASName" RUNTIME="true" OPTIONAL="false" DEFAULT="xces"
+				COMMENT="AnnotationSet name used in the GrAF standoff header">java.lang.String</PARAMETER>
+			<PARAMETER NAME="grafASType" RUNTIME="true" OPTIONAL="false" DEFAULT="http://www.xces.org/schema/2003"
+				COMMENT="Type URI for the GrAF annotation set.">java.lang.String</PARAMETER>
+			<PARAMETER NAME="grafDefaultASType" RUNTIME="true" OPTIONAL="false" DEFAULT="http://www.anc.org/ns/masc/1.0"
+				COMMENT="Default type URI for the other annotation sets encountered.">java.lang.String</PARAMETER>
+				
+		</RESOURCE>
+		<RESOURCE>
+			<NAME>Save Document Content</NAME>
+			<CLASS>org.anc.gate.SaveContent</CLASS>
+			<COMMENT>Saves the docuemtn content to a text file.</COMMENT>
+			<JAR>GrAF-GATE-${project.version}.jar</JAR>
+            <JAR>lib/commons-io-2.2.jar</JAR>
+            <JAR>lib/logback-classic-1.0.11.jar</JAR>
+            <JAR>lib/logback-core-1.0.11.jar</JAR>
+            <JAR>lib/slf4j-api-1.7.2.jar</JAR>
+			<PARAMETER NAME="document" COMMENT="Document to save"
+				REQUIRED="true" RUNTIME="true">gate.Document</PARAMETER>
+			<PARAMETER NAME="destination" COMMENT="Location to write the file"
+				REQUIRED="true" RUNTIME="true">java.net.URL</PARAMETER>
+			<PARAMETER NAME="encoding" COMMENT="Character encoding to use." 
+				RUNTIME="true" OPTIONAL="true" DEFAULT="UTF-8">java.lang.String</PARAMETER>
+		</RESOURCE>
+	</CREOLE>
+</CREOLE-DIRECTORY>
