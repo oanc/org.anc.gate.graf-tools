@@ -25,12 +25,15 @@ import gate.Gate;
 import gate.Resource;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
+import gate.util.Err;
 import gate.util.InvalidOffsetException;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 // import org.anc.conf.AnnotationSpaces;
@@ -138,8 +141,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             throw new ExecutionException(
                   "Source URL is a directory and no annotation type was specified.");
          }
-         // TODO The annotation file should be determined from the 
-         // header file.
+         // TODO The annotation file should be determined from the header.
          int index = name.lastIndexOf(".txt");
          if (index > 0)
          {
@@ -166,7 +168,6 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
          return;
       }
 
-      //File file = FileUtils.toFile(sourceUrl);
       //create empty graph to start
       IGraph graph = null;
       try
@@ -175,10 +176,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
          // System.out.println("Loading the graph.");
          graph = parser.parse(file);
 
-         //trying to add a Header to the graph ?
-         //System.out.println("adding the header.");
          addHeader(graph);
-         //graph.sort();
          //cycle through the nodes of the graph to get the annotations
          for (INode node : graph.nodes())
          {
@@ -192,9 +190,9 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       }
       catch (Exception ex)
       {
-         System.out.println("Error loading standoff.");
+         Err.prln("Error loading standoff.");
          ex.printStackTrace();
-         throw new ExecutionException(ex);
+         throw new ExecutionException("Unable to load standoff.", ex);
       }
 //      System.out.println("Execution complete.");
    }
@@ -249,7 +247,7 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
 //         return;
 //      }
       IRegion span = GraphUtils.getSpan(node);
-      if (span.getStart().compareTo(span.getEnd()) < 0)
+      if (span == null || span.getStart() == null || span.getEnd() == null || span.getStart().compareTo(span.getEnd()) > 0)
       {
          return;
       }
@@ -332,39 +330,49 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
    }
 
    /**
-    * adds header info to a Feature Map so it can be added to the document
+    * Adds metadata from the graph header to the document's feature map.
     * 
     * @param graph
     */
    protected void addHeader(IGraph graph)
    {
-      FeatureMap features = document.getFeatures();
-      // String aSetName = "Standoff Markups";
       IStandoffHeader header = graph.getHeader();
-
       if (header != null)
       {
-         // features.put(Graf.GRAF_HEADER, header);
-//         if (header.getMedia() != null)
-//         {
-
-//            for (Medium medium : header.getMedia())
-//            {
-//               
-//               System.out.println("MediumName is " + medium.getName() + "\n" + "MediumType is " + medium.getType());
-//               features.put(Graf.GRAF_MEDIANAME, medium.getName());
-//               features.put(Graf.GRAF_MEDIATYPE, "TEST TEST TEST");
-//            }
-//         }
-//         if (header.getAnchorTypes() != null)
-//         {
-//            for (AnchorType anchorType : header.getAnchorTypes())
-//            {
-//               features.put(Graf.GRAF_MEDIATYPE, anchorType.getName());
-//               
-//            }
-//         }
+         addToMetaData("graf:annotationSpaces", header.getAnnotationSpaces());
+         addToMetaData("graf:dependsOn", header.getDependsOn());
+         addToMetaData("graf:roots", header.getRoots());
       }
+   }
+
+   protected void addToMetaData(String name, List<?> objects)
+   {
+      String value = makeString(objects.iterator());
+      if (value != null)
+      {
+         document.getFeatures().put(name, value);
+      }
+   }
+
+   /** Creates a space delimited string of all objects in a collection. */
+   protected String makeString(Iterator<?> it)
+   {
+      StringBuilder buffer = new StringBuilder();
+      if (it.hasNext())
+      {
+         buffer.append(it.next().toString());
+      }
+      while (it.hasNext())
+      {
+         buffer.append(' ');
+         buffer.append(it.next().toString());
+      }
+      String result = buffer.toString();
+      if (result.length() == 0)
+      {
+         return null;
+      }
+      return result;
    }
 
    protected void addFeatures(IFeatureStructure featStruc, FeatureMap fm,
@@ -414,117 +422,9 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             //recurse with child featureStructure, featureMap, and feature name as base
             addFeatures(childFS, fm, childName);
          }
-//       if (e instanceof IFeature)
-//       {
-//       IFeature f = (IFeature) e;
-//       if (type == null)
-//       {
-//       features.put(f.getName(), f.getValue());
-//       }
-//       else
-//       {
-//       features.put(type + "." + f.getName(), f.getValue());
-//       }
-//       }
-//       else
-//       {
-//       IFeatureStructure childFS = (IFeatureStructure) e;
-//       String childType = childFS.getType();
-//       if (childType == null)
-//       {
-//       childType = type;
-//       }
-//       else
-//       {
-//       if (type != null)
-//       {
-//       childType = type + "." + childType;
-//       }
-//       }
-//       addFeatures(childFS, features, childType);
-//       }
       }
    }
 
-   @Deprecated
-   protected Offset getOffset(INode node)
-   {
-      Offset offset = (Offset) node.getUserObject();
-      if (offset != null)
-      {
-//       System.out.print("Found offset for node " + node.getId());
-//       System.out.println(" from " + offset.getStart() + " to " +
-//       offset.getEnd());
-         return offset;
-      }
-
-      long start = Long.MAX_VALUE;
-      long end = Long.MIN_VALUE;
-      for (IEdge e : node.getOutEdges())
-      {
-         INode to = e.getTo();
-         offset = getOffset(to);
-         if (offset != null)
-         {
-            if (offset.getStart() < start)
-            {
-               start = offset.getStart();
-            }
-            if (offset.getEnd() > end)
-            {
-               end = offset.getEnd();
-            }
-         }
-      }
-      if (end <= start)
-      {
-         return null;
-      }
-
-      offset = new Offset(start, end);
-//    System.out.print("Creating offset for node " + node.getId());
-//System.out.println(" from " + offset.getStart() + " to " +
-//    offset.getEnd());
-      node.setUserObject(offset);
-      return offset;
-   }
-
-   protected void test()
-   {
-      try
-      {
-         System.setProperty("gate.home", "C:/Program Files (x86)/Gate-5.0");
-         Gate.init();
-//         Document doc = Factory.newDocument(new URL(
-//               "file:/D:/corpora/masc/ptb/graf/110cyl067-ptb.xml"));
-         Document doc = Factory.newDocument(new URL(
-               "file:/D:/cygwin/home/Keith/oanc2graf/graf/VOL15_1.txt"));
-         System.out.println("Document loaded");
-         FeatureMap fm = Factory.newFeatureMap();
-         fm.put(STANDOFFASNAME_PARAMETER, "hepple");
-         Resource res = Factory.createResource("org.anc.gate.LoadGrafStandoff",
-               fm);
-         LoadGrafStandoff load = (LoadGrafStandoff) res;
-         System.out.println("Resource created.");
-//       List<String> types = new Vector<String> ();
-//       types.add("ptb");
-//       load.setTypes(types);
-         load.setDocument(doc);
-         load.execute();
-         System.out.println("Done");
-      }
-      catch (Exception ex)
-      {
-         System.out.println(ex);
-         ex.printStackTrace();
-      }
-   }
-
-   public static void main(String[] args)
-   {
-      LoadGrafStandoff app = new LoadGrafStandoff();
-      app.test();
-   }
 }
 
 class Offset extends Pair<Long, Long>

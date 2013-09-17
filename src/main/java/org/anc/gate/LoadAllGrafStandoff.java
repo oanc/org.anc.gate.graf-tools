@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 
+import gate.util.Out;
 import org.anc.gate.core.ANCLanguageAnalyzer;
 import org.apache.commons.io.FileUtils;
 import org.xces.graf.api.GrafException;
@@ -77,7 +78,6 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       content = document.getContent().toString();
       endOfContent = content.length();
 
-//      Out.prln("Loading standoff for : " + document.getName());
       File file = FileUtils.toFile(url);
       if (!file.exists())
       {
@@ -116,7 +116,7 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
                   docHeader.getAnnotationLocation(type));
             if (soFile.exists())
             {
-               //Out.prln("Attempting to load " + soFile.getPath());
+               Out.prln("Attempting to load " + soFile.getPath());
                IGraph graph = null;
                try
                {
@@ -180,8 +180,32 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
 //         return;
 //      }
       IRegion span = GraphUtils.getSpan(node);
-      if (span.getStart().compareTo(span.getEnd()) < 0)
+      if (span == null)
       {
+         return;
+      }
+
+      long start = 0;
+      long end = 0;
+      try
+      {
+         if (span.getStart() != null)
+         {
+            start = (Long) span.getStart().getOffset();
+         }
+         if (span.getEnd() != null)
+         {
+            end = (Long) span.getEnd().getOffset();
+         }
+      }
+      catch (Exception e)
+      {
+         throw new ExecutionException("Unable to get span offsets for node " + node.getId(), e);
+      }
+
+      if (start > end)
+      {
+         Out.prln("Invalid offsets (" + start + "," + end + ") for node " + node.getId());
          return;
       }
       
@@ -209,12 +233,12 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
          addFeatures(a.getFeatures(), newFeatures, null);
 
          AnnotationSet annotations = getAnnotations(type);
-         long start = 0; //offset.getStart();
-         long end = 0; //offset.getEnd();
+//         long start = 0; //offset.getStart();
+//         long end = 0; //offset.getEnd();
          try
          {
-            start = (Long) span.getStart().getOffset();
-            end = (Long) span.getEnd().getOffset();
+//            start = (Long) span.getStart().getOffset();
+//            end = (Long) span.getEnd().getOffset();
             if (end > endOfContent)
             {
                System.err.println("Invalid end offset for " + label + " " + end
@@ -242,10 +266,9 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       }
    }
 
-   protected void addFeatures(IFeatureStructure featStruc, FeatureMap fm,
+   protected void addFeatures(IFeatureStructure fs, FeatureMap fm,
          String base)
    {
-      IFeatureStructure fs = featStruc;
       if (fs == null)
       {
          return;
@@ -280,32 +303,4 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       }
    }
 
-   protected void test()
-   {
-      try
-      {
-         System.setProperty("gate.home", "d:/Applications/Gate-5.0");
-         Gate.init();
-         Document doc = Factory.newDocument(new URL(
-               "file:/D:/corpora/masc/ptb/graf/110cyl067-ptb.xml"));
-         System.out.println("Document loaded");
-         Resource res = Factory.createResource("org.anc.gate.LoadGrafStandoff");
-         LoadGrafStandoff load = (LoadGrafStandoff) res;
-         System.out.println("Resource created.");
-         load.setDocument(doc);
-         load.execute();
-         System.out.println("Done");
-      }
-      catch (Exception ex)
-      {
-         System.out.println(ex);
-         ex.printStackTrace();
-      }
-   }
-
-   public static void main(String[] args)
-   {
-      LoadGrafStandoff app = new LoadGrafStandoff();
-      app.test();
-   }
 }

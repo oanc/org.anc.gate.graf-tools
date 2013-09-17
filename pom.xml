@@ -10,7 +10,7 @@
 	<groupId>org.anc.gate</groupId>
 	<artifactId>graf-tools</artifactId>
 	<name>GrAF Tools for Gate</name>
-	<version>3.0.2</version>
+	<version>3.0.3</version>
 	<description>Plugins for loading and saving ANC files with standoff markup</description>
 	<url>http://www.anc.org/projects/gate-tools</url>
 	<properties>
@@ -100,38 +100,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- -->
 		</plugins>
-        <!--
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.anc.maven.plugins</groupId>
-										<artifactId>anc-maven-plugin</artifactId>
-										<versionRange>[1.0,)</versionRange>
-										<goals>
-											<goal>version</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute/>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-		-->
 	</build>
 	<dependencies>
 		<dependency>
@@ -217,6 +186,7 @@
             <scope>provided</scope>
         </dependency>
 	</dependencies>
+    <!--
 	<repositories>
 		<repository>
 			<id>anc-dev-release</id>
@@ -269,6 +239,7 @@
 			<url>scp://suderman@anc.org:22022/home/www/anc/projects/gate-tools</url>
 		</site>
 	</distributionManagement>
+	-->
 	<profiles>
 		<profile>
 			<id>make-jar</id>

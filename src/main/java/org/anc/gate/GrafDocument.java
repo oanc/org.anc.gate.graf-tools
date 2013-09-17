@@ -25,6 +25,7 @@ import gate.LanguageResource;
 import gate.Resource;
 import gate.corpora.DocumentContentImpl;
 import gate.creole.ResourceInstantiationException;
+import gate.util.Err;
 import gate.util.InvalidOffsetException;
 import gate.util.Out;
 
@@ -65,8 +66,8 @@ import org.xml.sax.SAXException;
  */
 public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageResource
 {
-   private static final long serialVersionUID = 1L; 
-   
+   private static final long serialVersionUID = 1L;
+
    public static final String LOAD_STANDOFF_PARAMETER_NAME = "loadStandoff";
    public static final String STANDOFF_MARKUP_SET_NAME = "standoffASName";
    public static final String STANDOFF_ANNOTATIONS_PARAMETER_NAME = "standoffAnnotations";
@@ -74,8 +75,8 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    public static final String FACTORY_PROPERTY = "javax.xml.sax.SAXParserFactory";
    public static final String CONTENT_ENCODING_PARAMETER_NAME = "contentEncoding";
    public static final String RESOURCE_HEADER_PARAMETER_NAME = "resourceHeader";
-   
-//   protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
+
+   //   protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
    protected transient int endOfContent = 0;
 
    private Boolean loadStandoff = Boolean.TRUE;
@@ -84,23 +85,23 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    private boolean standoffLoaded = false;
    private String contentEncoding = "UTF-16";
    private URL resourceHeader;
-   
+
    private Hashtable<String, String> ancAnnotations = null;
    protected AnnotationSet gateAnnotations = null;
    protected Set<String> seen = new HashSet<String>();
    AnnotationSet as;
-   
+
    public void setResourceHeader(URL location)
    {
-      Out.prln("Setting resource header " + location.toExternalForm()); 
+      Out.prln("Setting resource header " + location.toExternalForm());
       this.resourceHeader = location;
    }
-   
+
    public URL getResourceHeader()
    {
       return resourceHeader;
    }
-   
+
    public void setLoadStandoff(Boolean save)
    {
       loadStandoff = save;
@@ -153,21 +154,19 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
 
    public GrafDocument()
    {
-//    Out.prln("XCES document constructor.");
-//    this.addDocumentListener(new XCESDocumentListener(this));
    }
 
 
    @Override
    public Resource init() throws ResourceInstantiationException
    {
-      Out.prln("Initializing GrafDocument.");
+//      Out.prln("Initializing GrafDocument.");
       super.init();
-      
+
       IGraph graph;
       File fullPath;
       //from the gate gui
-      URL url = getSourceUrl();
+      URL url = super.getSourceUrl();
       if (url != null)
       {
          fullPath = FileUtils.toFile(url);
@@ -177,52 +176,24 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
          Out.println("No file found: sourceUrl = " + url);
          return null;
       }
+
+      // Load a DocumentHeader object to query the data it contains.
       DocumentHeader docHeader = null;
       try
       {
          docHeader = new DocumentHeader(fullPath);
-         Out.prln("Loading document header.");
       }
       catch (FileNotFoundException e)
       {
-         throw new ResourceInstantiationException("Error loading document header.", e);        
+         throw new ResourceInstantiationException("Error loading document header.", e);
       }
 
-//      OutputFormat format = new OutputFormat();
-//      format.setIndenting(true);
-//      format.setIndent(4);
-//      XMLSerializer serializer = new XMLSerializer(System.out, format);
-//      try
-//      {
-//         serializer.serialize(docHeader.getDomDocument());
-//      }
-//      catch (IOException e)
-//      {
-//         throw new ResourceInstantiationException("Unable to serialize document header.",e);
-//      }
-      
+      // Discard the XML from the header
       AnnotationSet originalMarkups = getAnnotations("Original markups");
-
-      //if empty gate annotation set; throw ResourceInstantiationException
-      if (originalMarkups == null || originalMarkups.size() == 0)
+      if (originalMarkups != null)
       {
-         throw new ResourceInstantiationException("No elements found the in the header file "
-               + fullPath.getPath());
+         originalMarkups.clear();
       }
-//      //from originalMarkups get the Gate annotation set tied to key "annotation"
-//      AnnotationSet annotationSet = originalMarkups.get("annotation");
-//      if (annotationSet == null || annotationSet.size() == 0)
-//      {
-//         throw new ResourceInstantiationException("No annotation elements found in the header "
-//               + fullPath.getPath());
-//      }
-
-      //annotations is a hashtable<String,String>, where the type is the key and string file name
-      //of the stand off files are the values
-//      ancAnnotations = getAnnotationFiles(annotationSet);
-      // clear the original markups. The loaded file is the document header,
-      originalMarkups.clear();
-      //originalMarkups.removeAll(new HashSet(annotationSet));
 
       // Get the text for the document
       String filename = null;
@@ -237,17 +208,26 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       //file should be there...
       if (filename == null)
       {
-         throw new ResourceInstantiationException("No document content found.");
+         throw new ResourceInstantiationException("Document content not specified in the headern.");
       }
-      
+
       //get the original text, see getContent below
       File txtFile = new File(fullPath.getParentFile(), filename);
       if (!txtFile.exists())
       {
          throw new ResourceInstantiationException("Primary data not found: " + txtFile.getPath());
       }
-      Out.prln("Loading text from " + txtFile.getPath());
-      String theContent = getContent(new File(fullPath.getParentFile(), filename));
+//      Out.prln("Loading text from " + txtFile.getPath());
+      String theContent = null;
+      try
+      {
+         theContent = getContent(new File(fullPath.getParentFile(), filename));
+      }
+      catch (IOException e)
+      {
+         throw new ResourceInstantiationException("Unable to load text content.", e);
+      }
+
       endOfContent = theContent.length();
       if (endOfContent == 0)
       {
@@ -265,59 +245,43 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       try
       {
          ResourceHeader header = new ResourceHeader(resourceHeader.openStream());
-         GrafParser graphParser = new GrafParser();
-         for (IAnnotationSpace aspace : header.getAnnotationSpaces())
+         GrafParser graphParser = new GrafParser(header);
+         //This is a gate Annotation set made using standoffASName, that comes from the
+         //gate GUI, Gate uses the setStandoffASName above to fill it, getAnnotations is a gate method, not ours
+         gateAnnotations = this.getAnnotations(standoffASName);
+         //get an iterator from the standoffAnnotations; ie iterate through the stand off file names
+         if (standoffAnnotations == null || standoffAnnotations.size() == 0)
          {
-            graphParser.addAnnotationSpace(aspace);
-         }         
-         
-         // stand-off annotations is a List provided by the Gate gui, 
-//         if (standoffAnnotations != null)
-//         {
-            //This is a gate Annotation set made using standoffASName, that comes from the
-            //gate GUI, Gate uses the setStandoffASName above to fill it, getAnnotations is a gate method, not ours
-            gateAnnotations = this.getAnnotations(standoffASName);
-            //get an iterator from the standoffAnnotations; ie iterate through the stand off file names
-//            Iterator<String> it = standoffAnnotations.iterator();
-//            while (it.hasNext())
-            if (standoffAnnotations == null || standoffAnnotations.size() == 0)
+            standoffAnnotations = docHeader.getAnnotationTypes();
+         }
+         for (String type : standoffAnnotations)
+         {
+            //ok get the file name for each standoff file type, remember we are working with a *.anc file here..
+            filename = docHeader.getAnnotationLocation(type);
+            Out.prln("Loading annotation " + type + " from " + filename);
+            // System.out.println("filename is " + filename);
+            if (filename != null)
             {
-               standoffAnnotations = docHeader.getAnnotationTypes();
-            }
-            for (String type : standoffAnnotations)
-            {
-               //ok get the file name for each standoff file type, remember we are working with a *.anc file here..
-//               String type = it.next();
-//               filename = getFileForType(type);
-               filename = docHeader.getAnnotationLocation(type);
-               Out.prln("Loading annotation " + type + " from " + filename);
-               // System.out.println("filename is " + filename);
-               if (filename != null)
+               try
                {
-//                  System.out.println("Adding annotations from " + filename);
-                  try
-                  {
-                     //get the file name from this iteration, call the parser for that file now...
-                     //and pull out the annotations from this iterations standoff file. 
-                     //  newAnnotations = parser.parse(basePath + System.getProperty("file.separator") + filename);
-                     graph = graphParser.parse(new File(fullPath.getParentFile(), filename));
-                     // GrafRenderer.render(graph);
-                  }
-                  catch (Exception e)
-                  {
-                     Out.println("Could not load graph from " + filename);
-                     throw new ResourceInstantiationException(e);
-                  }
-                  //cycle through the nodes only here, making it look easy
-                  for (INode node : graph.nodes())
-                  {
-                     //this is where the magic happens...see comments in addAnnotations
-                     addAnnotation(node);
-                  }
+                  //get the file name from this iteration, call the parser for that file now...
+                  //and pull out the annotations from this iterations standoff file.
+                  //  newAnnotations = parser.parse(basePath + System.getProperty("file.separator") + filename);
+                  graph = graphParser.parse(new File(fullPath.getParentFile(), filename));
+               }
+               catch (Exception e)
+               {
+                  Out.println("Could not load graph from " + filename);
+                  throw new ResourceInstantiationException(e);
+               }
+               //cycle through the nodes only here, making it look easy
+               for (INode node : graph.nodes())
+               {
+                  //this is where the magic happens...see comments in addAnnotations
+                  addAnnotation(node);
                }
             }
-//         }
-         System.out.println("Done");
+         }
       }
       catch (SAXException e)
       {
@@ -326,7 +290,7 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       catch (Exception e)
       {
          Out.prln("Unable to load GrafDocument");
-         e.printStackTrace(System.out);
+         e.printStackTrace();
       }
       return this;
    }
@@ -351,57 +315,34 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
 
    /**
     * gets the original text document
-    * 
+    *
     * @param file
     * @return
     * @throws ResourceInstantiationException
     */
-   protected String getContent(File file) throws ResourceInstantiationException
+   protected String getContent(File file) throws IOException // ResourceInstantiationException
    {
-      try
-      {
-         UTF8Reader reader = new UTF8Reader(file);
-         return reader.readString();
-      }
-      catch (IOException e)
-      {
-         throw new ResourceInstantiationException("Unable to load content", e);
-      }
-//      StringBuffer sbuffer = new StringBuffer();
-//      InputStreamReader reader = null;
 //      try
 //      {
-////         System.out.println("Loading content from " + path);
-//         reader = new InputStreamReader(new FileInputStream(path), contentEncoding);
-//         char[] cbuffer = new char[8192];
-//         int size = reader.read(cbuffer, 0, 8192);
-//         while (size > 0)
-//         {
-//            sbuffer.append(cbuffer, 0, size);
-//            size = reader.read(cbuffer, 0, 8192);
-//         }
-//         reader.close();
+         UTF8Reader reader = new UTF8Reader(file);
+         return reader.readString();
 //      }
-//      catch (IOException ex)
+//      catch (IOException e)
 //      {
-//         throw new ResourceInstantiationException("Error reading the document content from " + path);
+//         throw new ResourceInstantiationException("Unable to load content", e);
 //      }
-//
-//      //get length of the document, endOfContent is used later to make sure that annotations offsets are sane
-//      endOfContent = sbuffer.length();
-//      return sbuffer.toString();
    }
 
    /**
     * given gate Annotation set taken from *.anc document returns
     * hashtable<String,String> with type as key and file name as string value
-    * 
+    *
     * @param set
     * @return
     * @throws ResourceInstantiationException
     */
    protected Hashtable<String, String> _getAnnotationFiles(AnnotationSet set)
-         throws ResourceInstantiationException
+           throws ResourceInstantiationException
    {
       Hashtable<String, String> table = new Hashtable<String, String>();
       Iterator<gate.Annotation> it = set.iterator();
@@ -418,7 +359,7 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
          if (type == null)
          {
             throw new ResourceInstantiationException("f.id attribute node found.");
-         }         
+         }
          String location = getFeature(theFeatures, "loc");
          if (location == null)
          {
@@ -438,28 +379,35 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       }
       return value.toString();
    }
+
    /**
     * addAnnotation adds annotations to the gate annoationSet, it also adds
     * features to the annotations
-    * 
+    *
     * @param node
     * @throws InvalidOffsetException
     */
    protected void addAnnotation(INode node) throws InvalidOffsetException
    {
-//      getRangeFn.reset();
-//      //offset object extends pair, first is start (long), second is end (long),
-//      Offset offset = getRangeFn.apply(node);
-//      if (offset.getEnd() < offset.getStart())
-//      {
-//         return;
-//      }
       IRegion span = GraphUtils.getSpan(node);
-      if (span.getStart().compareTo(span.getEnd()) < 0)
+      long start = -2;
+      long end = -1;
+      try
       {
+         start = (Long) span.getStart().getOffset();
+         end = (Long) span.getEnd().getOffset();
+      }
+      catch (GrafException e)
+      {
+         throw new InvalidOffsetException(e.getMessage());
+      }
+
+      if (end < start)
+      {
+         Err.prln("Span for node " + node.getId() + " is empty (" + start + "," + end + ")");
          return;
       }
-      
+
       //node ids from out edges ( children node ids ) will end up as a long string
       //separated by spaces
       StringBuilder ids = new StringBuilder();
@@ -506,58 +454,35 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
          //gate FeatureMap newFeatures, null sent in as the base feature
          addFeatures(a.getFeatures(), newFeatures, null);
 
-         long start = 0; //offset.getStart();
-         long end = 0; //offset.getEnd();
-         try
+         if (end > endOfContent)
          {
-            start = (Long) span.getStart().getOffset();
-            end = (Long) span.getEnd().getOffset();
-            if (end > endOfContent)
-            {
-               System.err.println("Invalid end offset for " + label + " " + end + ", end of content = "
-                     + endOfContent);
+            System.err.println("Invalid end offset for " + label + " " + end + ", end of content = "
+                    + endOfContent);
 
-               end = endOfContent;
-            }
-            if (start > end)
-            {
-               System.err.println("Invalid start offset for " + label + " " + start + ", end of content = "
-                     + endOfContent);
-            }
-            else
-            {
-               //if here, the offsets look ok, finally add the annotation to the
-               //gate annotations object using the start, end, anc graf annotation name and the gate feature map
-//               Out.println("start: " + start + " end: " + end + " label: " + label + " newFeatures: "
-//                     + newFeatures.toString());
-//               try
-//               {
-                  if (gateAnnotations == null)
-                  {
-                     throw new NullPointerException("gateAnnotations is null");
-                  }
-                  if (label == null)
-                  {
-                     throw new NullPointerException("The label is null");
-                  }
-                  if (newFeatures == null)
-                  {
-                     throw new NullPointerException("newFeatures is null");
-                  }
-                  gateAnnotations.add(start, end, label, newFeatures);
-//               }
-//               catch (NullPointerException e)
-//               {
-//                  Out.println("null pointer exception");
-//               }
-            }
+            end = endOfContent;
          }
-         catch (Exception e)
+         if (start > end)
          {
-            System.err.println("Invalid offsets for " + label);
-            System.err.println("Annotation span : " + start + " - " + end);
-            throw new InvalidOffsetException("Invalid offsets for " + label + 
-                  " from " + start + " to " + end);
+            System.err.println("Invalid start offset for " + label + " " + start + ", end of content = "
+                    + endOfContent);
+         }
+         else
+         {
+            //if here, the offsets look ok, finally add the annotation to the
+            //gate annotations object using the start, end, anc graf annotation name and the gate feature map
+            if (gateAnnotations == null)
+            {
+               throw new NullPointerException("gateAnnotations is null");
+            }
+            if (label == null)
+            {
+               throw new NullPointerException("The label is null");
+            }
+            if (newFeatures == null)
+            {
+               throw new NullPointerException("newFeatures is null");
+            }
+            gateAnnotations.add(start, end, label, newFeatures);
          }
       }
    }
@@ -565,21 +490,18 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    /**
     * adds Features to the gate annotations, will recurse into feature
     * structures if nested
-    * 
-    * @param featStruc
+    *
+    * @param fs
     * @param fm
     * @param base
     */
-   protected void addFeatures(IFeatureStructure featStruc, FeatureMap fm, String base)
+   protected void addFeatures(IFeatureStructure fs, FeatureMap fm, String base)
    {
-      //graf type feature structure
-      IFeatureStructure fs = featStruc;
-      //if empty, get out
       if (fs == null)
       {
          return;
       }
-      //loop through the features in the feature structure
+
       for (IFeature f : fs.features())
       {
          //if this is not a feature structure, go, otherwise recurse with child features
