@@ -23,6 +23,10 @@ import gate.FeatureMap;
 import gate.Resource;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
+import gate.creole.metadata.CreoleParameter;
+import gate.creole.metadata.CreoleResource;
+import gate.creole.metadata.Optional;
+import gate.creole.metadata.RunTime;
 import gate.util.Out;
 import gate.util.Pair;
 
@@ -65,43 +69,48 @@ import org.xces.graf.io.XML;
 
 /**
  */
+@CreoleResource(
+        name = "GrAF Save Standoff",
+        comment = "Saves annotations to a GrAF standoff file."
+)
 public class SaveGrafStandoff extends ANCLanguageAnalyzer
 {
-   // Parameters passed by Gate.
-   /** Where the file will be written. */
-   public static final String DESTINATION_PARAMETER_NAME = "destination";
-   /** Gate AnnotationSet containing the annotations to be saved. */
-   public static final String INPUTASNAME_PARAMETER_NAME = "inputASName";
-   /** A white space delimited list of the annotation types (tags) to be saved. */
-   public static final String STANDOFFTAGS_PARAMETER_NAME = "standoffTags";
-   /** Character encoding to use. Default is UTF-8. */
-   public static final String ENCODING_PARAMETER_NAME = "encoding";
-   /** The type suffix that will be added to the file name. */
-   public static final String ANNOTYPE_PARAMETER_NAME = "annotationType";
-//   public static final String VERSION_PARAMETER_NAME = "version";
-   /** The name of the GrAF annotation set. */
-   public static final String GRAF_AS_NAME = "grafASName";
-   /** The type URI for the above GrAF annotation set name. */
-   public static final String GRAF_AS_TYPE = "grafASType";
-   /** Default URI to use if undeclared annotation sets are encountered. */
-   public static final String GRAF_DEFAULT_AS_TYPE = "grafDefaultASType";
-
-//	public static final String NAMESPACE_PARAMETER_NAME = "namespace";
-//	public static final String SCHEMALOCATION_PARAMETER_NAME = "schemaLocation";
+//   // Parameters passed by Gate.
+//   /** Where the file will be written. */
+//   public static final String DESTINATION_PARAMETER_NAME = "destination";
+//   /** Gate AnnotationSet containing the annotations to be saved. */
+//   public static final String INPUTASNAME_PARAMETER_NAME = "inputASName";
+//   /** A white space delimited list of the annotation types (tags) to be saved. */
+//   public static final String STANDOFFTAGS_PARAMETER_NAME = "standoffTags";
+//   /** Character encoding to use. Default is UTF-8. */
+//   public static final String ENCODING_PARAMETER_NAME = "encoding";
+//   /** The type suffix that will be added to the file name. */
+//   public static final String ANNOTYPE_PARAMETER_NAME = "annotationType";
+////   public static final String VERSION_PARAMETER_NAME = "version";
+//   /** The name of the GrAF annotation set. */
+//   public static final String GRAF_AS_NAME = "grafASName";
+//   /** The type URI for the above GrAF annotation set name. */
+//   public static final String GRAF_AS_TYPE = "grafASType";
+//   /** Default URI to use if undeclared annotation sets are encountered. */
+//   public static final String GRAF_DEFAULT_AS_TYPE = "grafDefaultASType";
 
    // Properties to hold parameter values.
    private java.net.URL destination = null;
    private String inputASName = null;
    private java.util.List<String> standoffTags = null;
    private String annotationType = "standoff";
-//   private String version = null;
+   private Boolean failFast = Boolean.FALSE;
+
+   /**
+    * If set to true stack traces will be displayed on the GATE console. Setting to
+    * false (the default) results in shorter error messages.
+    */
+   protected Boolean printStackTrace = Boolean.FALSE;
+
    private String encoding = null;
    private String grafASName = null;
    private String grafASType = null;
    private String grafDefaultASType = null;
-
-//	private String namespace = null;
-//	private String schemaLocation = null;
 
    public SaveGrafStandoff()
    {
@@ -166,13 +175,24 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
       }
       catch (RuntimeException ex)
       {
+         // RuntimeExceptions are propogated regardless of the failFast setting.
          throw ex;
       }
       catch (Exception ex)
       {
 //         System.out.println(ex.getMessage());
-         ex.printStackTrace();
-         throw new ExecutionException(ex);
+         if (failFast)
+         {
+            throw new ExecutionException(ex);
+         }
+         if (printStackTrace)
+         {
+            ex.printStackTrace();
+         }
+         else
+         {
+            Out.prln(ex.getMessage());
+         }
       }
    }
 
@@ -201,7 +221,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
          //on the inputASName inputed in the Gate UI ( see setinputASName below )
          //default is inputASName = standOffMarkups which is all the standoff markups we
          //know and love..nc + vc etc...
-         AnnotationSet originals = this.getAnnotations(inputASName);
+         AnnotationSet originals = super.getAnnotations(inputASName);
          if (originals != null && originals.size() > 0)
          {
             //standoffTags comes from user interface of Gate; if Gate user
@@ -358,10 +378,10 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
                         //come up with a new graf annotation set using setName and type only if set was found null
                         aset = Factory.newAnnotationSpace(setName, type);
                         //put it in the map of annotation sets
-                        grafAnnotationSetMap.put(setName, set);
+                        grafAnnotationSetMap.put(setName, aset);
                      }
                      //finally add the grafAnnoation we made above to this set 
-                     aset.addAnnotation(grafAnnotation);
+                     //aset.addAnnotation(grafAnnotation);
                      addedToSet = true;
                   }
                   else
@@ -385,12 +405,12 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
                }
             }
          }
-         if (!addedToSet)
-         {
-            //if here, we must have skipped adding the annotation, and maybe just added a feature to the 
-            //annotation. so add the annotation to the set of annotations
-            set.addAnnotation(grafAnnotation);
-         }
+//         if (!addedToSet)
+//         {
+//            //if here, we must have skipped adding the annotation, and maybe just added a feature to the
+//            //annotation. so add the annotation to the set of annotations
+//            set.addAnnotation(grafAnnotation);
+//         }
       }
 
       //now lets get back to the pairs, pairs is a list of...well...pairs
@@ -413,93 +433,128 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
    }
 
    // Property getters and setters.
+   @RunTime
+   @Optional(false)
+   @CreoleParameter(comment = "Where the standoff annotation file will be saved.")
    public void setDestination(java.net.URL destination)
    {
       this.destination = destination;
    }
-
    public java.net.URL getDestination()
    {
       return destination;
    }
 
+   @RunTime
+   @Optional(false)
+   @CreoleParameter(
+           comment = "AnnotationSet containing the annotations to be saved.",
+           defaultValue = "Standoff markups"
+   )
    public void setInputASName(String inputASName)
    {
       this.inputASName = inputASName;
    }
-
    public String getInputASName()
    {
       return inputASName;
    }
 
+   @RunTime
+   @Optional
+   @CreoleParameter(comment = "The list of annotation types to be serialized. If this is empty all annotations will be saved.")
    public void setStandoffTags(java.util.List<String> standoffTags)
    {
       this.standoffTags = standoffTags;
    }
-
    public java.util.List<String> getStandoffTags()
    {
       return standoffTags;
    }
 
+   @RunTime
+   @Optional(false)
+   @CreoleParameter(
+           comment = "Character encoding to use when saving the standoff annotation file.",
+           defaultValue = "UTF-8"
+   )
    public void setEncoding(String encoding)
    {
       this.encoding = encoding;
    }
-
    public String getEncoding()
    {
       return encoding;
    }
 
-//   public void setVersion(String version)
-//   {
-//      this.version = version;
-//   }
-//
-//   public String getVersion()
-//   {
-//      return version;
-//   }
-
+   @RunTime
+   @Optional(false)
+   @CreoleParameter(comment = "The annotation type suffix that will be used when deriving the name of the standoff annotation file.")
    public void setAnnotationType(String type)
    {
       this.annotationType = type;
    }
-
    public String getAnnotationType()
    {
       return annotationType;
    }
 
+   @RunTime
+   @Optional(false)
+   @CreoleParameter(comment = "The URI to use for the GrAF annotation space.")
    public void setGrafASType(String uri)
    {
       this.grafASType = uri;
    }
-
    public String getGrafASType()
    {
       return grafASType;
    }
 
+   @RunTime
+   @Optional(false)
+   @CreoleParameter(comment = "Name of the GrAF annotation space.")
    public void setGrafASName(String name)
    {
       grafASName = name;
    }
-
    public String getGrafASName()
    {
       return grafASName;
    }
 
+   @RunTime
+   @Optional(false)
+   @CreoleParameter(comment = "Default URI to use for undefined annotation spaces.")
    public void setGrafDefaultASType(String uri)
    {
       grafDefaultASType = uri;
    }
-
    public String getGrafDefaultASType()
    {
       return grafDefaultASType;
    }
+
+   @RunTime
+   @Optional
+   @CreoleParameter(
+           comment = "Determines whether stack traces will be displayed if an exception is encountered.",
+           defaultValue = "false"
+   )
+   public void setPrintStackTrace(Boolean printStackTrace) {
+      this.printStackTrace = printStackTrace;
+   }
+   public Boolean getPrintStackTrace()
+   {
+      return printStackTrace;
+   }
+
+   @RunTime
+   @Optional
+   @CreoleParameter(
+           comment = "Setting failFast to true causes pipelines to halt on the first exception.",
+           defaultValue = "false"
+   )
+   public void setFailFast(Boolean failFast) { this.failFast = failFast; }
+   public Boolean getFailFast() { return failFast; }
 }
