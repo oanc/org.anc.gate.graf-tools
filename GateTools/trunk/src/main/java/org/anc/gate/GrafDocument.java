@@ -25,6 +25,10 @@ import gate.LanguageResource;
 import gate.Resource;
 import gate.corpora.DocumentContentImpl;
 import gate.creole.ResourceInstantiationException;
+import gate.creole.metadata.CreoleParameter;
+import gate.creole.metadata.CreoleResource;
+import gate.creole.metadata.Optional;
+import gate.creole.metadata.RunTime;
 import gate.util.Err;
 import gate.util.InvalidOffsetException;
 import gate.util.Out;
@@ -56,25 +60,17 @@ import org.xces.graf.io.dom.ResourceHeader;
 import org.xces.graf.util.GraphUtils;
 import org.xml.sax.SAXException;
 
-// import org.xces.gate.AnaParser;
-// import org.xces.gate.CesAnaParser;
-// import org.xces.gate.Token;
-
 /**
  * @author Keith Suderman
  * @version 1.0
  */
+@CreoleResource(
+        name = "GrAF Document",
+        comment = "A single document with GrAF standoff annotations loaded."
+)
 public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageResource
 {
-   private static final long serialVersionUID = 1L;
-
-   public static final String LOAD_STANDOFF_PARAMETER_NAME = "loadStandoff";
-   public static final String STANDOFF_MARKUP_SET_NAME = "standoffASName";
-   public static final String STANDOFF_ANNOTATIONS_PARAMETER_NAME = "standoffAnnotations";
-   public static final String STANDOFF_LOADED_PARAMETER_NAME = "standoffLoaded";
-   public static final String FACTORY_PROPERTY = "javax.xml.sax.SAXParserFactory";
-   public static final String CONTENT_ENCODING_PARAMETER_NAME = "contentEncoding";
-   public static final String RESOURCE_HEADER_PARAMETER_NAME = "resourceHeader";
+   private static final long serialVersionUID = 2L;
 
    //   protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
    protected transient int endOfContent = 0;
@@ -83,7 +79,7 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    private String standoffASName = "Original markups";
    private List<String> standoffAnnotations = null;
    private boolean standoffLoaded = false;
-   private String contentEncoding = "UTF-16";
+   private String contentEncoding = "UTF-8";
    private URL resourceHeader;
 
    private Hashtable<String, String> ancAnnotations = null;
@@ -91,62 +87,79 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    protected Set<String> seen = new HashSet<String>();
    AnnotationSet as;
 
+   @RunTime(false)
+   @Optional(false)
+   @CreoleParameter(comment = "The corpus resource header.")
    public void setResourceHeader(URL location)
    {
       Out.prln("Setting resource header " + location.toExternalForm());
       this.resourceHeader = location;
    }
-
    public URL getResourceHeader()
    {
       return resourceHeader;
    }
 
+   @RunTime
+   @Optional
+   @CreoleParameter(
+           comment = "If set to false no standoff annotations will be loaded.",
+           defaultValue = "true"
+   )
    public void setLoadStandoff(Boolean save)
    {
       loadStandoff = save;
    }
-
    public Boolean getLoadStandoff()
    {
       return loadStandoff;
    }
 
+   // This not a Creole parameter. standoffLoaded will be set if any standfoff
+   // annotations are loaded.
    public void setStandoffLoaded(boolean loaded)
    {
       standoffLoaded = loaded;
    }
-
    public boolean getStandoffLoaded()
    {
       return standoffLoaded;
    }
 
+   @RunTime
+   @Optional(false)
+   @CreoleParameter(
+           comment = "The AnnotationSet where new annotations will be created.",
+           defaultValue = "Original markups"
+   )
    public void setStandoffASName(String name)
    {
       standoffASName = name;
    }
-
    public String getStandoffASName()
    {
       return standoffASName;
    }
 
+   @RunTime
+   @Optional
+   @CreoleParameter(comment = "The list of annotations to be loaded. If empty then all annotations will be loaded.")
    public void setStandoffAnnotations(List<String> list)
    {
       standoffAnnotations = list;
    }
-
    public List<String> getStandoffAnnotations()
    {
       return standoffAnnotations;
    }
 
+   @RunTime
+   @CreoleParameter(comment = "Character encoding of the document. Defaults to UTF-8",
+   defaultValue = "UTF-8")
    public void setContentEncoding(String encoding)
    {
       contentEncoding = encoding;
    }
-
    public String getContentEncoding()
    {
       return contentEncoding;

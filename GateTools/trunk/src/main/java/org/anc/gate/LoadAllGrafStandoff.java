@@ -8,6 +8,10 @@ import gate.Gate;
 import gate.Resource;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
+import gate.creole.metadata.CreoleParameter;
+import gate.creole.metadata.CreoleResource;
+import gate.creole.metadata.Optional;
+import gate.creole.metadata.RunTime;
 import gate.util.InvalidOffsetException;
 
 import java.io.File;
@@ -31,20 +35,25 @@ import org.xces.graf.io.dom.DocumentHeader;
 import org.xces.graf.io.dom.ResourceHeader;
 import org.xces.graf.util.GraphUtils;
 
+@CreoleResource(
+        name = "GrAF Load All Standoff",
+        comment = "Loads a text and all GrAF standoff annotations."
+)
 public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
 {
-   private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = 2L;
 
-   public static final String STANDOFFASNAME_PARAMETER = "standoffASName";
-   public static final String SOURCE_URL_PARAMETER = "sourceUrl";
-   public static final String RESOURCE_HEADER_PARAMETER_NAME = "resourceHeader";
-
-   protected String standoffASName = null;
-   protected URL sourceUrl = null;
    private URL resourceHeader;
+   protected String standoffASName;
+   private Boolean failFast;
+   /**
+    * If set to true stack traces will be displayed on the GATE console. Setting to
+    * false (the default) results in shorter error messages.
+    */
+   protected Boolean printStackTrace = Boolean.FALSE;
+
 
    protected transient GrafParser parser;
-//   protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
    protected transient String content = null;
    protected transient int endOfContent = 0;
 
@@ -104,8 +113,24 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
       {
          // This should not happen since we check that the file exists. So
          // this means something really bad went wrong.
-         throw new RuntimeException("Could not locate header file "
-               + headerFile.getPath());
+         if (failFast)
+         {
+            throw new RuntimeException("Could not locate header file "
+                    + headerFile.getPath());
+         }
+         else
+         {
+            Out.prln("Unable to load header file for " + file.getPath());
+            if (printStackTrace)
+            {
+               e.printStackTrace();
+            }
+            else
+            {
+               Out.prln(e.getMessage());
+            }
+            return;
+         }
       }
 
       try
@@ -128,46 +153,87 @@ public class LoadAllGrafStandoff extends ANCLanguageAnalyzer
                }
                catch (Exception ex)
                {
-                  throw new ExecutionException(ex);
+                  if (failFast)
+                  {
+                     throw new ExecutionException(ex);
+                  }
+                  else if (printStackTrace)
+                  {
+                     ex.printStackTrace();
+                  }
+                  else
+                  {
+                     Out.prln(ex.getMessage());
+                  }
                }
             }
          }
       }
       catch (GrafException e)
       {
-         throw new ExecutionException(
-               "Error getting annotation types from the header.");
+         if (failFast) {
+            throw new ExecutionException(
+                    "Error getting annotation types from the header.");
+         }
+         else if (printStackTrace)
+         {
+            e.printStackTrace();
+         }
+         else
+         {
+            Out.prln(e.getMessage());
+         }
       }
    }
 
+   @RunTime(false)
+   @Optional(false)
+   @CreoleParameter(comment ="Corpus resource header.")
    public void setResourceHeader(URL location)
    {
       resourceHeader = location;
    }
-
    public URL getResourceHeader()
    {
       return resourceHeader;
    }
 
+   @RunTime
+   @Optional
+   @CreoleParameter(
+           comment = "The AnnotationSet where new annotations will be created.",
+           defaultValue = "Standoff annotations"
+   )
+   public void setStandoffASName(String name)
+   {
+      standoffASName = name;
+   }
    public String getStandoffASName()
    {
       return standoffASName;
    }
 
-   public void setStandoffASName(String name)
-   {
-      standoffASName = name;
-   }
+   @RunTime
+   @Optional
+   @CreoleParameter(
+           comment = "When set to true causes pipelines to halt on the first exception.",
+           defaultValue = "false"
+   )
+   public void setFailFast(Boolean failFast) { this.failFast = failFast; }
+   public Boolean getFailFast() { return failFast; }
 
-   public URL getSourceUrl()
-   {
-      return sourceUrl;
+   @RunTime
+   @Optional
+   @CreoleParameter(
+           comment = "Determines whether stack traces will be displayed if an exception is encountered.",
+           defaultValue = "false"
+   )
+   public void setPrintStackTrace(Boolean printStackTrace) {
+      this.printStackTrace = printStackTrace;
    }
-
-   public void setSourceUrl(URL url)
+   public Boolean getPrintStackTrace()
    {
-      sourceUrl = url;
+      return printStackTrace;
    }
 
    protected void addAnnotation(INode node, String type)

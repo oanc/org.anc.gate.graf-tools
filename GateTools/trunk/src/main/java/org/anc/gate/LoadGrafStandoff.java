@@ -25,6 +25,10 @@ import gate.Gate;
 import gate.Resource;
 import gate.creole.ExecutionException;
 import gate.creole.ResourceInstantiationException;
+import gate.creole.metadata.CreoleParameter;
+import gate.creole.metadata.CreoleResource;
+import gate.creole.metadata.Optional;
+import gate.creole.metadata.RunTime;
 import gate.util.Err;
 import gate.util.InvalidOffsetException;
 
@@ -37,49 +41,76 @@ import java.util.List;
 import java.util.Set;
 
 // import org.anc.conf.AnnotationSpaces;
+import gate.util.Out;
 import org.anc.gate.core.ANCLanguageAnalyzer;
 import org.anc.util.Pair;
 import org.apache.commons.io.FileUtils;
-import org.xces.graf.api.IAnchor;
-import org.xces.graf.api.IAnnotation;
-import org.xces.graf.api.IAnnotationSpace;
-import org.xces.graf.api.IEdge;
-import org.xces.graf.api.IFeature;
-import org.xces.graf.api.IFeatureStructure;
-import org.xces.graf.api.IGraph;
-import org.xces.graf.api.ILink;
-import org.xces.graf.api.INode;
-import org.xces.graf.api.IRegion;
-import org.xces.graf.api.IStandoffHeader;
+import org.xces.graf.api.*;
 import org.xces.graf.impl.CharacterAnchor;
 import org.xces.graf.io.GrafParser;
 import org.xces.graf.io.dom.ResourceHeader;
 import org.xces.graf.util.GraphUtils;
 import org.xces.graf.util.IFunction;
+import org.xml.sax.SAXException;
 
 /**
  * 
  * @author Keith Suderman
  * @version 1.0
  */
+@CreoleResource(
+        name = "GrAF Load Standoff",
+        comment = "Loads GrAF standoff annotations"
+)
 public class LoadGrafStandoff extends ANCLanguageAnalyzer
 {
    private static final long serialVersionUID = 1L;
 
-   public static final String STANDOFFASNAME_PARAMETER = "standoffASName";
-   public static final String SOURCE_URL_PARAMETER = "sourceUrl";
-   public static final String ANNOTATION_TYPE_PARAMETER = "annotationType";
-   public static final String RESOURCE_HEADER_PARAMETER_NAME = "resourceHeader";
-
+   /** The name of the GATE annotationSet where the annotations will be created. */
    protected String standoffASName = null;
+
+   /** Allows the user to specify the annotation file to load. If set sourceUrl
+    *  overrides the default algorithm used to calculate the path to the standoff
+    *  annotation file.
+    */
    protected URL sourceUrl = null;
+
+   /** The annotation type (as specified in the resource header) to be loaded. The path
+    *  to the standoff annotation type can be fetched from the document header using the
+    *  annotationType or the path can be derived from the document URL and annotationType.
+    */
    protected String annotationType = null;
+
+   /** If failFast is set to true then an Exception will be thrown causing Pipelines
+    *  to halt. Otherwise exceptions are caught, an error message is printed, and the
+    *  resource exits cleanly.  This allows CorpusPipelines to continue processing when
+    *  a few documents cause exceptions to be thrown.
+    */
+   protected Boolean failFast = Boolean.FALSE;
+
+   /**
+    * If set to true stack traces will be displayed on the GATE console. Setting to
+    * false (the default) results in shorter error messages.
+    */
+   protected Boolean printStackTrace = Boolean.FALSE;
+
+   /** The URL to the corpus resource header. */
    private URL resourceHeader;
 
-   protected transient GrafParser parser;
+   private ResourceHeader header;
+
+   /** Parser used to load the standoff annotation file. */
+//   protected transient GrafParser parser;
+
+   /** The GATE AnnotationSet where new annotations will be created. */
    protected AnnotationSet annotations;
+
 //   protected transient GetRangeFunction getRangeFn = new GetRangeFunction();
+
+   /** Text content for the document being processed. */
    protected transient String content = null;
+
+   /** The length of the content. */
    protected transient int endOfContent = 0;
 
    public LoadGrafStandoff()
@@ -98,13 +129,13 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       try
       {
          super.init();
-         parser = new GrafParser();
+//         parser = new GrafParser();
          File headerFile = FileUtils.toFile(resourceHeader);
-         ResourceHeader header = new ResourceHeader(headerFile);
-         for (IAnnotationSpace aspace : header.getAnnotationSpaces())
-         {
-            parser.addAnnotationSpace(aspace);
-         }
+         header = new ResourceHeader(headerFile);
+//         for (IAnnotationSpace aspace : header.getAnnotationSpaces())
+//         {
+//            parser.addAnnotationSpace(aspace);
+//         }
       }
       catch (Exception ex)
       {
@@ -117,54 +148,75 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
    @Override
    public void execute() throws ExecutionException
    {
-      BufferedReader r;
-      //annotations is gate annotations not graf annotations
-      //getAnnotations comes from the parent class ANCLanguageAnalyzer
-      //standoffASName comes from the gate gui; default is 'Standoff markups'
-      annotations = getAnnotations(standoffASName);
-      //gets the text body of the document; document is the gate document
+//      BufferedReader r;
+		GrafParser parser = null;
+		try
+		{
+			parser = new GrafParser(header);
+		}
+		catch (SAXException e)
+		{
+			throw new ExecutionException(e);
+		}
+		catch (GrafException e)
+		{
+			throw new ExecutionException(e);
+		}
+
+		// Get the GATE annotations from the document being processed.
+      annotations = super.getAnnotations(standoffASName);
+
+      // Get the text from the document.
       content = document.getContent().toString();
-      //get length of the document
       endOfContent = content.length();
-      // System.out.println("standoffASName is " + standoffASName + " Content length is " + endOfContent);
-      //System.out.println("There are " + annotations.size() + " GATE annotations.");
 
-      //URL url = this.getSourceUrl();
-      //get the file path for the standoff file ( ie nc, vc etc ); sourceUrl comes from the gate gui
-
-      File file = new File(sourceUrl.getPath());
-      String name = document.getName();
-      if (file.isDirectory())
-      {
+      File file;
+      if (sourceUrl == null) {
+         // If the sourceUrl is null then the path to the standoff file should be derived
+         // from the path to the document and the annotationType.
          if (annotationType == null)
          {
+            // This is something we can not recover from so the failFast
+            // parameter is ignored.
             throw new ExecutionException(
-                  "Source URL is a directory and no annotation type was specified.");
+                    "Source URL is null and no annotation type was specified.");
          }
-         // TODO The annotation file should be determined from the header.
-         int index = name.lastIndexOf(".txt");
+         // TODO The annotation file should be retrieved from the document header.
+         File docFile = new File(document.getSourceUrl().getPath());
+         File parent = docFile.getParentFile();
+
+         String filename = docFile.getName();
+         int index = filename.lastIndexOf(".txt");
          if (index > 0)
          {
-            name = name.substring(0, index);
+            filename = filename.substring(0, index);
          }
-         name = name + "-" + annotationType + ".xml";
-         file = new File(file, name);
+         filename = filename + "-" + annotationType + ".xml";
+         file = new File(parent, filename);
       }
+      else
+      {
+         // The sourceUrl was specified so load the standoff annotations from there.
+         file = new File(sourceUrl.getPath());
+      }
+
       if (!file.exists())
       {
-         File docRoot = new File(document.getSourceUrl().getPath())
-               .getParentFile();
-         file = new File(docRoot, name);
-         if (!file.exists())
-         {
-            System.err.println("Unable to locate annotation file "
-                  + file.getPath());
-            return;
+         String message = "Unable to locate annotation file " + file.getPath();
+         if (failFast) {
+            throw new ExecutionException(message);
          }
+         Out.prln(message);
+         return;
       }
       if (file.length() == 0)
       {
-         System.err.println("WARNING: " + file.getPath() + " is empty.");
+         String message = "WARNING: " + file.getPath() + " is empty.";
+         if (failFast)
+         {
+            throw new ExecutionException(message);
+         }
+         Out.prln(message);
          return;
       }
 
@@ -190,62 +242,101 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
       }
       catch (Exception ex)
       {
-         Err.prln("Error loading standoff.");
-         ex.printStackTrace();
-         throw new ExecutionException("Unable to load standoff.", ex);
+         Err.prln("Error loading standoff from " + file.getPath());
+         if (failFast) {
+            throw new ExecutionException("Unable to load standoff.", ex);
+         }
+         else if (printStackTrace)
+         {
+            ex.printStackTrace();
+         }
+         else
+         {
+            Out.prln(ex.getMessage());
+         }
       }
 //      System.out.println("Execution complete.");
    }
 
+   @RunTime(false)
+   @Optional(false)
+   @CreoleParameter(comment = "Corpus resource header.")
    public void setResourceHeader(URL location)
    {
       resourceHeader = location;
    }
-
    public URL getResourceHeader()
    {
       return resourceHeader;
    }
 
+   @RunTime
+   @Optional
+   @CreoleParameter(
+           comment = "Determines whether stack traces will be displayed if an exception is encountered.",
+           defaultValue = "false"
+   )
+   public void setPrintStackTrace(Boolean printStackTrace) {
+      this.printStackTrace = printStackTrace;
+   }
+   public Boolean getPrintStackTrace()
+   {
+      return printStackTrace;
+   }
+
+   @RunTime
+   @Optional
+   @CreoleParameter(
+           comment = "Setting failFast to true causes pipelines to halt on the first exception.",
+           defaultValue = "false"
+   )
+   public void setFailFast(Boolean failFast) { this.failFast = failFast; }
+   public Boolean getFailFast() { return failFast; }
+
+   @RunTime
+   @Optional
+   @CreoleParameter(
+           comment = "New annotations will be added to this GATE annotation set.",
+           defaultValue = "Standoff markups"
+   )
+   public void setStandoffASName(String name)
+   {
+      standoffASName = name;
+   }
    public String getStandoffASName()
    {
       return standoffASName;
    }
 
-   public void setStandoffASName(String name)
-   {
-      standoffASName = name;
-   }
 
+   @RunTime
+   @Optional
+   @CreoleParameter(comment = "Standoff annotations will be loaded from this URL.")
+   public void setSourceUrl(URL url)
+   {
+      sourceUrl = url;
+   }
    public URL getSourceUrl()
    {
       return sourceUrl;
    }
 
-   public void setSourceUrl(URL url)
-   {
-      sourceUrl = url;
-   }
 
+   @RunTime
+   @Optional
+   @CreoleParameter(comment = "Annotation type to be loaded. Only used if the sourceUrl is not specified.")
+   public void setAnnotationType(String type)
+   {
+      this.annotationType = type;
+   }
    public String getAnnotationType()
    {
       return annotationType;
    }
 
-   public void setAnnotationType(String type)
-   {
-      this.annotationType = type;
-   }
 
    protected void addAnnotation(INode node) throws InvalidOffsetException
    {
-//      getRangeFn.reset();
-//      //offset object extends pair, first is start (long), second is end (long),
-//      Offset offset = getRangeFn.apply(node);
-//      if (offset.getEnd() < offset.getStart())
-//      {
-//         return;
-//      }
       IRegion span = GraphUtils.getSpan(node);
       if (span == null || span.getStart() == null || span.getEnd() == null || span.getStart().compareTo(span.getEnd()) > 0)
       {
@@ -423,40 +514,6 @@ public class LoadGrafStandoff extends ANCLanguageAnalyzer
             addFeatures(childFS, fm, childName);
          }
       }
-   }
-
-}
-
-class Offset extends Pair<Long, Long>
-{
-   public Offset()
-   {
-      super(Long.MAX_VALUE, Long.MIN_VALUE);
-   }
-
-   public Offset(long start, long end)
-   {
-      super(start, end);
-   }
-
-   public Long getStart()
-   {
-      return first;
-   }
-
-   public Long getEnd()
-   {
-      return second;
-   }
-
-   public void setStart(long start)
-   {
-      setFirst(start);
-   }
-
-   public void setEnd(long end)
-   {
-      setSecond(end);
    }
 
 }

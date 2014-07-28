@@ -3,7 +3,16 @@ package org.anc.gate;
 import gate.*;
 import gate.creole.*;
 import gate.corpora.*;
+import gate.creole.metadata.AutoInstance;
+import gate.creole.metadata.CreoleResource;
 
+
+@CreoleResource(
+        isPrivate = true,
+        name = "GrAF Document Format",
+        comment = "Used to tell GATE the GrAF header files are text/xml.",
+        autoinstances = { @AutoInstance(hidden=true) }
+)
 public class GrafDocumentFormat extends XmlDocumentFormat
 {
 

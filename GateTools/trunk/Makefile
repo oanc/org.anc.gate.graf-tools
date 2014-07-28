@@ -4,7 +4,19 @@
 ## Where the plugins will be installed.
 GRAF=$(PLUGINS)/GrAF
 
-default:
+help:
+	echo "Available goals:"
+	@echo ""
+	@echo "  all     : cleans and compiles the jar file."
+	@echo "  jar     : compiles the jar file (mvn package)."
+	@echo "  clean   : cleans build artifacts."
+	@echo "  skip    : builds the jar skipping unit tests."
+	@echo "  install : copys the jar to Gate's plugins directory."
+	@echo "  upload  : uploads distributions to the ANC server."
+	@echo "  test    : used for debugging the Makefile."
+	@echo ""
+
+all:
 	mvn clean package
 
 jar:
@@ -35,9 +47,9 @@ upload:
 		mv target/GrAF-dist-$(version).zip target/GrAF-GATE-$(version).zip ; \
 		scp -P 22022 target/GrAF-GATE-$(version).zip suderman@anc.org:/home/www/anc/tools ; \
 		scp -P 22022 target/GrAF-GATE-$(version).zip suderman@anc.org:/home/www/anc/tools/gate ; \
-		unzip target/GrAF-GATE-$(version).zip -d target ; \
-		mv target/GrAF target/GrAF-GATE-$(version) ; \
-		scp -r -P 22022 target/GrAF-GATE-$(version) suderman@anc.org:/home/www/anc/tools/gate ; \
+		#unzip target/GrAF-GATE-$(version).zip -d target ; \
+		#mv target/GrAF target/GrAF-GATE-$(version) ; \
+		#scp -r -P 22022 target/GrAF-GATE-$(version) suderman@anc.org:/home/www/anc/tools/gate ; \
 	fi
 	
 test:

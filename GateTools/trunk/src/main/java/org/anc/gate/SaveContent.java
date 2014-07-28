@@ -26,18 +26,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import gate.creole.metadata.CreoleParameter;
+import gate.creole.metadata.CreoleResource;
+import gate.creole.metadata.Optional;
+import gate.creole.metadata.RunTime;
 import org.anc.gate.core.ANCLanguageAnalyzer;
 
-// import ANC.creole.ANCProcessingResource;
-// import ANC.creole.ANCLanguageAnalyser;
-
-/**  */
+@CreoleResource(
+        name = "GrAF Save Content",
+        comment = "Saves the text content from a GATE document."
+)
 public class SaveContent extends ANCLanguageAnalyzer
 {
-   // Parameters passed by Gate.
-   public static final String DESTINATION_PARAMETER_NAME = "destination";
-   public static final String ENCODING_PARAMETER_NAME = "encoding";
-
    // Properties to hold parameter values.
    private java.net.URL destination = null;
    private java.lang.String encoding = null;
@@ -67,11 +67,6 @@ public class SaveContent extends ANCLanguageAnalyzer
       if (null == destination)
       {
          throw new ExecutionException("Parameter destination has not been set.");
-      }
-
-      if (null == encoding)
-      {
-         encoding = "UTF-8";
       }
 
       try
@@ -107,22 +102,28 @@ public class SaveContent extends ANCLanguageAnalyzer
       }
    }
 
-   // Property getters and setters.
+   @RunTime
+   @Optional(false)
+   @CreoleParameter(comment = "Where the standoff annotations will be saved.")
    public void setDestination(java.net.URL destination)
    {
       this.destination = destination;
    }
-
    public java.net.URL getDestination()
    {
       return destination;
    }
 
+   @RunTime
+   @Optional
+   @CreoleParameter(
+           comment = "Character encoding of the standoff file.",
+           defaultValue = "UTF-8"
+   )
    public void setEncoding(java.lang.String encoding)
    {
       this.encoding = encoding;
    }
-
    public java.lang.String getEncoding()
    {
       return encoding;
