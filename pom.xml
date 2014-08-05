@@ -10,7 +10,7 @@
 	<groupId>org.anc.gate</groupId>
 	<artifactId>graf-tools</artifactId>
 	<name>GrAF Tools for Gate</name>
-	<version>3.1.0</version>
+	<version>3.1.1</version>
 	<description>Plugins for loading and saving GrAF files with standoff annotations.</description>
 	<url>http://www.anc.org/projects/gate-tools</url>
 	<properties>

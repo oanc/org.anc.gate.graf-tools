@@ -75,30 +75,11 @@ import org.xces.graf.io.XML;
 )
 public class SaveGrafStandoff extends ANCLanguageAnalyzer
 {
-//   // Parameters passed by Gate.
-//   /** Where the file will be written. */
-//   public static final String DESTINATION_PARAMETER_NAME = "destination";
-//   /** Gate AnnotationSet containing the annotations to be saved. */
-//   public static final String INPUTASNAME_PARAMETER_NAME = "inputASName";
-//   /** A white space delimited list of the annotation types (tags) to be saved. */
-//   public static final String STANDOFFTAGS_PARAMETER_NAME = "standoffTags";
-//   /** Character encoding to use. Default is UTF-8. */
-//   public static final String ENCODING_PARAMETER_NAME = "encoding";
-//   /** The type suffix that will be added to the file name. */
-//   public static final String ANNOTYPE_PARAMETER_NAME = "annotationType";
-////   public static final String VERSION_PARAMETER_NAME = "version";
-//   /** The name of the GrAF annotation set. */
-//   public static final String GRAF_AS_NAME = "grafASName";
-//   /** The type URI for the above GrAF annotation set name. */
-//   public static final String GRAF_AS_TYPE = "grafASType";
-//   /** Default URI to use if undeclared annotation sets are encountered. */
-//   public static final String GRAF_DEFAULT_AS_TYPE = "grafDefaultASType";
-
    // Properties to hold parameter values.
    private java.net.URL destination = null;
    private String inputASName = null;
    private java.util.List<String> standoffTags = null;
-   private String annotationType = "standoff";
+   private String filenameSuffix = "standoff";
    private Boolean failFast = Boolean.FALSE;
 
    /**
@@ -152,7 +133,7 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
          File f = new File(destination.getPath());
          if (f.isDirectory())
          {
-            f = new File(f, document.getName() + "-" + annotationType + ".xml");
+            f = new File(f, document.getName() + "-" + filenameSuffix + ".xml");
          }
 
          IGraph graph = createGraph();
@@ -388,18 +369,18 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
                   {
                      //ok, if here we have found a feature of an annotation..right ?
                      //get the annotation from this iteration; see above
-                     String value = att.getValue().toString();
+                     Object value = att.getValue();
                      //if found
                      if (value != null)
                      {
                         //do some funny stuff here..?
-                        value = XML.encode(value);
+                        //value = XML.encode(value);
                         //add the feature to the annotation 
-                        grafAnnotation.addFeature(key, value);
+                        grafAnnotation.addFeature(key, XML.encode(value.toString()));
                      }
                      else
                      {
-                        Out.prln("Null value specified for " + key + ": " + start + "-" + end);
+                        Out.prln("Null value specified for " + gateAnnotation.getType() + ": " + key + ": " + start + "-" + end);
                      }
                   }
                }
@@ -489,14 +470,14 @@ public class SaveGrafStandoff extends ANCLanguageAnalyzer
 
    @RunTime
    @Optional(false)
-   @CreoleParameter(comment = "The annotation type suffix that will be used when deriving the name of the standoff annotation file.")
-   public void setAnnotationType(String type)
+   @CreoleParameter(comment = "The suffix that will be used when deriving the filename.")
+   public void setFilenameSuffix(String type)
    {
-      this.annotationType = type;
+      this.filenameSuffix = type;
    }
-   public String getAnnotationType()
+   public String getFilenameSuffix()
    {
-      return annotationType;
+      return filenameSuffix;
    }
 
    @RunTime
