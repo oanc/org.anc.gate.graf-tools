@@ -1,0 +1,7 @@
+<CREOLE-DIRECTORY ID="org.anc.gate.GrAF Tools" VERSION="${project.version}">
+    <JAR SCAN="true">GrAF-GATE-${project.version}.jar</JAR>
+    <JAR>lib/commons-io-2.2.jar</JAR>
+    <JAR>lib/logback-classic-1.0.11.jar</JAR>
+    <JAR>lib/logback-core-1.0.11.jar</JAR>
+    <JAR>lib/slf4j-api-1.7.2.jar</JAR>
+</CREOLE-DIRECTORY>
