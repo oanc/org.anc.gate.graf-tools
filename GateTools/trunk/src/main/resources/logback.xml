@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration debug="false">
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<!--
+			encoders are assigned the type
+			ch.qos.logback.classic.encoder.PatternLayoutEncoder by default
+		-->
+		<encoder>
+			<pattern>%date %-5level [%class{0}.%M:%line] %msg%n</pattern>
+		</encoder>
+	</appender>
+	<logger name="org.anc" level="info"/>
+    <logger name="org.xces.graf" level="warn"/>
+	<root level="info">
+		<appender-ref ref="STDOUT" />
+	</root>
+</configuration>
