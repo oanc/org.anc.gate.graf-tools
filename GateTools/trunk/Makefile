@@ -30,7 +30,7 @@ skip:
 	
 install:
 	$(eval version := $(shell cat VERSION))
-	echo "Copying GrAF Tools version "$(version)
+	echo "Copying GrAF Tools version $(version)"
 	tar -xzf target/GrAF-dist-$(version).tar.gz
 	if [ -d $(GRAF) ] ; then rm -rf $(GRAF) ; fi
 	mv GrAF $(PLUGINS)
@@ -38,18 +38,28 @@ install:
 
 upload:
 	$(eval version := $(shell cat VERSION))
-	echo "Uploading GrAF GATE Tools version "$(version)
+	echo "Uploading GrAF GATE Tools version $(version)"
 	if [ -e target/GrAF-dist-$(version).tar.gz ] ; then \
 		mv target/GrAF-dist-$(version).tar.gz target/GrAF-GATE-$(version).tar.gz ; \
 		scp -P 22022 target/GrAF-GATE-$(version).tar.gz suderman@anc.org:/home/www/anc/tools ; \
 	fi
+	
+foo:
+	$(eval version := $(shell cat VERSION))
 	if [ -e target/GrAF-dist-$(version).zip ] ; then \
 		mv target/GrAF-dist-$(version).zip target/GrAF-GATE-$(version).zip ; \
 		scp -P 22022 target/GrAF-GATE-$(version).zip suderman@anc.org:/home/www/anc/tools ; \
-		scp -P 22022 target/GrAF-GATE-$(version).zip suderman@anc.org:/home/www/anc/tools/gate ; \
+		#scp -P 22022 target/GrAF-GATE-$(version).zip suderman@anc.org:/home/www/anc/tools/gate ; \
 		#unzip target/GrAF-GATE-$(version).zip -d target ; \
 		#mv target/GrAF target/GrAF-GATE-$(version) ; \
 		#scp -r -P 22022 target/GrAF-GATE-$(version) suderman@anc.org:/home/www/anc/tools/gate ; \
+	fi
+
+bar:	
+	$(eval version := $(shell cat VERSION))
+	if [ -e target/GrAF-dist-$(version).zip ] ; then \
+		mv target/GrAF-dist-$(version).zip target/GrAF-GATE-$(version).zip ; \
+		scp -P 22022 target/GrAF-GATE-$(version).zip suderman@anc.org:/home/www/anc/tools ; \
 	fi
 	
 test:
