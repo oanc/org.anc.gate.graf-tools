@@ -87,9 +87,9 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    protected Set<String> seen = new HashSet<String>();
    AnnotationSet as;
 
-   @RunTime(false)
-   @Optional(false)
-   @CreoleParameter(comment = "The corpus resource header.")
+   @CreoleParameter(comment = "The corpus resource header.",
+           suffixes = ".xml"
+   )
    public void setResourceHeader(URL location)
    {
       Out.prln("Setting resource header " + location.toExternalForm());
@@ -100,7 +100,6 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       return resourceHeader;
    }
 
-   @RunTime
    @Optional
    @CreoleParameter(
            comment = "If set to false no standoff annotations will be loaded.",
@@ -126,8 +125,6 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       return standoffLoaded;
    }
 
-   @RunTime
-   @Optional(false)
    @CreoleParameter(
            comment = "The AnnotationSet where new annotations will be created.",
            defaultValue = "Original markups"
@@ -141,9 +138,8 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       return standoffASName;
    }
 
-   @RunTime
    @Optional
-   @CreoleParameter(comment = "The list of annotations to be loaded. If empty then all annotations will be loaded.")
+   @CreoleParameter(comment = "The list of annotations to be loaded. If this list is empty then all annotations will be loaded.")
    public void setStandoffAnnotations(List<String> list)
    {
       standoffAnnotations = list;
@@ -153,8 +149,7 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       return standoffAnnotations;
    }
 
-   @RunTime
-   @CreoleParameter(comment = "Character encoding of the document. Defaults to UTF-8",
+   @CreoleParameter(comment = "Character encoding of the document content. Defaults to UTF-8",
    defaultValue = "UTF-8")
    public void setContentEncoding(String encoding)
    {
@@ -165,6 +160,27 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
       return contentEncoding;
    }
 
+   @CreoleParameter(disjunction = "source",
+           priority = 1,
+           comment="The GrAF header file for the document to be loaded.",
+           suffixes = ".hdr;.xml"
+   )
+   public void setSourceUrl(URL url) {
+      super.setSourceUrl(url);
+   }
+   public URL getSourceUrl() {
+      return super.getSourceUrl();
+   }
+
+   @CreoleParameter(disjunction = "source", priority = 2,
+           comment = "The content of the document. This should not typically be used.")
+   public void setStringContent(String stringContent) {
+      super.setStringContent(stringContent);
+   } // set StringContent
+   public String getStringContent() {
+      return super.getStringContent();
+   }
+
    public GrafDocument()
    {
    }
@@ -173,7 +189,6 @@ public class GrafDocument extends gate.corpora.DocumentImpl implements LanguageR
    @Override
    public Resource init() throws ResourceInstantiationException
    {
-//      Out.prln("Initializing GrafDocument.");
       super.init();
 
       IGraph graph;
