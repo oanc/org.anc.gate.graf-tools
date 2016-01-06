@@ -14,6 +14,7 @@ help:
 	@echo "  skip    : builds the jar skipping unit tests."
 	@echo "  install : copys the jar to Gate's plugins directory."
 	@echo "  upload  : uploads distributions to the ANC server."
+	@echo "  update  : uploads the zip distribution to the GATE update site."
 	@echo "  test    : used for debugging the Makefile."
 	@echo ""
 
@@ -45,30 +46,13 @@ upload:
 		scp -P 22022 target/GrAF-GATE-$(version).tar.gz suderman@anc.org:/home/www/anc/tools ; \
 	fi
 	
-deploy:
+update:
 	$(eval version := $(shell cat VERSION))
 	if [ -e target/GrAF-dist-$(version).zip ] ; then \
 		cp target/GrAF-dist-$(version).zip target/GrAF-GATE-$(version).zip ; \
 		scp -P 22022 target/GrAF-GATE-$(version).zip suderman@anc.org:/home/www/anc/tools/gate ; \
 	fi
 
-wtf:
-		ssh -p 22022 suderman@anc.org 'cd /home/www/anc/tools/gate && unzip GrAF-GATE-'$(version)'.zip && mv GrAF GrAF-GATE-'$(version) 
-	
-dummy:		
-		#scp -P 22022 target/GrAF-GATE-$(version).zip suderman@anc.org:/home/www/anc/tools/gate ; \
-		#unzip target/GrAF-GATE-$(version).zip -d target ; \
-		#mv target/GrAF target/GrAF-GATE-$(version) ; \
-		#scp -r -P 22022 target/GrAF-GATE-$(version) suderman@anc.org:/home/www/anc/tools/gate ; \
-	fi
-
-bar:	
-	$(eval version := $(shell cat VERSION))
-	if [ -e target/GrAF-dist-$(version).zip ] ; then \
-		mv target/GrAF-dist-$(version).zip target/GrAF-GATE-$(version).zip ; \
-		scp -P 22022 target/GrAF-GATE-$(version).zip suderman@anc.org:/home/www/anc/tools ; \
-	fi
-	
 test:
 	echo "PLUGINS "$(PLUGINS)
 	
