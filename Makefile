@@ -2,6 +2,7 @@
 # tools for GATE
 
 ## Where the plugins will be installed.
+PLUGINS=$(HOME)/Documents/GatePlugins
 GRAF=$(PLUGINS)/GrAF
 
 help:
@@ -40,15 +41,21 @@ upload:
 	$(eval version := $(shell cat VERSION))
 	echo "Uploading GrAF GATE Tools version $(version)"
 	if [ -e target/GrAF-dist-$(version).tar.gz ] ; then \
-		mv target/GrAF-dist-$(version).tar.gz target/GrAF-GATE-$(version).tar.gz ; \
+		cp target/GrAF-dist-$(version).tar.gz target/GrAF-GATE-$(version).tar.gz ; \
 		scp -P 22022 target/GrAF-GATE-$(version).tar.gz suderman@anc.org:/home/www/anc/tools ; \
 	fi
 	
-foo:
+deploy:
 	$(eval version := $(shell cat VERSION))
 	if [ -e target/GrAF-dist-$(version).zip ] ; then \
-		mv target/GrAF-dist-$(version).zip target/GrAF-GATE-$(version).zip ; \
-		scp -P 22022 target/GrAF-GATE-$(version).zip suderman@anc.org:/home/www/anc/tools ; \
+		cp target/GrAF-dist-$(version).zip target/GrAF-GATE-$(version).zip ; \
+		scp -P 22022 target/GrAF-GATE-$(version).zip suderman@anc.org:/home/www/anc/tools/gate ; \
+	fi
+
+wtf:
+		ssh -p 22022 suderman@anc.org 'cd /home/www/anc/tools/gate && unzip GrAF-GATE-'$(version)'.zip && mv GrAF GrAF-GATE-'$(version) 
+	
+dummy:		
 		#scp -P 22022 target/GrAF-GATE-$(version).zip suderman@anc.org:/home/www/anc/tools/gate ; \
 		#unzip target/GrAF-GATE-$(version).zip -d target ; \
 		#mv target/GrAF target/GrAF-GATE-$(version) ; \
